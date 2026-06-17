@@ -13,7 +13,7 @@ export default {
         const corsHeaders = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Headers': 'Content-Type, X-Upload-Token',
         };
 
         // Handle CORS preflight
@@ -26,6 +26,16 @@ export default {
             // POST /upload?filename=xxx — Upload file ke R2
             // =================================================================
             if (request.method === 'POST' && url.pathname === '/upload') {
+                // Cek token upload — hanya aplikasi yang membawa token benar yang boleh upload.
+                // Set UPLOAD_TOKEN sebagai Secret di Cloudflare (Settings > Variables).
+                const expectedToken = env.UPLOAD_TOKEN;
+                if (!expectedToken || request.headers.get('X-Upload-Token') !== expectedToken) {
+                    return Response.json(
+                        { success: false, error: 'Tidak diizinkan: token upload tidak valid.' },
+                        { status: 401, headers: corsHeaders }
+                    );
+                }
+
                 const filename = url.searchParams.get('filename');
                 if (!filename) {
                     return Response.json(

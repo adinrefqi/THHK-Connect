@@ -15,7 +15,7 @@
 |---|---------|---------|--------|
 | 1 | 🔴 Kritis | Password admin & piket ditulis polos di kode client | ✅ **Diperbaiki** |
 | 2 | 🔴 Kritis | RLS database terlalu terbuka (`USING (true)`) | ⏳ Belum |
-| 3 | 🟠 Tinggi | Worker `/upload` tanpa autentikasi | ⏳ Belum |
+| 3 | 🟠 Tinggi | Worker `/upload` tanpa autentikasi | ✅ **Diperbaiki** |
 | 4 | 🟠 Tinggi | RPC `SECURITY DEFINER` tanpa cek hak akses | ⏳ Belum |
 
 > **Catatan:** Supabase **anon key** yang terlihat di kode itu **normal dan bukan
@@ -70,16 +70,27 @@ log absensi, dan **memindahkan titik lokasi sekolah** sehingga absen bisa dari m
 
 ---
 
-## 3. 🟠 Worker `/upload` tanpa autentikasi — ⏳ BELUM DIPERBAIKI
+## 3. 🟠 Worker `/upload` tanpa autentikasi — ✅ DIPERBAIKI
 
-`worker.js` membuka `POST /upload` untuk siapa pun (CORS `*`, tanpa token).
+**Sebelum:** `worker.js` membuka `POST /upload` untuk siapa pun (CORS `*`, tanpa token).
+Siapa pun bisa meng-upload file apa pun ke bucket R2 dan menyajikannya dari domain kamu.
 
-**Dampak:** siapa pun bisa meng-upload file apa pun ke bucket R2 dan menyajikannya dari
-domain kamu (penyalahgunaan storage / hosting konten berbahaya).
+**Perbaikan yang sudah dilakukan:**
+- `worker.js` kini menolak upload (HTTP 401) kecuali request membawa header
+  `X-Upload-Token` yang cocok dengan secret `UPLOAD_TOKEN` di Cloudflare.
+- `index.html` & `tugas_titipan.html` mengirim token tersebut di setiap upload.
 
-**Rekomendasi:** tambahkan header rahasia (mis. `X-Upload-Token`) yang dicek di worker
-sebelum menerima upload, dan simpan token sebagai *secret* di Cloudflare (bukan di client
-publik). Untuk keamanan lebih kuat, gunakan *signed upload URL* berjangka waktu.
+**⚠️ LANGKAH WAJIB agar upload kembali berfungsi:**
+1. Buka **Cloudflare Dashboard → Worker `thhk-storage` → Settings → Variables**.
+2. Tambah **Secret** baru bernama `UPLOAD_TOKEN` dengan nilai:
+   `e11a81b52fa2cf7b979189d525f7f53217022e289aeac77f`
+   (sama persis dengan konstanta `UPLOAD_TOKEN` di kode client).
+3. Deploy ulang worker.
+
+**Catatan jujur:** karena app murni client-side, token ini tetap ada di browser dan secara
+teori bisa ditemukan orang yang gigih. Ini menaikkan palang dari "siapa saja tanpa usaha"
+menjadi "harus sengaja membongkar". Pengamanan paling kuat (*signed upload URL* berjangka
+waktu via backend) bisa jadi langkah lanjutan.
 
 ---
 

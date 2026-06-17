@@ -2603,6 +2603,9 @@
             // ==========================================
             const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+            // Token upload ke Cloudflare Worker. HARUS sama persis dengan Secret
+            // UPLOAD_TOKEN yang di-set di Cloudflare (Worker thhk-storage > Settings > Variables).
+            const UPLOAD_TOKEN = 'e11a81b52fa2cf7b979189d525f7f53217022e289aeac77f';
 
             // Leaflet Map Variables (harus dideklarasikan global)
             var leafletMap = null;
@@ -3517,10 +3520,11 @@
                             method: 'POST',
                             body: file,
                             headers: {
-                                'Content-Type': file.type || 'application/octet-stream'
+                                'Content-Type': file.type || 'application/octet-stream',
+                                'X-Upload-Token': UPLOAD_TOKEN
                             }
                         });
-                        
+
                         if (!response.ok) {
                             const respText = await response.text().catch(() => '');
                             console.error('[IZIN] Upload gagal, status:', response.status, 'body:', respText);
@@ -3633,10 +3637,11 @@
                             method: 'POST',
                             body: file,
                             headers: {
-                                'Content-Type': file.type || 'application/octet-stream'
+                                'Content-Type': file.type || 'application/octet-stream',
+                                'X-Upload-Token': UPLOAD_TOKEN
                             }
                         });
-                        
+
                         if (!response.ok) {
                             throw new Error('Gagal mengunggah bukti ke server.');
                         }
