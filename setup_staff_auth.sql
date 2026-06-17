@@ -47,7 +47,9 @@ CREATE OR REPLACE FUNCTION public.verify_staff_password(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+-- pgcrypto (crypt/gen_salt) berada di schema 'extensions' pada Supabase,
+-- jadi keduanya harus disertakan di search_path.
+SET search_path = public, extensions
 AS $$
 DECLARE
     v_hash TEXT;
