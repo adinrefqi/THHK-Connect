@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru Dashboard - Buku Induk THHK</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#3b82f6',
+                        dark: '#0f172a'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- TOP NAVIGATION (Guru View) -->
+    <nav class="bg-primary text-white shadow-md z-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-book-open text-2xl text-blue-300"></i>
+                    <span class="font-bold text-lg tracking-tight">Portal Guru - Buku Induk</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="user-name" class="font-medium text-sm hidden md:block">Nama Guru</span>
+                    <button onclick="logout()" class="p-2 bg-blue-800 rounded-lg hover:bg-red-600 transition" title="Keluar">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden">
+        
+        <!-- SEARCH BAR -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 shrink-0">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Pencarian Data Siswa</h2>
+            <div class="flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="guru-search" oninput="handleSearch()" placeholder="Masukkan NIS, NISN, atau Nama Siswa..." class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-secondary focus:ring-2 focus:ring-blue-100 transition">
+                </div>
+                <button onclick="handleSearch()" class="bg-secondary hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-md transition flex items-center gap-2">
+                    Cari Data
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle text-blue-400"></i> Gunakan portal ini untuk melihat data demografi dan histori siswa secara cepat.</p>
+        </div>
+
+        <!-- SEARCH RESULTS (View Only) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex-1 overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-gray-100 bg-gray-50">
+                <h3 class="font-bold text-gray-700">Hasil Pencarian (Menampilkan Semua)</h3>
+            </div>
+            <div class="flex-1 overflow-auto p-0">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-white sticky top-0 z-10 shadow-sm border-b">
+                        <tr>
+                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Identitas</th>
+                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Kontak Darurat</th>
+                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Kelas</th>
+                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-table-body" class="divide-y divide-gray-100">
+                        <tr><td colspan="4" class="py-10 text-center text-gray-500">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        // Supabase Initialization
+        const SUPABASE_URL = 'https://jbmhfwfckmneivztsizc.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_lkdD9wXKswBi-r0PegxHhQ_6QTnitLL'; // Must match index.html
+        var supabaseClient = null;
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        let allData = []; // Store data locally
+
+        function checkAuth() {
+            const session = localStorage.getItem('bi_session');
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            try {
+                const data = JSON.parse(session);
+                document.getElementById('user-name').innerText = data.nama;
+                fetchData(); // Fetch data if auth passes
+            } catch (e) {
+                window.location.href = 'index.html';
+            }
+        }
+        checkAuth();
+
+        // Fetch Data from Supabase
+        async function fetchData() {
+            if(!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('buku_induk')
+                    .select('*')
+                    .order('nama_lengkap', { ascending: true });
+
+                if (error) throw error;
+                allData = data || [];
+                renderTable(allData);
+            } catch (err) {
+                console.error('Fetch error:', err);
+                document.getElementById('student-table-body').innerHTML = '<tr><td colspan="4" class="py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderTable(dataToRender) {
+            const tbody = document.getElementById('student-table-body');
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            dataToRender.forEach(student => {
+                // Determine best contact
+                let contactName = student.nama_ayah || student.nama_ibu || student.nama_wali || '-';
+                let contactPhone = student.no_telp_ortu || student.no_telp_siswa || '-';
+
+                html += `
+                    <tr class="hover:bg-blue-50/50 transition">
+                        <td class="py-4 px-6">
+                            <p class="font-bold text-gray-800">${student.nama_lengkap}</p>
+                            <p class="text-xs text-gray-500">NIS: ${student.nis || '-'} • ${student.jenis_kelamin || '-'}</p>
+                        </td>
+                        <td class="py-4 px-6">
+                            <p class="text-sm text-gray-800">${contactName}</p>
+                            <p class="text-xs text-gray-500"><i class="fas fa-phone-alt"></i> ${contactPhone}</p>
+                        </td>
+                        <td class="py-4 px-6 font-medium text-gray-700">${student.kelas_sekarang || '-'}</td>
+                        <td class="py-4 px-6 text-center space-x-1">
+                            <button onclick="alert('Profil Detail Segera Hadir')" class="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-semibold transition" title="Buka Detail Profil">
+                                <i class="fas fa-folder-open"></i> Buka
+                            </button>
+                            <button onclick="window.open('print_induk.html?id=${student.id}', '_blank')" class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-semibold transition" title="Cetak Lembar Induk">
+                                <i class="fas fa-print"></i> Cetak
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('guru-search').value.toLowerCase();
+            if(!query) {
+                renderTable(allData);
+                return;
+            }
+            const filtered = allData.filter(s => 
+                (s.nis && s.nis.toLowerCase().includes(query)) || 
+                (s.nama_lengkap && s.nama_lengkap.toLowerCase().includes(query)) ||
+                (s.nisn && s.nisn.toLowerCase().includes(query)) ||
+                (s.kelas_sekarang && s.kelas_sekarang.toLowerCase().includes(query))
+            );
+            renderTable(filtered);
+        }
+
+        function logout() {
+            localStorage.removeItem('bi_session');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

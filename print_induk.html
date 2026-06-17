@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Lembar Buku Induk</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <style>
+        /* Base styles for formal document */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            background: #e5e7eb;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .a4-container {
+            background: #fff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px double #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 18pt;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+        }
+
+        .header h2 {
+            font-size: 14pt;
+            margin: 0 0 5px 0;
+        }
+
+        .header p {
+            font-size: 10pt;
+            margin: 0;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 20px 0;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
+        /* Layout with Photo */
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .photo-box {
+            width: 30mm;
+            height: 40mm;
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            background-color: #f9f9f9;
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* hidden if no photo */
+        }
+
+        .table-data {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            margin-bottom: 20px;
+        }
+
+        .table-data td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+
+        .table-data td.label {
+            width: 35%;
+        }
+
+        .table-data td.colon {
+            width: 2%;
+            text-align: center;
+        }
+
+        .table-data td.value {
+            width: 63%;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+        }
+
+        /* Signatures */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            page-break-inside: avoid;
+        }
+
+        .sign-box {
+            width: 200px;
+            text-align: center;
+            font-size: 11pt;
+        }
+
+        .sign-space {
+            height: 80px;
+        }
+
+        /* Loading Overlay */
+        .loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+            font-size: 20px;
+            z-index: 1000;
+        }
+
+        /* Print Settings */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .a4-container {
+                box-shadow: none;
+                width: 100%;
+                min-height: auto;
+                padding: 10mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading" class="loading">Memuat Data Siswa...</div>
+
+    <div class="a4-container" id="printable-area" style="display: none;">
+        
+        <!-- Header Kop Surat -->
+        <div class="header">
+            <h1>YAYASAN PENDIDIKAN TUNAS HIDUP HARAPAN KITA</h1>
+            <h2>SMP TUNAS HIDUP HARAPAN KITA (THHK)</h2>
+            <p>Jl. Contoh Alamat No. 123, Kota Tegal, Jawa Tengah</p>
+            <p>NPSN: 203XXXXX | Telp: (0283) XXXXXX</p>
+        </div>
+
+        <div class="title">LEMBAR BUKU INDUK SISWA</div>
+
+        <!-- Section 1: Top Data & Photo -->
+        <div class="top-section">
+            <table class="table-data" style="width: 75%;">
+                <tr>
+                    <td class="label">Nomor Induk Siswa (NIS)</td><td class="colon">:</td><td class="value" id="p_nis">-</td>
+                </tr>
+                <tr>
+                    <td class="label">Nomor Induk Siswa Nasional</td><td class="colon">:</td><td class="value" id="p_nisn">-</td>
+                </tr>
+            </table>
+            <div class="photo-box">
+                <span id="p_foto_text">Pas Foto<br>3x4</span>
+                <img id="p_foto_img" src="" alt="Foto Siswa">
+            </div>
+        </div>
+
+        <!-- Section 2: Data Pribadi -->
+        <div class="section-title">A. KETERANGAN PRIBADI SISWA</div>
+        <table class="table-data">
+            <tr>
+                <td class="label">1. Nama Lengkap</td><td class="colon">:</td><td class="value" id="p_nama">-</td>
+            </tr>
+            <tr>
+                <td class="label">2. Jenis Kelamin</td><td class="colon">:</td><td class="value" id="p_jk">-</td>
+            </tr>
+            <tr>
+                <td class="label">3. Tempat, Tanggal Lahir</td><td class="colon">:</td><td class="value" id="p_ttl">-</td>
+            </tr>
+            <tr>
+                <td class="label">4. Agama</td><td class="colon">:</td><td class="value" id="p_agama">-</td>
+            </tr>
+            <tr>
+                <td class="label">5. Kewarganegaraan</td><td class="colon">:</td><td class="value" id="p_warga">-</td>
+            </tr>
+            <tr>
+                <td class="label">6. Anak ke / Jumlah Saudara</td><td class="colon">:</td><td class="value" id="p_saudara">-</td>
+            </tr>
+            <tr>
+                <td class="label">7. Alamat Lengkap</td><td class="colon">:</td><td class="value" id="p_alamat">-</td>
+            </tr>
+            <tr>
+                <td class="label">8. No. Telepon / HP Siswa</td><td class="colon">:</td><td class="value" id="p_telp_siswa">-</td>
+            </tr>
+        </table>
+
+        <!-- Section 3: Data Sekolah & Akademik -->
+        <div class="section-title">B. KETERANGAN PENDIDIKAN</div>
+        <table class="table-data">
+            <tr>
+                <td class="label">1. Asal Sekolah Dasar (SD)</td><td class="colon">:</td><td class="value" id="p_asal_sd">-</td>
+            </tr>
+            <tr>
+                <td class="label">2. Diterima di Sekolah Ini</td><td class="colon">:</td><td class="value" id="p_diterima">-</td>
+            </tr>
+            <tr>
+                <td class="label">3. Status Siswa Saat Ini</td><td class="colon">:</td><td class="value" id="p_status">-</td>
+            </tr>
+        </table>
+
+        <!-- Section 4: Data Orang Tua -->
+        <div class="section-title">C. KETERANGAN ORANG TUA / WALI</div>
+        <table class="table-data">
+            <tr>
+                <td class="label">1. Nama Ayah Kandung</td><td class="colon">:</td><td class="value" id="p_ayah">-</td>
+            </tr>
+            <tr>
+                <td class="label">2. Pekerjaan Ayah</td><td class="colon">:</td><td class="value" id="p_pek_ayah">-</td>
+            </tr>
+            <tr>
+                <td class="label">3. Nama Ibu Kandung</td><td class="colon">:</td><td class="value" id="p_ibu">-</td>
+            </tr>
+            <tr>
+                <td class="label">4. Pekerjaan Ibu</td><td class="colon">:</td><td class="value" id="p_pek_ibu">-</td>
+            </tr>
+            <tr>
+                <td class="label">5. No. Telepon / HP Orang Tua</td><td class="colon">:</td><td class="value" id="p_telp_ortu">-</td>
+            </tr>
+            <tr>
+                <td class="label">6. Nama Wali (Jika Ada)</td><td class="colon">:</td><td class="value" id="p_wali">-</td>
+            </tr>
+            <tr>
+                <td class="label">7. Pekerjaan Wali</td><td class="colon">:</td><td class="value" id="p_pek_wali">-</td>
+            </tr>
+        </table>
+
+        <!-- Signatures -->
+        <div class="signatures">
+            <div class="sign-box">
+                <p>Orang Tua / Wali,</p>
+                <div class="sign-space"></div>
+                <p>_______________________</p>
+            </div>
+            <div class="sign-box">
+                <p>Tegal, <span id="p_today_date"></span></p>
+                <p>Kepala Sekolah,</p>
+                <div class="sign-space"></div>
+                <p>_______________________</p>
+                <p style="font-size: 9pt; margin-top:0;">NIP. .........................</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Print Buttons (Hidden during printing) -->
+    <div class="no-print" style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px;">
+        <button onclick="window.close()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer; font-family: sans-serif; font-weight: bold;">Tutup</button>
+        <button onclick="window.print()" style="padding: 10px 20px; border-radius: 8px; border: none; background: #1e40af; color: white; cursor: pointer; font-family: sans-serif; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Cetak PDF / Print</button>
+    </div>
+
+    <script>
+        // Supabase Initialization
+        const SUPABASE_URL = 'https://jbmhfwfckmneivztsizc.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_lkdD9wXKswBi-r0PegxHhQ_6QTnitLL'; // Must match index.html
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Utility safely getting values
+        const val = (v) => v ? v : '-';
+
+        async function loadData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                alert('ID Siswa tidak ditemukan.');
+                window.close();
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('buku_induk')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                if (!data) throw new Error("Data tidak ditemukan");
+
+                // Populate Fields
+                document.getElementById('p_nis').innerText = val(data.nis);
+                document.getElementById('p_nisn').innerText = val(data.nisn);
+                document.getElementById('p_nama').innerText = val(data.nama_lengkap);
+                document.getElementById('p_jk').innerText = val(data.jenis_kelamin);
+                
+                let dob = '-';
+                if(data.tanggal_lahir) {
+                    const d = new Date(data.tanggal_lahir);
+                    dob = `${val(data.tempat_lahir)}, ${d.toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'})}`;
+                }
+                document.getElementById('p_ttl').innerText = dob;
+                
+                document.getElementById('p_agama').innerText = val(data.agama);
+                document.getElementById('p_warga').innerText = val(data.kewarganegaraan);
+                
+                let anak = data.anak_ke ? `Anak ke-${data.anak_ke}` : '-';
+                let sdr = data.jumlah_saudara !== null ? ` dari ${data.jumlah_saudara} bersaudara` : '';
+                document.getElementById('p_saudara').innerText = anak + sdr;
+                
+                document.getElementById('p_alamat').innerText = val(data.alamat_lengkap);
+                document.getElementById('p_telp_siswa').innerText = val(data.no_telp_siswa);
+                
+                document.getElementById('p_asal_sd').innerText = val(data.asal_sekolah);
+                let kelasTahun = [];
+                if(data.kelas_sekarang) kelasTahun.push(`Kelas ${data.kelas_sekarang}`);
+                if(data.tahun_masuk) kelasTahun.push(`Tahun Ajaran ${data.tahun_masuk}`);
+                document.getElementById('p_diterima').innerText = kelasTahun.length > 0 ? kelasTahun.join(' / ') : '-';
+                
+                document.getElementById('p_status').innerText = val(data.status_siswa);
+
+                document.getElementById('p_ayah').innerText = val(data.nama_ayah);
+                document.getElementById('p_pek_ayah').innerText = val(data.pekerjaan_ayah);
+                document.getElementById('p_ibu').innerText = val(data.nama_ibu);
+                document.getElementById('p_pek_ibu').innerText = val(data.pekerjaan_ibu);
+                document.getElementById('p_telp_ortu').innerText = val(data.no_telp_ortu);
+                document.getElementById('p_wali').innerText = val(data.nama_wali);
+                document.getElementById('p_pek_wali').innerText = val(data.pekerjaan_wali);
+
+                // Photo
+                if(data.foto_url) {
+                    const img = document.getElementById('p_foto_img');
+                    img.src = data.foto_url;
+                    img.style.display = 'block';
+                    document.getElementById('p_foto_text').style.display = 'none';
+                }
+
+                // Date Today
+                const today = new Date();
+                document.getElementById('p_today_date').innerText = today.toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+
+                // Hide loading, show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('printable-area').style.display = 'block';
+
+                // Automatically trigger print dialog after small delay to render images
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan saat memuat data: ' + err.message);
+            }
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
