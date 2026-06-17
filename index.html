@@ -3817,7 +3817,20 @@
                 // --- LOGIKA GURU PIKET ---
                 const teacherNames = ['wida', 'thevea', 'sunedi', 'morys', 'faizal', 'yanuar', 'adin', 'erwin'];
                 if (teacherNames.includes(nis.toLowerCase())) {
-                    if (password === 'admin54321') {
+                    if (!supabaseClient) {
+                        showToast("Sistem belum siap. Mohon refresh halaman.", "error");
+                        return;
+                    }
+                    // Verifikasi password di server (tidak ada password polos di sisi client)
+                    const { data: okPiket, error: errPiket } = await supabaseClient.rpc('verify_staff_password', {
+                        p_role: 'piket',
+                        p_password: password
+                    });
+                    if (errPiket) {
+                        showToast('Gagal memverifikasi: ' + errPiket.message, 'error');
+                        return;
+                    }
+                    if (okPiket === true) {
                         localStorage.setItem('piket_session', nis);
                         if (nis.toLowerCase() === 'adin') {
                             showToast('Selamat datang, Admin Adin!', 'success');

@@ -525,16 +525,25 @@
         let habitsToday = [];
         let isRealtimeSubscribed = false;
 
-        function loginPiket() {
+        async function loginPiket() {
             const name = document.getElementById('piket-name').value;
             const pass = document.getElementById('piket-pass').value;
-            
+
             if (!name) {
                 alert('Silakan pilih nama Guru Piket!');
                 return;
             }
 
-            if (pass === 'admin54321') {
+            // Verifikasi password di server (tidak ada password polos di sisi client)
+            const { data: okPiket, error: errPiket } = await supabaseClient.rpc('verify_staff_password', {
+                p_role: 'piket',
+                p_password: pass
+            });
+            if (errPiket) {
+                alert('Gagal memverifikasi: ' + errPiket.message);
+                return;
+            }
+            if (okPiket === true) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('dashboard-view').classList.remove('hidden');
                 document.getElementById('today-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - Piket: ' + name;
