@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin - Manajemen Device THHK</title>
+    
+    <!-- Session Check for Admin Adin -->
+    <script>
+        const session = localStorage.getItem('piket_session');
+        if (!session || session.toLowerCase() !== 'adin') {
+            window.location.href = 'index.html';
+        }
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        /* Glassmorphic Panel Styles */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .input-glass {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .input-glass:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(99, 102, 241, 0.6);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Spinner Animation */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== RESPONSIVE MOBILE FIXES ===== */
+        @media (max-width: 640px) {
+            /* Header compact on mobile */
+            header .text-lg {
+                font-size: 0.9375rem;
+            }
+            header .text-\[10px\] {
+                font-size: 9px;
+            }
+
+            /* Main content tighter padding */
+            main {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+                padding-top: 1rem !important;
+            }
+
+            /* Stat grid 2 cols on mobile */
+            .stat-grid-mobile {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.5rem !important;
+            }
+            .stat-grid-mobile .text-4xl {
+                font-size: 1.75rem !important;
+            }
+
+            /* Geofence map shorter */
+            #geofence-map-container {
+                height: 200px !important;
+            }
+
+            /* Geofence grid stacked */
+            .geofence-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Glass panel tighter padding */
+            .glass-panel {
+                padding: 1rem !important;
+            }
+
+            /* Section titles smaller */
+            .text-lg {
+                font-size: 1rem;
+            }
+
+            /* Table text smaller */
+            table th, table td {
+                padding: 0.375rem 0.5rem !important;
+                font-size: 0.6875rem !important;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding-bottom: 2rem !important;
+            }
+
+            main {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+
+            .stat-grid-mobile .text-4xl {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        /* Smooth table scroll */
+        .table-scroll-smooth {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="text-slate-100 antialiased min-h-screen flex flex-col pb-12">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-[-20px] opacity-0">
+        <div id="toast-content" class="px-6 py-4 rounded-xl shadow-2xl font-medium flex items-center gap-3 text-white">
+            <span id="toast-message">Notifikasi</span>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="bg-slate-900/60 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-30 shadow-lg">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white leading-tight">THHK Connect</h1>
+                    <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">Panel Admin &bull; Waka Kurikulum</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 md:gap-4">
+                <a href="index.html" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-xs font-bold text-indigo-300 transition-all active:scale-95">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Kembali</span>
+                </a>
+                <div class="text-right hidden sm:block">
+                    <span class="text-sm font-medium text-slate-300 block">Waka Kurikulum</span>
+                    <span class="text-[10px] text-slate-500">Super Administrator</span>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shadow-inner">
+                    <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        
+        <!-- DASHBOARD METRICS SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Donut Chart Card -->
+            <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center lg:col-span-1">
+                <div class="flex justify-between items-center w-full mb-4">
+                    <h3 class="font-bold text-base text-white">Proporsi Kehadiran</h3>
+                    <button onclick="fetchTodayStats()" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 transition" title="Refresh Statistik">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative w-44 h-44 mb-4">
+                    <canvas id="todayChart"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-wider w-full mt-2 border-t border-slate-800 pt-4">
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hadir (<span id="pct-hadir">0%</span>)</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Terlambat (<span id="pct-terlambat">0%</span>)</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Sakit (<span id="pct-sakit">0%</span>)</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Izin (<span id="pct-izin">0%</span>)</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 col-span-2"></span> Alfa (<span id="pct-alfa">0%</span>)</div>
+                </div>
+            </div>
+
+            <!-- Attendance Stats Counters -->
+            <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 stat-grid-mobile">
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hadir</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-hadir" class="text-4xl font-extrabold text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.25)]">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Terlambat</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-terlambat" class="text-4xl font-extrabold text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.25)]">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-sky-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sakit</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-sakit" class="text-4xl font-extrabold text-sky-400 drop-shadow-[0_0_8px_rgba(14,165,233,0.25)]">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Izin</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-izin" class="text-4xl font-extrabold text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.25)]">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-rose-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Alfa / Belum Absen</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-alfa" class="text-4xl font-extrabold text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.25)]">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-slate-500/30 transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Siswa</p>
+                    <div class="flex justify-between items-end mt-4">
+                        <span id="stat-total" class="text-4xl font-extrabold text-slate-100">0</span>
+                        <span class="text-xs text-slate-500">siswa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GEOFENCE MANAGEMENT SECTION -->
+        <div class="glass-panel rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Pengaturan Geofencing Sekolah (Batas Absensi)
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 geofence-grid">
+                <!-- Map Container (col-span-2) -->
+                <div class="lg:col-span-2 rounded-xl overflow-hidden border border-slate-700/60 h-[280px] relative" id="geofence-map-container">
+                    <div id="geofence-map" class="w-full h-full z-10"></div>
+                    <!-- Map loading placeholder -->
+                    <div class="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center gap-2 z-20 transition" id="map-loader">
+                        <div class="w-6 h-6 rounded-full spinner"></div>
+                        <span class="text-xs text-slate-400 font-medium">Inisialisasi Peta Geofence...</span>
+                    </div>
+                </div>
+                
+                <!-- Controls (col-span-1) -->
+                <div class="flex flex-col justify-between gap-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Latitude Sekolah</label>
+                            <input type="number" step="any" id="geo-lat" class="block w-full px-4 py-2.5 rounded-xl input-glass text-sm font-semibold" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Longitude Sekolah</label>
+                            <input type="number" step="any" id="geo-lon" class="block w-full px-4 py-2.5 rounded-xl input-glass text-sm font-semibold" readonly>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Radius Absensi</label>
+                                <span class="text-xs font-bold text-indigo-400" id="radius-val">50m</span>
+                            </div>
+                            <input type="range" id="geo-radius" min="10" max="500" step="5" value="50" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                            <p class="text-[10px] text-slate-500 mt-1 italic">Geser slider atau tarik pin di peta untuk mengubah parameter</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveGeofenceSettings()" id="btn-save-geofence"
+                            class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 flex justify-center items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        <span>Simpan Pengaturan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH SECTION -->
+        <div class="glass-panel rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Pencarian Siswa
+            </h2>
+            
+            <form onsubmit="searchStudents(event)" class="flex flex-col sm:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider pl-1">Nama atau NISN</label>
+                    <input type="text" id="searchInput" placeholder="Masukkan kata kunci nama atau nomor induk..." 
+                           class="block w-full px-4 py-2.5 rounded-xl input-glass placeholder-slate-500 text-sm">
+                </div>
+                
+                <button type="submit" 
+                        class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-2.5 px-8 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 flex justify-center items-center gap-2">
+                    <span>Cari Siswa</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/35">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Daftar Status Device Siswa
+                </h3>
+                <span id="resultCount" class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 py-1 px-3 rounded-full uppercase tracking-wider">0 Siswa</span>
+            </div>
+            
+            <!-- Desktop View (Tabel) -->
+            <div class="hidden md:block overflow-x-auto table-scroll-smooth">
+                <table class="min-w-full divide-y divide-slate-800/80">
+                    <thead class="bg-slate-900/20">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest w-32">NISN</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Nama Siswa</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Status Device</th>
+                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-widest w-32">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-800/60">
+                        <!-- Default empty state -->
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center text-slate-500 font-medium">
+                                Gunakan kolom pencarian di atas untuk memuat data siswa.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile View (Daftar Kartu) -->
+            <div id="mobileCardList" class="block md:hidden divide-y divide-slate-800/60">
+                <div class="px-6 py-12 text-center text-slate-500 font-medium">
+                    Gunakan kolom pencarian di atas untuk memuat data siswa.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="resetModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-slate-900 border border-slate-700/60 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:max-w-lg w-full z-10">
+            <div class="px-6 pt-6 pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-bold text-white" id="modal-title">
+                            Konfirmasi Reset HP
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-slate-400">
+                                Apakah Anda yakin ingin mereset kuncian HP untuk <strong id="modal-student-name" class="text-white">Siswa</strong>?<br>
+                                Tindakan ini akan mengizinkan siswa tersebut untuk login dan absen dari perangkat (HP) yang baru.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-950/40 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-slate-800/80 gap-2">
+                <button type="button" onclick="confirmReset()" 
+                        class="w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 bg-rose-600 text-sm font-bold text-white hover:bg-rose-500 active:scale-95 shadow-lg shadow-rose-500/20 transition-all duration-300">
+                    Ya, Reset HP
+                </button>
+                <button type="button" onclick="closeResetModal()" 
+                        class="mt-3 sm:mt-0 w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-sm font-bold text-slate-300 transition-all">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // 1. SETUP SUPABASE
+        // ==========================================
+        const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+        
+        var supabaseClient;
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            alert("Gagal memuat library Supabase. Periksa koneksi internet.");
+        }
+
+        // State variables
+        let currentStudentIdToReset = null;
+        let myChart = null;
+
+        // ==========================================
+        // 2. UI UTILITIES
+        // ==========================================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastContent = document.getElementById('toast-content');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.innerText = message;
+            
+            // Atur gaya berdasarkan tipe
+            toastContent.className = 'px-6 py-4 rounded-xl shadow-2xl font-semibold flex items-center gap-3 text-white border';
+            
+            if (type === 'success') {
+                toastContent.classList.add('bg-emerald-600', 'border-emerald-500/50');
+                toastContent.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>${message}</span>
+                `;
+            } else if (type === 'error') {
+                toastContent.classList.add('bg-rose-600', 'border-rose-500/50');
+                toastContent.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span>${message}</span>
+                `;
+            } else {
+                toastContent.classList.add('bg-indigo-600', 'border-indigo-500/50');
+                toastContent.innerHTML = `
+                    <div class="w-4 h-4 rounded-full spinner"></div>
+                    <span>${message}</span>
+                `;
+            }
+
+            // Animasi masuk
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+            
+            // Animasi keluar otomatis (kecuali loading)
+            if (type !== 'info') {
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                    setTimeout(() => toast.classList.add('hidden'), 300);
+                }, 3000);
+            }
+        }
+
+        // ==========================================
+        // 3. STATISTIK PRESENSI (CHART.JS + PG METRICS)
+        // ==========================================
+        async function fetchTodayStats() {
+            if (!supabaseClient) return;
+
+            // Dapatkan tanggal hari ini (WIB)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayLocal = `${year}-${month}-${day}`;
+            
+            // Konversi rentang hari ini (waktu lokal) ke UTC
+            const startOfDay = new Date(`${todayLocal}T00:00:00+07:00`).toISOString();
+            const endOfDay = new Date(`${todayLocal}T23:59:59+07:00`).toISOString();
+
+            try {
+                // 1. Ambil total siswa
+                const { count: totalSiswa, error: errCount } = await supabaseClient
+                    .from('students')
+                    .select('*', { count: 'exact', head: true });
+
+                if (errCount) throw errCount;
+
+                // 2. Ambil semua log absen hari ini
+                const { data: logs, error: errLogs } = await supabaseClient
+                    .from('attendance_logs')
+                    .select('user_id, status, device_id')
+                    .gte('created_at', startOfDay)
+                    .lte('created_at', endOfDay);
+
+                if (errLogs) throw errLogs;
+
+                let hadir = 0;
+                let terlambat = 0;
+                let sakit = 0;
+                let izin = 0;
+
+                // Set untuk melacak siswa yang sudah absen hari ini
+                const loggedUsers = new Set();
+
+                logs.forEach(log => {
+                    if (loggedUsers.has(log.user_id)) return; // Log pertama saja
+                    loggedUsers.add(log.user_id);
+
+                    const isIzin = log.device_id && log.device_id.startsWith('[IZIN]');
+                    if (isIzin) {
+                        if (log.device_id.toLowerCase().includes('sakit')) {
+                            sakit++;
+                        } else {
+                            izin++;
+                        }
+                    } else if (log.status === 'T') {
+                        terlambat++;
+                    } else {
+                        hadir++;
+                    }
+                });
+
+                const alfa = Math.max(0, totalSiswa - loggedUsers.size);
+
+                // Update UI Counter Cards
+                document.getElementById('stat-hadir').innerText = hadir;
+                document.getElementById('stat-terlambat').innerText = terlambat;
+                document.getElementById('stat-sakit').innerText = sakit;
+                document.getElementById('stat-izin').innerText = izin;
+                document.getElementById('stat-alfa').innerText = alfa;
+                document.getElementById('stat-total').innerText = totalSiswa;
+
+                // Render or Update Chart
+                updateChart(hadir, terlambat, sakit, izin, alfa);
+
+            } catch (err) {
+                console.error("Gagal memuat statistik hari ini:", err);
+            }
+        }
+
+        function updateChart(hadir, terlambat, sakit, izin, alfa) {
+            const total = hadir + terlambat + sakit + izin + alfa;
+            
+            // Hitung persentase
+            const getPct = val => total > 0 ? Math.round((val / total) * 100) + '%' : '0%';
+            document.getElementById('pct-hadir').innerText = getPct(hadir);
+            document.getElementById('pct-terlambat').innerText = getPct(terlambat);
+            document.getElementById('pct-sakit').innerText = getPct(sakit);
+            document.getElementById('pct-izin').innerText = getPct(izin);
+            document.getElementById('pct-alfa').innerText = getPct(alfa);
+
+            const canvas = document.getElementById('todayChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hadir', 'Terlambat', 'Sakit', 'Izin', 'Alfa'],
+                    datasets: [{
+                        data: [hadir, terlambat, sakit, izin, alfa],
+                        backgroundColor: [
+                            '#10b981', // emerald-500
+                            '#f59e0b', // amber-500
+                            '#0ea5e9', // sky-500
+                            '#6366f1', // indigo-500
+                            '#f43f5e'  // rose-500
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#0f172a', // deep background color match
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw;
+                                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                    return ` ${context.label}: ${val} siswa (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // ==========================================
+        // 4. LOGIKA PENCARIAN & TABEL
+        // ==========================================
+        async function searchStudents(event) {
+            if (event) event.preventDefault();
+            
+            const keyword = document.getElementById('searchInput').value.trim();
+            const tableBody = document.getElementById('tableBody');
+            const mobileCardList = document.getElementById('mobileCardList');
+            
+            // Set Loading State
+            const loadingHtml = `
+                <div class="flex flex-col items-center justify-center py-12">
+                    <div class="w-8 h-8 rounded-full spinner mb-3"></div>
+                    <span class="text-sm text-slate-400 font-medium animate-pulse">Mencari data siswa...</span>
+                </div>
+            `;
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center">
+                        ${loadingHtml}
+                    </td>
+                </tr>
+            `;
+            mobileCardList.innerHTML = loadingHtml;
+            document.getElementById('resultCount').innerText = 'Loading...';
+
+            try {
+                // Query menggunakan iLIKE untuk pencarian fleksibel
+                let query = supabaseClient.from('students').select('id, nis, nama, kelas, device_id');
+                
+                if (keyword !== '') {
+                    query = query.or(`nama.ilike.%${keyword}%,nis.ilike.%${keyword}%`);
+                } else {
+                    // Jika kosong, limit 50 agar tidak berat
+                    query = query.limit(50); 
+                }
+
+                const { data, error } = await query.order('kelas', { ascending: true }).order('nis', { ascending: true });
+
+                if (error) throw error;
+                
+                renderTable(data);
+
+            } catch (error) {
+                console.error('Error fetching students:', error);
+                const errorMsg = `Gagal mengambil data: ${error.message}`;
+                tableBody.innerHTML = `
+                    <tr><td colspan="4" class="px-6 py-6 text-center text-rose-500 font-medium">${errorMsg}</td></tr>
+                `;
+                mobileCardList.innerHTML = `
+                    <div class="px-6 py-6 text-center text-rose-500 font-medium">${errorMsg}</div>
+                `;
+                document.getElementById('resultCount').innerText = 'Error';
+            }
+        }
+
+        function renderTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            const mobileCardList = document.getElementById('mobileCardList');
+            document.getElementById('resultCount').innerText = `${data.length} Siswa`;
+
+            if (data.length === 0) {
+                const emptyMsg = 'Tidak ada data siswa yang cocok dengan pencarian Anda.';
+                tableBody.innerHTML = `
+                    <tr><td colspan="4" class="px-6 py-10 text-center text-slate-500 font-medium">${emptyMsg}</td></tr>
+                `;
+                mobileCardList.innerHTML = `
+                    <div class="px-6 py-10 text-center text-slate-500 font-medium">${emptyMsg}</div>
+                `;
+                return;
+            }
+
+            let desktopHtml = '';
+            let mobileHtml = '';
+            data.forEach(student => {
+                const isLocked = student.device_id !== null && student.device_id !== '';
+                
+                // Format Status
+                let statusBadge = '';
+                let statusBadgeMobile = '';
+                if (isLocked) {
+                    const shortId = student.device_id.length > 8 ? student.device_id.substring(0, 8) + '...' : student.device_id;
+                    statusBadge = `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/25 shadow-sm shadow-rose-500/5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            Terkunci (ID: ${shortId})
+                        </span>
+                    `;
+                    statusBadgeMobile = `
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/20">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            Terkunci (${shortId})
+                        </span>
+                    `;
+                } else {
+                    statusBadge = `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-sm shadow-emerald-500/5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                            Belum Terkunci
+                        </span>
+                    `;
+                    statusBadgeMobile = `
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                            Belum Terkunci
+                        </span>
+                    `;
+                }
+
+                // Format Tombol Aksi
+                let actionBtn = isLocked 
+                    ? `<button onclick="openResetModal('${student.id}', '${student.nama.replace(/'/g, "\\'")}')" class="text-xs px-4 py-2 bg-slate-850 hover:bg-slate-800 border border-rose-500/40 text-rose-400 hover:text-rose-300 font-semibold rounded-xl shadow-md active:scale-95 transition-all">Reset HP</button>`
+                    : `<button disabled class="text-xs px-4 py-2 bg-slate-800/30 border border-slate-800 text-slate-600 font-semibold rounded-xl cursor-not-allowed">Reset HP</button>`;
+
+                let actionBtnMobile = isLocked 
+                    ? `<button onclick="openResetModal('${student.id}', '${student.nama.replace(/'/g, "\\'")}')" class="w-full text-xs py-2.5 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-400 font-bold rounded-xl active:scale-[0.98] transition-all">Reset HP</button>`
+                    : `<button disabled class="w-full text-xs py-2.5 bg-slate-800/20 border border-slate-800 text-slate-600 font-semibold rounded-xl cursor-not-allowed">Reset HP</button>`;
+
+                // Escape XSS sederhana
+                const safeNis = student.nis || '-';
+                const safeNama = student.nama || '-';
+                const safeKelas = student.kelas || '-';
+
+                desktopHtml += `
+                    <tr class="hover:bg-slate-800/30 transition duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-300">${safeNis}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-100 font-semibold">${safeNama} <span class="text-xs text-slate-400 ml-1.5 px-2 py-0.5 bg-slate-800/50 rounded-full border border-slate-700/30">Kelas ${safeKelas}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">${actionBtn}</td>
+                    </tr>
+                `;
+
+                mobileHtml += `
+                    <div class="p-4 flex flex-col gap-3 hover:bg-slate-800/10 transition">
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                                    <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">NISN: ${safeNis}</span>
+                                    <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700/50">Kelas ${safeKelas}</span>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-100 leading-snug break-words">${safeNama}</h4>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 mt-1 pt-3 border-t border-slate-800/40">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-slate-400">Status Kuncian:</span>
+                                <div>${statusBadgeMobile}</div>
+                            </div>
+                            <div class="w-full">
+                                ${actionBtnMobile}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            tableBody.innerHTML = desktopHtml;
+            mobileCardList.innerHTML = mobileHtml;
+        }
+
+        // ==========================================
+        // 5. LOGIKA RESET DEVICE (RPC PANGGILAN)
+        // ==========================================
+        function openResetModal(studentId, studentName) {
+            currentStudentIdToReset = studentId;
+            document.getElementById('modal-student-name').innerText = studentName;
+            document.getElementById('resetModal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            currentStudentIdToReset = null;
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        async function confirmReset() {
+            if (!currentStudentIdToReset) return;
+
+            const idToReset = currentStudentIdToReset;
+            closeResetModal(); // Tutup modal
+            showToast('Sedang mereset device...', 'info');
+
+            try {
+                // Gunakan RPC reset_device_siswa yang aman dan terdaftar di DB
+                const { error } = await supabaseClient.rpc('reset_device_siswa', {
+                    p_student_id: idToReset
+                });
+
+                if (error) throw error;
+
+                // Hilangkan paksa notifikasi loading dengan CSS
+                const toast = document.getElementById('toast');
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                
+                setTimeout(() => {
+                    showToast('Device berhasil direset!', 'success');
+                    // Muat ulang isi tabel agar status berubah
+                    searchStudents();
+                    fetchTodayStats(); // Refresh statistik
+                }, 300);
+
+            } catch (error) {
+                console.error('Reset Error:', error);
+                
+                const toast = document.getElementById('toast');
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                
+                setTimeout(() => {
+                    showToast('Gagal mereset: ' + error.message, 'error');
+                }, 300);
+            }
+        }
+
+        // ==========================================
+        // 6. MANAJEMEN GEOFENCING SEKOLAH
+        // ==========================================
+        let geofenceMap = null;
+        let geofenceMarker = null;
+        let geofenceCircle = null;
+        
+        async function loadGeofenceConfig() {
+            if (!supabaseClient) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'geofence')
+                    .single();
+                
+                let lat = -6.858194;
+                let lon = 109.137222;
+                let radius = 50;
+                
+                if (!error && data && data.value) {
+                    lat = parseFloat(data.value.latitude) || lat;
+                    lon = parseFloat(data.value.longitude) || lon;
+                    radius = parseInt(data.value.radius_meters) || radius;
+                }
+                
+                // Update Form Fields
+                document.getElementById('geo-lat').value = lat;
+                document.getElementById('geo-lon').value = lon;
+                document.getElementById('geo-radius').value = radius;
+                document.getElementById('radius-val').innerText = radius + 'm';
+                
+                // Inisialisasi Peta
+                initGeofenceMap(lat, lon, radius);
+                
+            } catch (err) {
+                console.error("Gagal mengambil pengaturan geofence:", err);
+                showToast("Gagal memuat peta geofence.", "error");
+            }
+        }
+        
+        function initGeofenceMap(lat, lon, radius) {
+            const loader = document.getElementById('map-loader');
+            if (loader) loader.classList.add('hidden'); // Sembunyikan loader
+            
+            if (geofenceMap) {
+                // Update map & elements jika sudah terinisialisasi
+                geofenceMap.setView([lat, lon], 17);
+                if (geofenceMarker) geofenceMarker.setLatLng([lat, lon]);
+                if (geofenceCircle) {
+                    geofenceCircle.setLatLng([lat, lon]);
+                    geofenceCircle.setRadius(radius);
+                }
+                geofenceMap.invalidateSize();
+                return;
+            }
+            
+            try {
+                geofenceMap = L.map('geofence-map', {
+                    zoomControl: true,
+                    attributionControl: false
+                }).setView([lat, lon], 17);
+                
+                // Tambahkan Tile Layer Dark Matter
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 20
+                }).addTo(geofenceMap);
+                
+                // Marker Sekolah (Draggable)
+                const schoolIcon = L.divIcon({
+                    className: 'custom-school-marker-icon',
+                    html: `<div class="w-7 h-7 bg-indigo-600 border border-indigo-400 rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30 animate-bounce"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                
+                geofenceMarker = L.marker([lat, lon], {
+                    icon: schoolIcon,
+                    draggable: true
+                }).addTo(geofenceMap);
+                
+                // Lingkaran Geofence
+                geofenceCircle = L.circle([lat, lon], {
+                    color: '#6366f1',
+                    fillColor: '#6366f1',
+                    fillOpacity: 0.15,
+                    radius: radius,
+                    weight: 2
+                }).addTo(geofenceMap);
+                
+                // Event saat marker di-drag
+                geofenceMarker.on('drag', function (e) {
+                    const position = geofenceMarker.getLatLng();
+                    document.getElementById('geo-lat').value = position.lat.toFixed(8);
+                    document.getElementById('geo-lon').value = position.lng.toFixed(8);
+                    geofenceCircle.setLatLng(position);
+                });
+                
+                geofenceMarker.on('dragend', function (e) {
+                    const position = geofenceMarker.getLatLng();
+                    geofenceMap.panTo(position);
+                });
+                
+                // Event saat klik pada peta untuk memindahkan marker
+                geofenceMap.on('click', function(e) {
+                    const latlng = e.latlng;
+                    geofenceMarker.setLatLng(latlng);
+                    geofenceCircle.setLatLng(latlng);
+                    document.getElementById('geo-lat').value = latlng.lat.toFixed(8);
+                    document.getElementById('geo-lon').value = latlng.lng.toFixed(8);
+                    geofenceMap.panTo(latlng);
+                });
+                
+                // Event saat slider radius digeser
+                const radiusSlider = document.getElementById('geo-radius');
+                radiusSlider.addEventListener('input', function() {
+                    const r = parseInt(this.value);
+                    document.getElementById('radius-val').innerText = r + 'm';
+                    if (geofenceCircle) {
+                        geofenceCircle.setRadius(r);
+                    }
+                });
+                
+                geofenceMap.invalidateSize();
+                
+            } catch (err) {
+                console.error("Gagal inisialisasi peta geofence:", err);
+            }
+        }
+        
+        async function saveGeofenceSettings() {
+            const btn = document.getElementById('btn-save-geofence');
+            const lat = parseFloat(document.getElementById('geo-lat').value);
+            const lon = parseFloat(document.getElementById('geo-lon').value);
+            const radius = parseInt(document.getElementById('geo-radius').value);
+            
+            if (isNaN(lat) || isNaN(lon) || isNaN(radius)) {
+                showToast("Parameter geofence tidak valid!", "error");
+                return;
+            }
+            
+            // Set loading state
+            btn.disabled = true;
+            btn.innerHTML = `<div class="w-4 h-4 rounded-full spinner"></div> <span>Menyimpan...</span>`;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .upsert({
+                        key: 'geofence',
+                        value: {
+                            latitude: lat,
+                            longitude: lon,
+                            radius_meters: radius
+                        },
+                        updated_at: new Date().toISOString()
+                    });
+                
+                if (error) throw error;
+                
+                showToast("Pengaturan Geofencing berhasil disimpan!", "success");
+                
+            } catch (err) {
+                console.error("Gagal menyimpan pengaturan geofence:", err);
+                showToast("Gagal menyimpan: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> <span>Simpan Pengaturan</span>`;
+            }
+        }
+
+        // Jalankan pencarian dan load stats saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            searchStudents();
+            fetchTodayStats();
+            loadGeofenceConfig();
+        });
+    </script>
+</body>
+</html>

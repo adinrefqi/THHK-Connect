@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Skrip dev sekali pakai (menunggu dihapus permanen)
+_archive/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Env / secrets
+.env
+.env.local

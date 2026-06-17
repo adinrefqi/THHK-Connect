@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Rekap Absensi - THHK Connect</title>
+    
+    <!-- Session Check for Admin Adin -->
+    <script>
+        const session = localStorage.getItem('piket_session');
+        if (!session || session.toLowerCase() !== 'adin') {
+            window.location.href = 'index.html';
+        }
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f1f5f9;
+        }
+
+        /* Glassmorphic Panel Styles */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .input-glass {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .input-glass:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(99, 102, 241, 0.6);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Table custom structure & scrollbar */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.75);
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            background: rgba(15, 23, 42, 0.95) !important;
+            z-index: 10;
+            border-right: 2px solid rgba(255, 255, 255, 0.15) !important;
+            min-width: 180px;
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .loader {
+            border-top-color: #6366f1;
+            animation: spinner 0.8s linear infinite;
+        }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== RESPONSIVE MOBILE FIXES ===== */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.625rem !important;
+            }
+
+            /* Header title smaller */
+            header h1 {
+                font-size: 1.375rem !important;
+            }
+            header h1 svg {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+            }
+            header p {
+                font-size: 0.6875rem !important;
+            }
+
+            /* Controls tighter — exclude table container */
+            .glass-panel:not(.table-scroll-enhanced) {
+                padding: 0.875rem !important;
+            }
+
+            /* Stat cards smaller text */
+            .stat-card-mobile .text-3xl {
+                font-size: 1.5rem !important;
+            }
+
+            /* Chart heights smaller */
+            .chart-responsive {
+                height: 180px !important;
+                min-height: 180px !important;
+            }
+
+            /* Legend + signature stacked */
+            .legend-sig-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+
+            /* Signature area */
+            .sig-grid-mobile {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+            .sig-grid-mobile .h-36 {
+                height: auto !important;
+                min-height: 5rem;
+            }
+
+            /* Report title */
+            #title-leger {
+                font-size: 0.875rem !important;
+            }
+            #subtitle-leger {
+                font-size: 0.6875rem !important;
+            }
+
+            /* Status summary 5 cols → smaller */
+            .status-summary-grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 0.25rem !important;
+                font-size: 8px !important;
+            }
+            .status-summary-grid .text-sm {
+                font-size: 0.75rem !important;
+            }
+
+            /* Visualization section */
+            section .text-xl {
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 0.375rem !important;
+            }
+
+            /* Sticky col thinner */
+            .sticky-col {
+                min-width: 120px !important;
+                padding-left: 8px !important;
+                font-size: 10px !important;
+            }
+
+            /* Stat cards even smaller */
+            .stat-card-mobile .text-3xl {
+                font-size: 1.25rem !important;
+            }
+        }
+
+        /* Table scroll with shadow indicator */
+        .table-scroll-enhanced {
+            overflow-x: auto !important;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            touch-action: pan-x pan-y;
+        }
+        .table-scroll-enhanced::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 24px;
+            background: linear-gradient(to left, rgba(15, 23, 42, 0.6), transparent);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Custom print overrides */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 10mm;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                font-family: 'Inter', sans-serif !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-header {
+                display: block !important;
+            }
+            .glass-panel, .table-container {
+                background: transparent !important;
+                backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+            }
+            table {
+                width: 100% !important;
+                color: black !important;
+                font-size: 9px !important;
+            }
+            th, td {
+                border: 1px solid #000000 !important;
+                color: black !important;
+                padding: 4px 2px !important;
+                background: transparent !important;
+            }
+            th {
+                font-weight: 700 !important;
+                text-transform: none !important;
+                letter-spacing: 0 !important;
+            }
+            .sticky-col {
+                position: static !important;
+                background: transparent !important;
+                color: black !important;
+                font-weight: 600 !important;
+                border-right: 1px solid #000000 !important;
+                padding-left: 6px !important;
+                min-width: auto !important;
+            }
+            .status-badge-print {
+                background: transparent !important;
+                color: black !important;
+                border: none !important;
+                padding: 0 !important;
+                font-weight: bold !important;
+                display: inline !important;
+            }
+            .legend-print-list {
+                color: black !important;
+            }
+            .signature-section {
+                color: black !important;
+            }
+            .signature-line {
+                border-bottom: 1px solid black !important;
+            }
+            .table-scroll-enhanced::after {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-4 md:p-8 min-h-screen">
+
+    <!-- KOP SURAT CETAK (Hanya muncul saat print) -->
+    <div class="print-header hidden mb-6">
+        <div class="text-center border-b-2 border-double border-black pb-3">
+            <h1 class="text-xl font-bold tracking-wider uppercase">Yayasan Pendidikan Tiong Hoa Hwe Koan Tegal</h1>
+            <h2 class="text-lg font-bold text-slate-800 uppercase">SMP THHK TEGAL</h2>
+            <p class="text-xs text-slate-500 italic">Jl. Kartini No. 17 Tegal, Jawa Tengah | Telp: (0283) 351025</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- BACK TO DASHBOARD -->
+        <a href="admin_dashboard.html" class="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-semibold mb-6 no-print">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Kembali ke Dashboard Admin
+        </a>
+
+        <!-- HEADER VIEW -->
+        <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-6 no-print">
+            <div>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                    <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Leger & Rekap Absensi
+                </h1>
+                <p class="text-indigo-200/60 text-sm mt-1">Laporan kehadiran siswa bulanan kelas dengan visualisasi statistik premium</p>
+            </div>
+            
+            <!-- CONTROLS CONTAINER -->
+            <div class="bg-slate-900/40 p-4 rounded-2xl border border-slate-800/80 glass-panel">
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3.5">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Kelas</label>
+                        <select id="sel-kelas" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+                            <option value="8">Kelas 8</option>
+                            <option value="9">Kelas 9</option>
+                            <option value="7">Kelas 7</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
+                        <select id="sel-bulan" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6">Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex flex-col col-span-2 sm:col-span-1">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
+                        <select id="sel-tahun" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+
+                    <div class="flex-1 min-w-[120px]">
+                        <button onclick="fetchData()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Tampilkan
+                        </button>
+                    </div>
+
+                    <div class="flex-1 min-w-[120px]">
+                        <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            </svg>
+                            Cetak PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- TITLE FOR PRINT & VIEW -->
+        <div id="report-header" class="text-center mb-6">
+            <h2 class="text-xl md:text-2xl font-extrabold uppercase text-white print:text-black tracking-wider" id="title-leger">LEGER ABSENSI SISWA KELAS 8</h2>
+            <p class="font-semibold text-indigo-400 print:text-slate-800 uppercase tracking-widest text-sm mt-1" id="subtitle-leger">BULAN MEI 2026</p>
+        </div>
+
+        <!-- Swipe instruction for mobile -->
+        <div class="block md:hidden text-center mb-4 no-print">
+            <span class="inline-flex items-center gap-1.5 text-xs text-indigo-300 font-bold bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/25 animate-pulse">
+                Swipe ke kanan/kiri untuk melihat leger lengkap ➡️
+            </span>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <div class="glass-panel mb-8 border border-slate-800/80 shadow-2xl table-container relative table-scroll-enhanced" style="border-radius: 16px;">
+            <table id="leger-table" class="min-w-full divide-y divide-slate-800/60">
+                <thead>
+                    <tr id="table-head" class="bg-slate-900/40">
+                        <!-- Filled by JS -->
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y divide-slate-800/40">
+                    <!-- Filled by JS -->
+                    <tr>
+                        <td class="py-12 text-center text-slate-500 font-medium" colspan="33">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <div class="loader ease-linear rounded-full border-2 border-t-2 border-slate-700 h-6 w-6"></div>
+                                <span>Menyiapkan dokumen leger...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- LEGER LEGEND & SIGNATURE SECTION -->
+        <div class="mt-8 sm:mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start legend-sig-grid">
+            
+            <!-- LEGEND (Left) -->
+            <div class="lg:col-span-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl p-5 glass-panel print:border-none print:shadow-none print:p-0">
+                <h4 class="text-xs font-bold text-indigo-300 print:text-black uppercase tracking-wider mb-4 border-b border-slate-800/60 pb-2 print:border-black">KETERANGAN ABSENSI:</h4>
+                <ul class="space-y-2.5 text-xs text-slate-300 legend-print-list">
+                    <li class="flex items-center gap-2">
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">H</span>
+                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Kehadiran Tepat Waktu (Hadir)</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">T</span>
+                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Keterlambatan Masuk Sekolah (Terlambat)</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="bg-sky-500/10 text-sky-400 border border-sky-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">S</span>
+                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Ketidakhadiran karena Sakit (Sakit)</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">I</span>
+                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Ketidakhadiran Terkonfirmasi Izin (Izin)</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="bg-rose-500/10 text-rose-400 border border-rose-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">A</span>
+                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Tanpa Keterangan / Mangkir (Alfa)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- SIGNATURES (Right) -->
+            <div class="lg:col-span-8 grid grid-cols-2 text-center text-xs gap-4 mt-4 lg:mt-0 signature-section sig-grid-mobile">
+                <div class="flex flex-col h-36 justify-between">
+                    <p class="font-semibold text-slate-300 print:text-black">Mengetahui,<br>Kepala Sekolah SMP THHK</p>
+                    <div class="mx-auto w-48 border-b border-slate-700/80 pb-1 signature-line">
+                        <span class="font-bold text-slate-100 print:text-black text-sm uppercase">Sutarno, S.Pd.</span>
+                    </div>
+                </div>
+                <div class="flex flex-col h-36 justify-between">
+                    <p id="sign-date" class="font-semibold text-slate-300 print:text-black">Tegal, 20 Mei 2026<br>Wali Kelas</p>
+                    <div class="mx-auto w-48 border-b border-slate-700/80 pb-1 signature-line">
+                        <span class="font-bold text-slate-100 print:text-black text-sm uppercase">Wali Kelas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS VISUALIZATION DASHBOARD (no-print) -->
+        <section class="mt-12 border-t border-slate-800/80 pt-10 no-print">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5.5 h-5.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                </svg>
+                Dashboard Visualisasi Statistik Kelas
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- METRIC CARDS -->
+                <div class="lg:col-span-1 grid grid-cols-2 gap-3 sm:gap-4 stat-card-mobile">
+                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
+                        <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Total Siswa</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <span id="stat-siswa-total" class="text-3xl font-extrabold text-white">0</span>
+                            <span class="text-[10px] text-slate-500 font-semibold">Siswa</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
+                        <p class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">Rasio Kehadiran</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <span id="stat-rasio" class="text-3xl font-extrabold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.15)]">0%</span>
+                            <span class="text-[10px] text-slate-500 font-semibold">Persen</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
+                        <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Hari Belajar</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <span id="stat-hari-belajar" class="text-3xl font-extrabold text-indigo-400">0</span>
+                            <span class="text-[10px] text-slate-500 font-semibold">Hari</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
+                        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Rata Hadir/Siswa</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <span id="stat-avg-siswa" class="text-3xl font-extrabold text-slate-100">0</span>
+                            <span class="text-[10px] text-slate-500 font-semibold">Hari/Siswa</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl col-span-2 border border-slate-800/60 shadow-lg bg-slate-900/25">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2.5">Ringkasan Total Status Kelas (Bulan Ini)</h4>
+                        <div class="grid grid-cols-5 text-center text-[10px] font-bold uppercase tracking-wider border-t border-slate-800/80 pt-2.5 gap-1 sm:gap-2 status-summary-grid">
+                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mx-auto"></span> Hadir<br><span id="total-lbl-H" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
+                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mx-auto"></span> Lambat<br><span id="total-lbl-T" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
+                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 mx-auto"></span> Sakit<br><span id="total-lbl-S" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
+                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 mx-auto"></span> Izin<br><span id="total-lbl-I" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
+                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mx-auto"></span> Alfa<br><span id="total-lbl-A" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TREND LINE CHART -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col justify-between">
+                    <h3 class="font-bold text-sm text-white mb-4 flex items-center justify-between">
+                        <span>Tren Kehadiran Harian (Hadir + Lambat)</span>
+                        <span class="text-[10px] text-indigo-400 font-extrabold uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25">Grafik Garis</span>
+                    </h3>
+                    <div class="relative flex-1 h-[210px] min-h-[210px] chart-responsive">
+                        <canvas id="attendanceTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- DONUT DISTRIBUTION CHART -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col justify-between">
+                    <h3 class="font-bold text-sm text-white mb-4 flex items-center justify-between">
+                        <span>Proporsi Jenis Ketidakhadiran</span>
+                        <span class="text-[10px] text-indigo-400 font-extrabold uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25">Grafik Donat</span>
+                    </h3>
+                    <div class="relative flex-1 h-[210px] min-h-[210px] flex justify-center items-center chart-responsive">
+                        <canvas id="statusDistChart" class="max-h-[190px]"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Chart References
+        let attendanceTrendChart = null;
+        let statusDistChart = null;
+
+        // Initialize Dates
+        const now = new Date();
+        document.getElementById('sel-bulan').value = now.getMonth();
+        document.getElementById('sel-tahun').value = now.getFullYear();
+
+        // Update signature date on load/change
+        function updateSignatureDate() {
+            const bulan = parseInt(document.getElementById('sel-bulan').value);
+            const tahun = parseInt(document.getElementById('sel-tahun').value);
+            const bulanText = document.getElementById('sel-bulan').options[bulan].text;
+            
+            // Format signature date with current date or end of month date
+            const today = new Date();
+            let dateStr = "";
+            if (today.getMonth() === bulan && today.getFullYear() === tahun) {
+                dateStr = `${today.getDate()} ${bulanText} ${tahun}`;
+            } else {
+                // Get last day of that month
+                const lastDay = new Date(tahun, bulan + 1, 0).getDate();
+                dateStr = `${lastDay} ${bulanText} ${tahun}`;
+            }
+            document.getElementById('sign-date').innerHTML = `Tegal, ${dateStr}<br>Wali Kelas`;
+        }
+
+        async function fetchData() {
+            const kelas = document.getElementById('sel-kelas').value;
+            const bulan = parseInt(document.getElementById('sel-bulan').value);
+            const tahun = parseInt(document.getElementById('sel-tahun').value);
+            
+            // Update UI titles and dates
+            const bulanText = document.getElementById('sel-bulan').options[bulan].text;
+            document.getElementById('title-leger').innerText = `LEGER ABSENSI SISWA KELAS ${kelas}`;
+            document.getElementById('subtitle-leger').innerText = `BULAN ${bulanText.toUpperCase()} ${tahun}`;
+            updateSignatureDate();
+
+            // Set up Calendar Columns (1 to 28-31)
+            const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
+            const headRow = document.getElementById('table-head');
+            
+            headRow.innerHTML = `<th class="sticky-col">Nama Siswa</th>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                headRow.innerHTML += `<th class="w-8 border-l border-r border-slate-800/80">${d}</th>`;
+            }
+            headRow.innerHTML += `<th class="bg-indigo-500/20 text-indigo-300 font-bold border-l-2 border-indigo-500/35">Σ H</th>`;
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td class="py-12 text-center text-slate-500 font-medium" colspan="${daysInMonth + 2}">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="loader ease-linear rounded-full border-2 border-t-2 border-slate-700 h-6 w-6"></div>
+                            <span>Menghubungkan ke basis data Supabase...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            try {
+                // 1. Fetch Students
+                const { data: students, error: sErr } = await supabaseClient
+                    .from('students')
+                    .select('id, nama, nis')
+                    .eq('kelas', kelas)
+                    .order('nama');
+
+                if (sErr) throw sErr;
+
+                if (!students || students.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td class="py-12 text-center text-slate-500 font-medium" colspan="${daysInMonth + 2}">
+                                Tidak ada data siswa untuk Kelas ${kelas}
+                            </td>
+                        </tr>
+                    `;
+                    resetStatsDashboard();
+                    return;
+                }
+
+                // 2. Fetch Attendance Logs for the selected month
+                // Setup start & end bounds matching Asia/Jakarta offset
+                const start = new Date(tahun, bulan, 1).toISOString();
+                const end = new Date(tahun, bulan + 1, 0, 23, 59, 59).toISOString();
+                
+                const { data: logs, error: lErr } = await supabaseClient
+                    .from('attendance_logs')
+                    .select('user_id, created_at, status')
+                    .gte('created_at', start)
+                    .lte('created_at', end);
+
+                if (lErr) throw lErr;
+
+                // 3. Map logs into [studentId][day] structure
+                const logMap = {};
+                logs.forEach(log => {
+                    const localTime = new Date(log.created_at);
+                    const d = localTime.getDate();
+                    if (!logMap[log.user_id]) logMap[log.user_id] = {};
+                    logMap[log.user_id][d] = log.status || 'H';
+                });
+
+                // 4. Calculate Statistics
+                let totalPresentAll = 0;
+                let countH = 0;
+                let countT = 0;
+                let countS = 0;
+                let countI = 0;
+                let countA = 0;
+
+                // Track daily totals for trend chart
+                const dailyPresentCounts = Array(daysInMonth).fill(0);
+                const activeDaysSet = new Set();
+
+                // Clear table body before rendering
+                tbody.innerHTML = '';
+                
+                students.forEach(s => {
+                    let rowHtml = `<tr class="hover:bg-slate-800/15 transition-colors">
+                        <td class="sticky-col font-medium text-slate-100 flex items-center gap-1">${s.nama}</td>`;
+                    
+                    let countHadir = 0;
+                    
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const status = logMap[s.id] && logMap[s.id][d];
+                        
+                        if (status) {
+                            // Accumulate stats
+                            if (status === 'H') {
+                                countH++;
+                                countHadir++;
+                                dailyPresentCounts[d-1]++;
+                                activeDaysSet.add(d);
+                                rowHtml += `<td><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                            } else if (status === 'T') {
+                                countT++;
+                                countHadir++;
+                                dailyPresentCounts[d-1]++;
+                                activeDaysSet.add(d);
+                                rowHtml += `<td><span class="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                            } else if (status === 'S') {
+                                countS++;
+                                rowHtml += `<td><span class="bg-sky-500/10 text-sky-400 border border-sky-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                            } else if (status === 'I') {
+                                countI++;
+                                rowHtml += `<td><span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                            } else if (status === 'A') {
+                                countA++;
+                                rowHtml += `<td><span class="bg-rose-500/10 text-rose-400 border border-rose-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                            } else {
+                                rowHtml += `<td><span class="text-slate-600 font-normal">.</span></td>`;
+                            }
+                        } else {
+                            rowHtml += `<td><span class="text-slate-600/60 font-normal">.</span></td>`;
+                        }
+                    }
+                    
+                    totalPresentAll += countHadir;
+                    rowHtml += `<td class="bg-indigo-500/10 font-bold text-indigo-400 border-l-2 border-indigo-500/25">${countHadir}</td></tr>`;
+                    tbody.innerHTML += rowHtml;
+                });
+
+                // Update text stats cards
+                const numSiswa = students.length;
+                const hariEfektif = activeDaysSet.size || 20; // fallback to 20 if no school days are logged
+                const totalKehadiranMax = numSiswa * hariEfektif;
+                const ratioKehadiran = totalKehadiranMax > 0 ? ((totalPresentAll / totalKehadiranMax) * 100).toFixed(1) : 0;
+                const avgHadirPerSiswa = (totalPresentAll / numSiswa).toFixed(1);
+
+                document.getElementById('stat-siswa-total').innerText = numSiswa;
+                document.getElementById('stat-rasio').innerText = `${ratioKehadiran}%`;
+                document.getElementById('stat-hari-belajar').innerText = hariEfektif;
+                document.getElementById('stat-avg-siswa').innerText = `${avgHadirPerSiswa} Hari`;
+
+                // Update label breakdown
+                document.getElementById('total-lbl-H').innerText = countH;
+                document.getElementById('total-lbl-T').innerText = countT;
+                document.getElementById('total-lbl-S').innerText = countS;
+                document.getElementById('total-lbl-I').innerText = countI;
+                document.getElementById('total-lbl-A').innerText = countA;
+
+                // 5. Render Charts
+                renderCharts(daysInMonth, dailyPresentCounts, countH, countT, countS, countI, countA);
+
+            } catch (err) {
+                console.error(err);
+                alert('Gagal memuat rekap absensi: ' + err.message);
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="py-12 text-center text-rose-400 font-bold" colspan="${daysInMonth + 2}">
+                            Terjadi kesalahan saat memuat data. Periksa koneksi internet Anda.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function resetStatsDashboard() {
+            document.getElementById('stat-siswa-total').innerText = '0';
+            document.getElementById('stat-rasio').innerText = '0%';
+            document.getElementById('stat-hari-belajar').innerText = '0';
+            document.getElementById('stat-avg-siswa').innerText = '0';
+            document.getElementById('total-lbl-H').innerText = '0';
+            document.getElementById('total-lbl-T').innerText = '0';
+            document.getElementById('total-lbl-S').innerText = '0';
+            document.getElementById('total-lbl-I').innerText = '0';
+            document.getElementById('total-lbl-A').innerText = '0';
+            if (attendanceTrendChart) attendanceTrendChart.destroy();
+            if (statusDistChart) statusDistChart.destroy();
+        }
+
+        function renderCharts(daysInMonth, dailyData, h, t, s, i, a) {
+            const isDark = true; // Designed primarily in dark mode
+
+            // 1. Attendance Trend Line Chart
+            const ctxTrend = document.getElementById('attendanceTrendChart').getContext('2d');
+            if (attendanceTrendChart) attendanceTrendChart.destroy();
+
+            const daysLabels = Array.from({length: daysInMonth}, (_, i) => `Tgl ${i + 1}`);
+            
+            // Create glowing line gradient
+            const gradientLine = ctxTrend.createLinearGradient(0, 0, 0, 200);
+            gradientLine.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+            gradientLine.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            attendanceTrendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: daysLabels,
+                    datasets: [{
+                        label: 'Siswa Hadir',
+                        data: dailyData,
+                        borderColor: '#6366f1',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#818cf8',
+                        pointBorderColor: 'rgba(255, 255, 255, 0.1)',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#6366f1',
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: true,
+                        backgroundColor: gradientLine,
+                        tension: 0.35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(99, 102, 241, 0.25)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Hadir: ${context.parsed.y} Siswa`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                borderColor: 'transparent'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 9,
+                                    family: 'Outfit'
+                                },
+                                maxRotation: 45,
+                                autoSkip: true
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                borderColor: 'transparent'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: {
+                                    size: 10,
+                                    family: 'Outfit'
+                                },
+                                stepSize: 1,
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Status Distribution Donut Chart
+            const ctxDist = document.getElementById('statusDistChart').getContext('2d');
+            if (statusDistChart) statusDistChart.destroy();
+
+            const totalAbsen = s + i + a;
+            
+            if (totalAbsen === 0 && h === 0 && t === 0) {
+                // Draw empty chart state if no logs
+                statusDistChart = new Chart(ctxDist, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tidak Ada Log'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['rgba(255, 255, 255, 0.05)'],
+                            borderColor: ['rgba(255, 255, 255, 0.1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+                return;
+            }
+
+            statusDistChart = new Chart(ctxDist, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hadir', 'Terlambat', 'Sakit', 'Izin', 'Alfa'],
+                    datasets: [{
+                        data: [h, t, s, i, a],
+                        backgroundColor: [
+                            '#10b981', // Hadir (Emerald)
+                            '#f59e0b', // Terlambat (Amber)
+                            '#0ea5e9', // Sakit (Sky)
+                            '#6366f1', // Izin (Indigo)
+                            '#f43f5e'  // Alfa (Rose)
+                        ],
+                        borderColor: 'rgba(15, 23, 42, 0.85)',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#cbd5e1',
+                                font: {
+                                    size: 10,
+                                    family: 'Outfit',
+                                    weight: 'bold'
+                                },
+                                padding: 12,
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                borderRadius: 3
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                    const val = context.parsed;
+                                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                    return ` ${context.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%',
+                    borderRadius: 4
+                }
+            });
+        }
+
+        // Run on Page Load
+        fetchData();
+    </script>
+</body>
+</html>

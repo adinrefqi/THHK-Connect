@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Guru Piket - THHK Connect</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        /* Glassmorphic Panel Styles */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .input-glass {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .input-glass:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(99, 102, 241, 0.6);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Micro-Animations & Transitions */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-item {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .student-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(30, 41, 59, 0.65);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.15);
+        }
+
+        .loader {
+            border-top-color: #6366f1;
+            animation: spinner 0.8s linear infinite;
+        }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== RESPONSIVE MOBILE FIXES ===== */
+        @media (max-width: 640px) {
+            h1.text-3xl {
+                font-size: 1.5rem !important;
+            }
+
+            /* Tabs scrollable */
+            .tabs-scrollable {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                white-space: nowrap;
+                gap: 1rem !important;
+                padding-bottom: 0.25rem;
+            }
+            .tabs-scrollable::-webkit-scrollbar {
+                display: none;
+            }
+            .tabs-scrollable button {
+                font-size: 0.8125rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            /* Modal scrollable on small screens */
+            .modal-scroll-inner {
+                overflow-y: auto;
+                max-height: 85vh;
+                max-height: 85dvh;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 0.625rem !important;
+            }
+        }
+
+        @media (max-height: 700px) {
+            #login-view {
+                margin-top: 2rem !important;
+            }
+        }
+        /* Modern Confirm Modal */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .confirm-overlay.active { opacity: 1; }
+
+        .confirm-box {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.7);
+            transform: scale(0.9) translateY(10px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .confirm-overlay.active .confirm-box {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modern Alert Toast */
+        .alert-toast {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120%);
+            z-index: 99999;
+            max-width: 360px;
+            width: calc(100% - 2rem);
+            padding: 0.875rem 1.25rem;
+            border-radius: 1rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .alert-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .alert-toast.toast-success {
+            background: rgba(16, 185, 129, 0.9);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            color: white;
+        }
+        .alert-toast.toast-error {
+            background: rgba(239, 68, 68, 0.9);
+            border: 1px solid rgba(252, 129, 129, 0.4);
+            color: white;
+        }
+        .alert-toast.toast-info {
+            background: rgba(99, 102, 241, 0.9);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+<body class="text-slate-100 antialiased min-h-screen p-4 md:p-8 pb-12">
+
+    <!-- PORTAL LOGIN -->
+    <div id="login-view" class="max-w-md mx-auto mt-8 sm:mt-20">
+        <div class="glass-card rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
+            <!-- Background Radial Accents -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-500/20 border border-indigo-400/30">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold mb-2">Portal Guru Piket</h1>
+                <p class="text-indigo-200/60 text-sm mb-8">Masuk untuk mencatat presensi harian siswa</p>
+                
+                <select id="piket-name" class="w-full px-4 py-3 mb-4 rounded-xl input-glass text-sm outline-none cursor-pointer">
+                    <option value="" disabled selected class="bg-slate-900 text-slate-400">Pilih Nama Guru Piket</option>
+                    <option value="Wida" class="bg-slate-900 text-white">Wida</option>
+                    <option value="Thevea" class="bg-slate-900 text-white">Thevea</option>
+                    <option value="Sunedi" class="bg-slate-900 text-white">Sunedi</option>
+                    <option value="Morys" class="bg-slate-900 text-white">Morys</option>
+                    <option value="Faizal" class="bg-slate-900 text-white">Faizal</option>
+                    <option value="Yanuar" class="bg-slate-900 text-white">Yanuar</option>
+                    <option value="Adin" class="bg-slate-900 text-white">Adin</option>
+                    <option value="Erwin" class="bg-slate-900 text-white">Erwin</option>
+                </select>
+                <input type="password" id="piket-pass" placeholder="Password Guru Piket" 
+                       class="w-full px-4 py-3 mb-4 rounded-xl input-glass placeholder-slate-500 text-sm outline-none">
+                
+                <button onclick="loginPiket()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300">
+                    Buka Panel Piket
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PORTAL DASHBOARD -->
+    <div id="dashboard-view" class="hidden max-w-4xl mx-auto">
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-slate-800/80 pb-6">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_currentColor]"></span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Dashboard Piket</h1>
+                </div>
+                <p id="today-date" class="text-indigo-300 opacity-80 mt-1.5 font-medium">Memuat tanggal...</p>
+            </div>
+            
+            <div class="flex gap-2">
+                <select id="filter-kelas" onchange="loadStudents()" 
+                        class="bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
+                    <option value="8" class="bg-slate-900 text-white">Kelas 8</option>
+                    <option value="9" class="bg-slate-900 text-white">Kelas 9</option>
+                    <option value="7" class="bg-slate-900 text-white">Kelas 7</option>
+                </select>
+                <button onclick="loadStudents()" class="p-2.5 glass-card rounded-xl hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95" title="Refresh Data">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+                <button onclick="logoutPiket()" class="p-2.5 glass-card rounded-xl border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-95" title="Keluar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- TABS -->
+        <div class="flex border-b border-slate-800/80 mb-6 gap-6 tabs-scrollable">
+            <button onclick="switchTab('manual')" id="tab-manual" class="pb-3 text-indigo-400 border-b-2 border-indigo-500 font-bold transition-all">Absensi Manual</button>
+            <button onclick="switchTab('izin')" id="tab-izin" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+                Persetujuan Izin
+                <span id="badge-izin" class="absolute -top-1 -right-4 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-red-500/50">0</span>
+            </button>
+            <button onclick="switchTab('bullying')" id="tab-bullying" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+                Laporan Perundungan
+                <span id="badge-bullying" class="absolute -top-1 -right-4 bg-rose-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-rose-500/50">0</span>
+            </button>
+            <button onclick="switchTab('tugas')" id="tab-tugas" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+                Tugas Titipan
+                <span id="badge-tugas" class="absolute -top-1 -right-4 bg-purple-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-purple-500/50">0</span>
+            </button>
+        </div>
+
+
+        <!-- MANUAL TAB CONTENT -->
+        <div id="content-manual">
+            <!-- SEARCH BOX -->
+            <div class="mb-6">
+                <input type="text" id="search-student" oninput="filterList()" placeholder="Cari nama siswa atau NIS..." 
+                       class="w-full px-6 py-4 rounded-2xl input-glass placeholder-slate-500 shadow-inner text-sm">
+            </div>
+
+            <!-- LISTING CONTAINER -->
+            <div id="student-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Dynamic data loaded here -->
+                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat data siswa...</div>
+            </div>
+        </div>
+
+        <!-- IZIN TAB CONTENT -->
+        <div id="content-izin" class="hidden">
+            <div id="leave-requests-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat permintaan izin...</div>
+            </div>
+        </div>
+
+        <!-- BULLYING TAB CONTENT -->
+        <div id="content-bullying" class="hidden">
+            <div id="bullying-reports-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat aduan perundungan...</div>
+            </div>
+        </div>
+
+        <!-- TUGAS TAB CONTENT -->
+        <div id="content-tugas" class="hidden">
+            <div id="tugas-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat tugas titipan...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL KEBIASAAN SISWA -->
+    <div id="modal-detail-siswa" class="fixed inset-0 hidden flex-col items-center justify-center p-3"
+        style="z-index: 10000; background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); overflow-y: auto; -webkit-overflow-scrolling: touch;">
+        <div class="glass-card w-full max-w-md p-5 relative overflow-hidden rounded-3xl modal-scroll-inner"
+            style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin: auto;">
+            <!-- Ambient Light Decor -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-600/20 border border-indigo-500/35 rounded-xl flex items-center justify-center">
+                            <span class="text-xl">⭐</span>
+                        </div>
+                        <div>
+                            <h3 id="detail-student-name" class="font-bold text-lg text-white">Nama Siswa</h3>
+                            <p id="detail-student-nis" class="text-xs text-slate-400">NIS: 09-001</p>
+                        </div>
+                    </div>
+                    <button onclick="closeStudentDetail()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mood evaluation -->
+                <div class="mb-5">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Perasaan Hari Ini</span>
+                    <div id="detail-mood-card" class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 flex items-center gap-4">
+                        <span id="detail-mood-emoji" class="text-4xl">😐</span>
+                        <div>
+                            <p id="detail-mood-status" class="text-base font-bold text-white">Biasa</p>
+                            <p class="text-[10px] text-slate-400">Siswa merasa biasa hari ini.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habits evaluation checklist -->
+                <div class="mb-5">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Jurnal 7 Kebiasaan</span>
+                    <div class="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar" id="detail-habits-grid">
+                        <!-- Habit list item dynamic -->
+                    </div>
+                </div>
+
+                <!-- Parents Signature preview -->
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Tanda Tangan Orang Tua / Wali</span>
+                    <div class="h-24 bg-slate-950/50 border border-slate-850 rounded-xl flex items-center justify-center overflow-hidden relative p-1">
+                        <img id="detail-sig-parent" class="max-h-full max-w-full object-contain hidden" src="" alt="Tanda Tangan Orang Tua">
+                        <span id="detail-sig-parent-placeholder" class="text-[10px] text-slate-500 italic">Belum Tanda Tangan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // =============================================
+        // MODERN CONFIRM & ALERT UTILITIES
+        // =============================================
+        function showConfirm(title, message, confirmText = 'Ya', cancelText = 'Batal', accentColor = 'indigo') {
+            return new Promise((resolve) => {
+                const colorMap = {
+                    emerald: { bg: 'rgba(16,185,129,0.9)', border: 'rgba(52,211,153,0.5)', hover: 'rgba(16,185,129,1)' },
+                    rose:    { bg: 'rgba(244,63,94,0.9)',   border: 'rgba(251,113,133,0.5)', hover: 'rgba(244,63,94,1)' },
+                    indigo:  { bg: 'rgba(99,102,241,0.9)',  border: 'rgba(129,140,248,0.5)', hover: 'rgba(99,102,241,1)' },
+                    amber:   { bg: 'rgba(245,158,11,0.9)',  border: 'rgba(252,211,77,0.5)',  hover: 'rgba(245,158,11,1)' },
+                    sky:     { bg: 'rgba(14,165,233,0.9)',  border: 'rgba(56,189,248,0.5)',  hover: 'rgba(14,165,233,1)' },
+                    purple:  { bg: 'rgba(168,85,247,0.9)',  border: 'rgba(192,132,252,0.5)', hover: 'rgba(168,85,247,1)' },
+                };
+                const c = colorMap[accentColor] || colorMap.indigo;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'confirm-overlay';
+                overlay.innerHTML = `
+                    <div class="confirm-box">
+                        <h3 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:0.5rem;">${title}</h3>
+                        <p style="font-size:0.8125rem;color:#94a3b8;line-height:1.6;">${message}</p>
+                        <div style="display:flex;gap:0.625rem;margin-top:1.25rem;">
+                            <button id="confirm-cancel" style="flex:1;padding:0.625rem;border-radius:0.75rem;font-size:0.8125rem;font-weight:700;background:rgba(51,65,85,0.6);color:#94a3b8;border:1px solid rgba(255,255,255,0.08);cursor:pointer;transition:all 0.2s;">${cancelText}</button>
+                            <button id="confirm-ok" style="flex:1;padding:0.625rem;border-radius:0.75rem;font-size:0.8125rem;font-weight:700;background:${c.bg};color:#fff;border:1px solid ${c.border};cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px -3px ${c.bg};">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => overlay.classList.add('active'));
+                });
+
+                function close(result) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => { overlay.remove(); resolve(result); }, 250);
+                }
+
+                overlay.querySelector('#confirm-ok').onclick = () => close(true);
+                overlay.querySelector('#confirm-cancel').onclick = () => close(false);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) close(false); });
+
+                // Hover effects
+                const okBtn = overlay.querySelector('#confirm-ok');
+                const cancelBtn = overlay.querySelector('#confirm-cancel');
+                okBtn.onmouseenter = () => { okBtn.style.transform = 'scale(1.03)'; okBtn.style.background = c.hover; };
+                okBtn.onmouseleave = () => { okBtn.style.transform = 'scale(1)'; okBtn.style.background = c.bg; };
+                cancelBtn.onmouseenter = () => { cancelBtn.style.background = 'rgba(71,85,105,0.7)'; cancelBtn.style.color = '#e2e8f0'; };
+                cancelBtn.onmouseleave = () => { cancelBtn.style.background = 'rgba(51,65,85,0.6)'; cancelBtn.style.color = '#94a3b8'; };
+            });
+        }
+
+        function showAlert(message, type = 'info') {
+            const icons = {
+                success: '<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>',
+                error: '<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>',
+                info: '<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `alert-toast toast-${type}`;
+            toast.innerHTML = `${icons[type] || icons.info}<span style="flex:1;line-height:1.4;">${message}</span>`;
+            document.body.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => toast.classList.add('show'));
+            });
+
+            // Auto dismiss
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 450);
+            }, 3000);
+
+            // Click to dismiss
+            toast.addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 450);
+            });
+        }
+
+        function checkPiketSession() {
+            const session = localStorage.getItem('piket_session');
+            if (session) {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                const name = session.charAt(0).toUpperCase() + session.slice(1);
+                document.getElementById('today-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - Piket: ' + name;
+                window.currentPiketName = name;
+                requestNotificationPermission();
+                loadStudents();
+                checkPendingLeaveBadge();
+                checkPendingBullyingBadge();
+                checkPendingTasksBadge();
+                subscribeBullyingRealtime();
+                subscribeTasksRealtime();
+                subscribeLeaveRealtime();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function logoutPiket() {
+            localStorage.removeItem('piket_session');
+            window.location.href = 'index.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', checkPiketSession);
+        
+        // Sembunyikan form login jika diakses langsung, biarkan blank sampai checkPiketSession selesai
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!localStorage.getItem('piket_session')) {
+                document.body.style.display = 'none';
+            }
+        });
+</script>
+<script>
+        const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allStudents = [];
+        let attendanceToday = [];
+        let habitsToday = [];
+        let isRealtimeSubscribed = false;
+
+        function loginPiket() {
+            const name = document.getElementById('piket-name').value;
+            const pass = document.getElementById('piket-pass').value;
+            
+            if (!name) {
+                alert('Silakan pilih nama Guru Piket!');
+                return;
+            }
+
+            if (pass === 'admin54321') {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('today-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - Piket: ' + name;
+                window.currentPiketName = name;
+                requestNotificationPermission();
+                loadStudents();
+                checkPendingLeaveBadge();
+                checkPendingBullyingBadge();
+                checkPendingTasksBadge();
+                subscribeBullyingRealtime();
+                subscribeTasksRealtime();
+                subscribeLeaveRealtime();
+            } else {
+                alert('Password Guru Piket Salah!');
+            }
+        }
+
+        async function loadStudents() {
+            const kelas = document.getElementById('filter-kelas').value;
+            const container = document.getElementById('student-list');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
+                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Menghubungkan ke basis data...</span>
+                </div>
+            `;
+
+            try {
+                // 1. Ambil semua siswa di kelas tersebut
+                const { data: students, error: sErr } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('kelas', kelas)
+                    .order('nama', { ascending: true });
+
+                if (sErr) throw sErr;
+
+                // 2. Ambil data absen hari ini (WIB)
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const todayLocal = `${year}-${month}-${day}`;
+                
+                const startOfDay = new Date(`${todayLocal}T00:00:00+07:00`).toISOString();
+                const endOfDay = new Date(`${todayLocal}T23:59:59+07:00`).toISOString();
+
+                const { data: logs, error: lErr } = await supabaseClient
+                    .from('attendance_logs')
+                    .select('user_id, status, device_id, latitude, longitude')
+                    .gte('created_at', startOfDay)
+                    .lte('created_at', endOfDay);
+
+                if (lErr) throw lErr;
+
+                // 3. Ambil data log kebiasaan hari ini (WIB)
+                const { data: habits, error: hErr } = await supabaseClient
+                    .from('habit_logs')
+                    .select('user_id, habit_1, habit_2, habit_3, habit_4, habit_5, habit_6, habit_7, mood, signature_parent')
+                    .eq('log_date', todayLocal);
+
+                if (hErr) throw hErr;
+
+                allStudents = students;
+                attendanceToday = logs;
+                habitsToday = habits || [];
+                renderList();
+
+                // DENGARKAN REAL-TIME PRESENSI
+                if (!isRealtimeSubscribed) {
+                    supabaseClient
+                    .channel('public:attendance_logs')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attendance_logs' }, payload => {
+                        console.log('Absen baru terdeteksi:', payload.new);
+                        
+                        // Cek apakah log ini untuk hari ini
+                        const logDate = new Date(payload.new.created_at).toDateString();
+                        const todayDate = new Date().toDateString();
+                        
+                        if (logDate === todayDate) {
+                            // Cek apakah ada record lama untuk user ini di array hari ini
+                            const existingIndex = attendanceToday.findIndex(l => l.user_id === payload.new.user_id);
+                            if (existingIndex !== -1) {
+                                attendanceToday[existingIndex] = payload.new;
+                            } else {
+                                attendanceToday.push(payload.new);
+                            }
+                            renderList();
+                        }
+                    })
+                    .subscribe();
+                    isRealtimeSubscribed = true;
+                }
+
+                // DENGARKAN REAL-TIME KEBIASAAN
+                if (!window.isHabitRealtimeSubscribed) {
+                    supabaseClient
+                    .channel('public:habit_logs')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'habit_logs' }, payload => {
+                        console.log('Perubahan jurnal kebiasaan terdeteksi:', payload);
+                        
+                        // Cek apakah data ini untuk hari ini
+                        const logDate = payload.new ? payload.new.log_date : (payload.old ? payload.old.log_date : null);
+                        const getLocalDateString = (d) => {
+                            const year = d.getFullYear();
+                            const month = String(d.getMonth() + 1).padStart(2, '0');
+                            const day = String(d.getDate()).padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        };
+                        const todayLocalStr = getLocalDateString(new Date());
+                        
+                        if (logDate === todayLocalStr) {
+                            if (payload.eventType === 'INSERT') {
+                                habitsToday.push(payload.new);
+                            } else if (payload.eventType === 'UPDATE') {
+                                const idx = habitsToday.findIndex(h => h.user_id === payload.new.user_id);
+                                if (idx !== -1) {
+                                    habitsToday[idx] = payload.new;
+                                } else {
+                                    habitsToday.push(payload.new);
+                                }
+                            } else if (payload.eventType === 'DELETE') {
+                                const idx = habitsToday.findIndex(h => h.user_id === payload.old.user_id);
+                                if (idx !== -1) habitsToday.splice(idx, 1);
+                            }
+                            renderList();
+                        }
+                    })
+                    .subscribe();
+                    window.isHabitRealtimeSubscribed = true;
+                }
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="col-span-full text-rose-400 py-10 text-center font-bold">Gagal memuat data: ' + (err.message || JSON.stringify(err)) + '</div>';
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('student-list');
+            const search = document.getElementById('search-student').value.toLowerCase().trim();
+            
+            const filtered = allStudents.filter(s => s.nama.toLowerCase().includes(search) || s.nis.toLowerCase().includes(search));
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500 font-semibold">Siswa tidak ditemukan.</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map((s, idx) => {
+                const log = attendanceToday.find(l => l.user_id === s.id);
+                const isPresent = !!log;
+                const status = log ? log.status : '';
+                const hasDevice = s.device_id && s.device_id !== '';
+                const isIzin = log && log.device_id && log.device_id.startsWith('[IZIN]');
+                
+                // Hitung jumlah kebiasaan yang diselesaikan hari ini
+                const habit = habitsToday.find(h => h.user_id === s.id);
+                let completedHabits = 0;
+                if (habit) {
+                    for (let i = 1; i <= 7; i++) {
+                        if (habit[`habit_${i}`] && habit[`habit_${i}`].trim() !== '') completedHabits++;
+                    }
+                }
+                
+                const statusStyles = {
+                    'H': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-sm shadow-emerald-500/5',
+                    'T': 'bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-sm shadow-amber-500/5',
+                    'S': 'bg-sky-500/10 text-sky-400 border-sky-500/25 shadow-sm shadow-sky-500/5',
+                    'I': 'bg-indigo-500/10 text-indigo-400 border-indigo-500/25 shadow-sm shadow-indigo-500/5',
+                    'A': 'bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-sm shadow-rose-500/5'
+                };
+
+                let statusName = 'Hadir';
+                if (isIzin) {
+                    const match = log.device_id.match(/^\[IZIN\]\s*([^\s-]+)/i);
+                    statusName = match ? match[1] : '';
+                } else {
+                    statusName = { 'H': 'Hadir', 'T': 'Terlambat', 'S': 'Sakit', 'I': 'Izin', 'A': 'Alfa' }[status] || 'Hadir';
+                }
+
+                // Hitung stagger animation
+                const animationStyle = `style="animation-delay: ${idx * 40}ms"`;
+
+                return `
+                    <div class="student-item glass-card rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" ${animationStyle}>
+                        <div class="flex-1 min-w-0 cursor-pointer" onclick="showStudentDetail('${s.id}', '${s.nama.replace(/'/g, "\\'")}', '${s.nis}')">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="font-bold text-base text-white truncate">${s.nama}</h3>
+                                ${completedHabits > 0 
+                                    ? `<span title="7 Kebiasaan: ${completedHabits}/7 Selesai" class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold flex items-center gap-0.5 drop-shadow-[0_0_6px_rgba(245,158,11,0.25)] select-none">⭐ ${completedHabits}/7</span>`
+                                    : `<span title="Belum mengisi jurnal kebiasaan" class="px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-500 border border-slate-700/60 text-[10px] font-semibold flex items-center gap-0.5 select-none">⭐ 0/7</span>`
+                                }
+                                ${hasDevice ? `<span title="HP Terkunci" class="text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.4)]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg></span>` : ''}
+                                ${(log && log.latitude && log.longitude) ? `<a href="https://maps.google.com/?q=${log.latitude},${log.longitude}" target="_blank" title="Audit Lokasi GPS" class="text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.4)] hover:text-yellow-300 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg></a>` : ''}
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">NIS: ${s.nis}</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Tombol Reset HP (Hanya muncul jika HP sudah terkunci) -->
+                            ${hasDevice ? `
+                                <button onclick="resetDevice('${s.id}', '${s.nama.replace(/'/g, "\\'")}')" 
+                                        class="p-2 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-xl transition-all border border-slate-700/60 hover:border-rose-500/35 active:scale-95"
+                                        title="Reset Kunci HP">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                                </button>
+                            ` : ''}
+
+                            <div class="h-6 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+                            ${isPresent 
+                                ? `<span class="${statusStyles[status] || statusStyles['H']} border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-current"></span>
+                                    ${statusName}
+                                   </span>`
+                                : `
+                                    <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'H')" class="bg-emerald-500/10 hover:bg-emerald-600 border border-emerald-500/25 text-emerald-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-emerald-500/15">H</button>
+                                    <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'S')" class="bg-sky-500/10 hover:bg-sky-600 border border-sky-500/25 text-sky-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-sky-500/15">S</button>
+                                    <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'I')" class="bg-indigo-500/10 hover:bg-indigo-600 border border-indigo-500/25 text-indigo-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-indigo-500/15">I</button>
+                                    <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'A')" class="bg-rose-500/10 hover:bg-rose-600 border border-rose-500/25 text-rose-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-rose-500/15">A</button>
+                                  `
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function resetDevice(id, nama) {
+            const ok = await showConfirm(
+                'Reset Kunci HP',
+                `Hapus kunci perangkat untuk <strong>${nama}</strong>?<br><span class="text-xs text-slate-400">Siswa akan bisa mendaftarkan HP baru saat absen berikutnya.</span>`,
+                'Reset', 'Batal', 'rose'
+            );
+            if (!ok) return;
+
+            try {
+                const { error } = await supabaseClient.rpc('reset_device_siswa', {
+                    p_student_id: id
+                });
+
+                if (error) throw error;
+                showAlert(`Berhasil! Kunci HP ${nama} telah dihapus.`, 'success');
+                loadStudents();
+            } catch (err) {
+                showAlert('Gagal: ' + err.message, 'error');
+            }
+        }
+
+        async function absenManual(id, nama, status) {
+            const statusFull = { 'H': 'Hadir', 'S': 'Sakit', 'I': 'Izin', 'A': 'Alfa' };
+            const statusColors = { 'H': 'emerald', 'S': 'sky', 'I': 'indigo', 'A': 'rose' };
+            const ok = await showConfirm(
+                'Konfirmasi Absensi',
+                `Catat status <strong>${statusFull[status]}</strong> untuk <strong>${nama}</strong>?`,
+                'Ya, Catat', 'Batal', statusColors[status] || 'indigo'
+            );
+            if (!ok) return;
+
+            try {
+                const { error } = await supabaseClient.rpc('proses_absen_piket', {
+                    p_student_id: id,
+                    p_teacher_note: 'GURU PIKET',
+                    p_status: status
+                });
+
+                if (error) throw error;
+                
+                showAlert(`Berhasil mencatat ${statusFull[status]} untuk ${nama}`, 'success');
+                loadStudents();
+            } catch (err) {
+                showAlert('Gagal mencatat absen: ' + err.message, 'error');
+            }
+        }
+
+        function filterList() {
+            renderList();
+        }
+        function switchTab(tab) {
+            const tManual = document.getElementById('tab-manual');
+            const tIzin = document.getElementById('tab-izin');
+            const tBullying = document.getElementById('tab-bullying');
+            const tTugas = document.getElementById('tab-tugas');
+            const cManual = document.getElementById('content-manual');
+            const cIzin = document.getElementById('content-izin');
+            const cBullying = document.getElementById('content-bullying');
+            const cTugas = document.getElementById('content-tugas');
+
+            const inactiveClass = "pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative";
+            const activeClass = "pb-3 text-indigo-400 border-b-2 border-indigo-500 font-bold transition-all relative";
+
+            tManual.className = inactiveClass.replace(" relative", "");
+            tIzin.className = inactiveClass;
+            tBullying.className = inactiveClass;
+            tTugas.className = inactiveClass;
+
+            cManual.classList.add('hidden');
+            cIzin.classList.add('hidden');
+            cBullying.classList.add('hidden');
+            cTugas.classList.add('hidden');
+
+            if (tab === 'manual') {
+                tManual.className = activeClass.replace(" relative", "");
+                cManual.classList.remove('hidden');
+            } else if (tab === 'izin') {
+                tIzin.className = activeClass;
+                cIzin.classList.remove('hidden');
+                loadLeaveRequests();
+            } else if (tab === 'bullying') {
+                tBullying.className = activeClass;
+                cBullying.classList.remove('hidden');
+                loadBullyingReports();
+            } else if (tab === 'tugas') {
+                tTugas.className = activeClass;
+                cTugas.classList.remove('hidden');
+                loadDelegatedTasks();
+            }
+        }
+
+        async function checkPendingLeaveBadge() {
+            try {
+                const { count, error } = await supabaseClient
+                    .from('leave_requests')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'PENDING');
+                
+                if (error) throw error;
+                const badge = document.getElementById('badge-izin');
+                if (count > 0) {
+                    badge.innerText = count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Gagal load badge izin", err);
+            }
+        }
+
+        async function loadLeaveRequests() {
+            const container = document.getElementById('leave-requests-list');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
+                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data izin...</span>
+                </div>
+            `;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('leave_requests')
+                    .select('*')
+                    .eq('status', 'PENDING')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                
+                if (data) {
+                    const badge = document.getElementById('badge-izin');
+                    if (data.length > 0) {
+                        badge.innerText = data.length;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-20 text-slate-500 font-medium">Tidak ada permintaan izin pending.</div>';
+                    return;
+                }
+
+                // Ambil data siswa untuk setiap request
+                const userIds = [...new Set(data.map(r => r.user_id))];
+                const { data: students } = await supabaseClient
+                    .from('students')
+                    .select('id, nama, kelas')
+                    .in('id', userIds);
+                
+                const studentMap = {};
+                if (students) students.forEach(s => studentMap[s.id] = s);
+
+                container.innerHTML = data.map(req => {
+                    const date = new Date(req.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    const student = studentMap[req.user_id] || { nama: req.user_id, kelas: '?' };
+                    console.log('[PIKET] Leave request:', req.id, 'attachment_url:', req.attachment_url);
+                    const fileLink = req.attachment_url 
+                        ? `<div class="mt-3 space-y-2">
+                            <a href="${req.attachment_url}" target="_blank" class="block">
+                                <img src="${req.attachment_url}" alt="Lampiran" class="w-full max-h-40 object-cover rounded-lg border border-slate-600/50 hover:border-indigo-500/50 transition-all cursor-pointer" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display:none" class="items-center gap-1 text-indigo-400 text-xs mt-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran</div>
+                            </a>
+                           </div>` 
+                        : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada lampiran</span>`;
+                        
+                    return `
+                    <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-indigo-500/30 transition-all" id="req-${req.id}">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg text-white">${student.nama}</h3>
+                                    <p class="text-xs text-slate-400">Kelas ${student.kelas} • ${date}</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${req.type === 'Sakit' ? 'bg-sky-500/20 text-sky-400' : 'bg-indigo-500/20 text-indigo-400'} border border-current">
+                                    ${req.type}
+                                </span>
+                            </div>
+                            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
+                                <p class="text-sm text-slate-300">"${req.reason}"</p>
+                                ${fileLink}
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="approveLeave('${req.id}', '${req.user_id}', '${req.type}', '${req.reason}')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Setujui</button>
+                            <button onclick="rejectLeave('${req.id}')" class="flex-1 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-red-500/30 active:scale-95">Tolak</button>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="col-span-full text-center py-20 text-red-400">Gagal memuat data: ' + err.message + '</div>';
+            }
+        }
+
+        async function approveLeave(reqId, userId, type, reason) {
+            const ok = await showConfirm(
+                'Setujui Izin',
+                `Setujui pengajuan izin <strong>${type}</strong> ini?`,
+                'Setujui', 'Batal', 'emerald'
+            );
+            if (!ok) return;
+            try {
+                const { error: errUpdate } = await supabaseClient
+                    .from('leave_requests')
+                    .update({ status: 'APPROVED' })
+                    .eq('id', reqId);
+                
+                if (errUpdate) throw errUpdate;
+
+                const statusChar = (type === 'Sakit') ? 'S' : 'I';
+                const note = `[IZIN] ${type} - ${reason}`;
+                
+                const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', {
+                    p_student_id: userId,
+                    p_teacher_note: note,
+                    p_status: statusChar
+                });
+
+                if (errRpc) throw errRpc;
+                
+                showAlert('Berhasil menyetujui izin!', 'success');
+                
+                loadLeaveRequests();
+                checkPendingLeaveBadge();
+            } catch(e) {
+                console.error(e);
+                showAlert('Terjadi kesalahan: ' + e.message, 'error');
+            }
+        }
+
+        async function rejectLeave(reqId) {
+            const ok = await showConfirm(
+                'Tolak Izin',
+                'Apakah Anda yakin ingin <strong>menolak</strong> izin ini?',
+                'Ya, Tolak', 'Batal', 'rose'
+            );
+            if (!ok) return;
+            try {
+                const { error: errUpdate } = await supabaseClient
+                    .from('leave_requests')
+                    .update({ status: 'REJECTED' })
+                    .eq('id', reqId);
+                
+                if (errUpdate) throw errUpdate;
+                
+                showAlert('Izin berhasil ditolak.', 'info');
+                
+                loadLeaveRequests();
+                checkPendingLeaveBadge();
+            } catch(e) {
+                console.error(e);
+                showAlert('Terjadi kesalahan: ' + e.message, 'error');
+            }
+        }
+
+        let isBullyingRealtimeSubscribed = false;
+
+        function subscribeBullyingRealtime() {
+            if (isBullyingRealtimeSubscribed || !supabaseClient) return;
+            
+            try {
+                supabaseClient
+                    .channel('public:bullying_reports')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'bullying_reports' }, payload => {
+                        console.log('Bullying report change:', payload);
+                        checkPendingBullyingBadge();
+                        if (document.getElementById('content-bullying') && !document.getElementById('content-bullying').classList.contains('hidden')) {
+                            loadBullyingReports();
+                        }
+
+                        // Kirim notifikasi jika laporan baru masuk
+                        if (payload.eventType === 'INSERT' && payload.new.status === 'PENDING') {
+                            const report = payload.new;
+                            showPiketNotification(
+                                'Laporan Bullying Baru! ⚠️',
+                                `Korban: ${report.victim_name} (Lokasi: ${report.incident_location})`,
+                                'bullying'
+                            );
+                        }
+                    })
+                    .subscribe();
+                    
+                isBullyingRealtimeSubscribed = true;
+            } catch (err) {
+                console.error("Gagal inisialisasi realtime bullying:", err);
+            }
+        }
+
+        let isLeaveRealtimeSubscribed = false;
+
+        function subscribeLeaveRealtime() {
+            if (isLeaveRealtimeSubscribed || !supabaseClient) return;
+            
+            try {
+                supabaseClient
+                    .channel('public:leave_requests_piket')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'leave_requests' }, payload => {
+                        checkPendingLeaveBadge();
+                        if (document.getElementById('content-izin') && !document.getElementById('content-izin').classList.contains('hidden')) {
+                            loadLeaveRequests();
+                        }
+                        
+                        // Kirim notifikasi jika ada izin baru masuk
+                        if (payload.eventType === 'INSERT' && payload.new.status === 'PENDING') {
+                            const req = payload.new;
+                            supabaseClient
+                                .from('students')
+                                .select('nama')
+                                .eq('id', req.user_id)
+                                .single()
+                                .then(({ data }) => {
+                                    const name = data ? data.nama : 'Siswa';
+                                    showPiketNotification(
+                                        'Permohonan Izin Baru! 📝',
+                                        `${name} mengajukan izin (${req.type}): "${req.reason}"`,
+                                        'izin'
+                                    );
+                                });
+                        }
+                    })
+                    .subscribe();
+                isLeaveRealtimeSubscribed = true;
+            } catch (err) {
+                console.error("Gagal inisialisasi realtime izin:", err);
+            }
+        }
+
+        async function checkPendingBullyingBadge() {
+            try {
+                const { count, error } = await supabaseClient
+                    .from('bullying_reports')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'PENDING');
+                
+                if (error) throw error;
+                const badge = document.getElementById('badge-bullying');
+                if (count > 0) {
+                    badge.innerText = count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Gagal load badge bullying", err);
+            }
+        }
+
+        async function loadBullyingReports() {
+            const container = document.getElementById('bullying-reports-list');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
+                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data aduan perundungan...</span>
+                </div>
+            `;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bullying_reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Update badge berdasarkan data ter-load
+                const pendingCount = data ? data.filter(r => r.status === 'PENDING').length : 0;
+                const badge = document.getElementById('badge-bullying');
+                if (pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-20 text-slate-500 font-medium">Belum ada aduan perundungan masuk.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(req => {
+                    const date = new Date(req.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    
+                    const fileLink = req.attachment_url 
+                        ? `<a href="${req.attachment_url}" target="_blank" class="text-rose-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Bukti</a>` 
+                        : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada lampiran</span>`;
+                    
+                    let statusLabel = 'Baru Masuk';
+                    let statusCss = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+                    let actionButtons = '';
+                    
+                    if (req.status === 'PENDING') {
+                        statusLabel = 'Baru Masuk';
+                        statusCss = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+                        actionButtons = `
+                            <button onclick="updateBullyingStatus('${req.id}', 'DIPROSES')" class="flex-1 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-amber-500/30 active:scale-95">Proses</button>
+                            <button onclick="updateBullyingStatus('${req.id}', 'SELESAI')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Selesaikan</button>
+                        `;
+                    } else if (req.status === 'DIPROSES') {
+                        statusLabel = 'Diproses';
+                        statusCss = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                        actionButtons = `
+                            <button onclick="updateBullyingStatus('${req.id}', 'SELESAI')" class="w-full py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Selesaikan Kasus</button>
+                        `;
+                    } else {
+                        statusLabel = 'Selesai';
+                        statusCss = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                        actionButtons = `
+                            <span class="w-full text-center py-2 text-slate-400 text-xs font-semibold">Telah ditangani oleh Guru Piket</span>
+                        `;
+                    }
+                    
+                    const isAnon = req.reporter_name_display === 'Anonim';
+                    const reporterInfoHtml = isAnon 
+                        ? `<span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 uppercase tracking-wider">Laporan Anonim</span>` 
+                        : `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 uppercase tracking-wider">Pelapor: ${req.reporter_name_display}</span>`;
+                        
+                    return `
+                    <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-purple-500/30 transition-all">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg text-white">Korban: ${req.victim_name}</h3>
+                                    <p class="text-xs text-slate-400">${date} • Lokasi: ${req.incident_location}</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusCss} border">
+                                    ${statusLabel}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                ${reporterInfoHtml}
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 text-[10px] font-bold border border-rose-500/25 uppercase tracking-wider">Jenis: ${req.bullying_type}</span>
+                            </div>
+                            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
+                                <p class="text-sm text-slate-300">"${req.description}"</p>
+                                ${fileLink}
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            ${actionButtons}
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="col-span-full text-center py-20 text-red-400">Gagal memuat data: ' + err.message + '</div>';
+            }
+        }
+
+        async function updateBullyingStatus(reportId, newStatus) {
+            const statusLabel = { 'DIPROSES': 'Proses Tindak Lanjut', 'SELESAI': 'Selesai Ditangani' };
+            const color = newStatus === 'SELESAI' ? 'emerald' : 'amber';
+            const ok = await showConfirm(
+                'Ubah Status Aduan',
+                `Ubah status aduan ini menjadi <strong>${statusLabel[newStatus]}</strong>?`,
+                'Ya, Ubah', 'Batal', color
+            );
+            if (!ok) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('bullying_reports')
+                    .update({ status: newStatus })
+                    .eq('id', reportId);
+                
+                if (error) throw error;
+                
+                showAlert('Status aduan berhasil diperbarui!', 'success');
+                
+                loadBullyingReports();
+                checkPendingBullyingBadge();
+            } catch (e) {
+                console.error(e);
+                showAlert('Gagal memperbarui status: ' + e.message, 'error');
+            }
+        }
+
+
+        // ==========================================
+        // TUGAS TITIPAN FUNCTIONS FOR GURU PIKET
+        // ==========================================
+        async function checkPendingTasksBadge() {
+            if (!window.currentPiketName) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('delegated_tasks')
+                    .select('id')
+                    .eq('status', 'Belum Disalurkan')
+                    .ilike('assigned_piket', window.currentPiketName);
+
+                if (error) throw error;
+                const badge = document.getElementById('badge-tugas');
+                if (data && data.length > 0) {
+                    badge.innerText = data.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Gagal memuat badge tugas", err);
+            }
+        }
+
+        async function loadDelegatedTasks() {
+            const container = document.getElementById('tugas-list');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
+                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data tugas titipan...</span>
+                </div>
+            `;
+            try {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const todayStr = `${year}-${month}-${day}`;
+
+                const { data, error } = await supabaseClient
+                    .from('delegated_tasks')
+                    .select('*')
+                    .or(`task_date.eq.${todayStr},status.neq.Selesai`)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-20 text-slate-500 font-medium">Tidak ada tugas titipan aktif.</div>';
+                    return;
+                }
+
+                data.sort((a, b) => {
+                    const isMyTaskA = (a.assigned_piket || '').toLowerCase() === (window.currentPiketName || '').toLowerCase();
+                    const isMyTaskB = (b.assigned_piket || '').toLowerCase() === (window.currentPiketName || '').toLowerCase();
+                    if (isMyTaskA && !isMyTaskB) return -1;
+                    if (!isMyTaskA && isMyTaskB) return 1;
+                    return 0;
+                });
+
+                container.innerHTML = data.map(t => {
+                    const isMyTask = (t.assigned_piket || '').toLowerCase() === (window.currentPiketName || '').toLowerCase();
+                    const dateFormatted = new Date(t.task_date).toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+                    
+                    const fileLink = t.attachment_url
+                        ? `<a href="${t.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Unduh Berkas Tugas</a>`
+                        : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada berkas</span>`;
+
+                    const statusStyles = {
+                        'Belum Disalurkan': 'bg-slate-800 text-slate-400 border-slate-700/60',
+                        'Disalurkan': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+                        'Selesai': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    };
+                    const badgeClass = statusStyles[t.status] || statusStyles['Belum Disalurkan'];
+
+                    let actions = '';
+                    if (t.status === 'Belum Disalurkan') {
+                        actions = `<button onclick="updateDelegatedTaskStatus('${t.id}', 'Disalurkan')" class="flex-1 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-900 rounded-xl text-xs font-bold transition-all border border-amber-500/30 active:scale-95">Tandai Disalurkan</button>`;
+                    } else if (t.status === 'Disalurkan') {
+                        actions = `<button onclick="updateDelegatedTaskStatus('${t.id}', 'Selesai')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-xs font-bold transition-all border border-emerald-500/30 active:scale-95">Tandai Selesai</button>`;
+                    } else {
+                        actions = `<span class="text-xs text-emerald-400 font-bold block text-center w-full py-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10">Tugas Selesai Disalurkan</span>`;
+                    }
+
+                    const cardBorder = isMyTask 
+                        ? 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-purple-950/10' 
+                        : 'border-slate-700/50';
+
+                    return `
+                    <div class="glass-card rounded-2xl p-5 border ${cardBorder} flex flex-col justify-between hover:border-purple-500/30 transition-all">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg text-white flex items-center gap-1.5">
+                                        Kelas ${t.class_name} 
+                                        ${isMyTask ? `<span class="px-2 py-0.5 rounded bg-purple-500 text-white text-[9px] font-bold uppercase tracking-wider">Tugas Anda</span>` : ''}
+                                    </h3>
+                                    <p class="text-xs text-slate-400">Ketidakhadiran: ${t.teacher_name} • ${dateFormatted}</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass} border">
+                                    ${t.status}
+                                </span>
+                            </div>
+                            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
+                                <p class="text-xs font-bold text-purple-300 mb-1">Mata Pelajaran: ${t.subject}</p>
+                                <p class="text-sm text-slate-300 whitespace-pre-line">"${t.task_description}"</p>
+                                ${fileLink}
+                            </div>
+                            <div class="mt-3 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                                Penanggung Jawab Piket: <span class="text-purple-300 font-bold">${t.assigned_piket}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            ${actions}
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="col-span-full text-center py-20 text-red-400">Gagal memuat data tugas: ' + err.message + '</div>';
+            }
+        }
+
+        async function updateDelegatedTaskStatus(taskId, newStatus) {
+            const labels = { 'Disalurkan': 'Telah Disalurkan', 'Selesai': 'Tugas Selesai' };
+            const color = newStatus === 'Selesai' ? 'emerald' : 'amber';
+            const ok = await showConfirm(
+                'Perbarui Status Tugas',
+                `Tandai tugas ini sebagai <strong>${labels[newStatus] || newStatus}</strong>?`,
+                'Ya, Tandai', 'Batal', color
+            );
+            if (!ok) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('delegated_tasks')
+                    .update({ status: newStatus })
+                    .eq('id', taskId);
+
+                if (error) throw error;
+
+                showAlert(`Status tugas diperbarui ke ${newStatus}!`, 'success');
+
+                loadDelegatedTasks();
+                checkPendingTasksBadge();
+            } catch (err) {
+                console.error(err);
+                showAlert('Gagal memperbarui status tugas: ' + err.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // NOTIFICATION & SOUND LOGIC FOR GURU PIKET
+        // ==========================================
+        function requestNotificationPermission() {
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission().then(permission => {
+                    console.log("Notification permission:", permission);
+                });
+            }
+        }
+
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Sound chime note 1
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                gain1.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.35);
+
+                // Sound chime note 2
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime); // A5
+                    gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.55);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.55);
+                }, 110);
+            } catch (e) {
+                console.error("Gagal memutar audio: ", e);
+            }
+        }
+
+        function showPiketNotification(title, message, type = 'info') {
+            // 1. Putar suara
+            playNotificationSound();
+
+            // 2. Kirim notifikasi sistem browser jika dizinkan
+            if ("Notification" in window && Notification.permission === "granted") {
+                try {
+                    new Notification(title, { body: message });
+                } catch (e) {
+                    console.error("Gagal kirim notifikasi browser:", e);
+                }
+            }
+
+            // 3. Buat container toast jika belum ada di DOM
+            let container = document.getElementById('piket-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'piket-toast-container';
+                container.className = 'fixed top-4 right-4 z-[99999] flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0 pointer-events-none';
+                document.body.appendChild(container);
+            }
+
+            // 4. Konfigurasi visual toast berdasarkan jenis
+            const configs = {
+                tugas: {
+                    icon: '📋',
+                    border: 'border-purple-500/40 bg-purple-950/80 backdrop-blur-md',
+                    tab: 'tugas'
+                },
+                izin: {
+                    icon: '📝',
+                    border: 'border-indigo-500/40 bg-indigo-950/80 backdrop-blur-md',
+                    tab: 'izin'
+                },
+                bullying: {
+                    icon: '⚠️',
+                    border: 'border-rose-500/40 bg-rose-950/80 backdrop-blur-md',
+                    tab: 'bullying'
+                },
+                info: {
+                    icon: '🔔',
+                    border: 'border-slate-500/40 bg-slate-900/80 backdrop-blur-md',
+                    tab: 'manual'
+                }
+            };
+
+            const config = configs[type] || configs.info;
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto transform translate-x-full opacity-0 transition-all duration-500 ease-out border rounded-2xl p-4 flex gap-3 shadow-2xl cursor-pointer select-none ${config.border}`;
+            toast.innerHTML = `
+                <div class="text-2xl flex items-center justify-center">${config.icon}</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm text-white">${title}</h4>
+                    <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${message}</p>
+                </div>
+                <button class="text-slate-400 hover:text-white flex-shrink-0 self-start text-xs font-bold w-5 h-5 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full transition-colors">&times;</button>
+            `;
+
+            // Tombol close
+            toast.querySelector('button').addEventListener('click', (e) => {
+                e.stopPropagation();
+                dismissToast(toast);
+            });
+
+            // Klik toast untuk pindah tab
+            toast.addEventListener('click', () => {
+                switchTab(config.tab);
+                dismissToast(toast);
+            });
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, 50);
+
+            // Auto dismiss setelah 7 detik
+            const timeoutId = setTimeout(() => {
+                dismissToast(toast);
+            }, 7000);
+
+            toast.dataset.timeoutId = timeoutId;
+        }
+
+        function dismissToast(toast) {
+            if (toast.dataset.timeoutId) {
+                clearTimeout(toast.dataset.timeoutId);
+            }
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }
+
+        function subscribeTasksRealtime() {
+            if (window.isTasksRealtimeSubscribed) return;
+            supabaseClient
+                .channel('public:delegated_tasks_piket')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'delegated_tasks' }, (payload) => {
+                    checkPendingTasksBadge();
+                    if (document.getElementById('content-tugas') && !document.getElementById('content-tugas').classList.contains('hidden')) {
+                        loadDelegatedTasks();
+                    }
+
+                    // Kirim notifikasi jika tugas titipan baru ditugaskan ke piket ini
+                    if (payload.eventType === 'INSERT') {
+                        const task = payload.new;
+                        const currentPiket = (window.currentPiketName || '').toLowerCase();
+                        const assignedPiket = (task.assigned_piket || '').toLowerCase();
+                        
+                        if (currentPiket === assignedPiket) {
+                            showPiketNotification(
+                                'Tugas Titipan Baru! 📋',
+                                `Kelas ${task.class_name} - ${task.subject} dari ${task.teacher_name}`,
+                                'tugas'
+                            );
+                        }
+                    }
+                })
+                .subscribe();
+            window.isTasksRealtimeSubscribed = true;
+        }
+
+
+        function showStudentDetail(studentId, name, nis) {
+            const modal = document.getElementById('modal-detail-siswa');
+            if (!modal) return;
+
+            document.getElementById('detail-student-name').innerText = name;
+            document.getElementById('detail-student-nis').innerText = 'NIS: ' + nis;
+
+            // Cari log kebiasaan siswa hari ini
+            const habit = habitsToday.find(h => h.user_id === studentId);
+
+            // 1. Mood rendering
+            const moodEmojiEl = document.getElementById('detail-mood-emoji');
+            const moodStatusEl = document.getElementById('detail-mood-status');
+            const moodDescEl = document.querySelector('#detail-mood-card p.text-\\[10px\\]');
+            
+            const moods = {
+                'senang': { emoji: '😊', label: 'Senang', desc: 'Alhamdulillah, siswa merasa gembira dan berenergi hari ini!' },
+                'biasa': { emoji: '😐', label: 'Biasa', desc: 'Perasaan siswa stabil dan biasa saja hari ini.' },
+                'sedih': { emoji: '😢', label: 'Sedih', desc: 'Siswa merasa sedih hari ini. Butuh perhatian ekstra.' },
+                'kesal': { emoji: '😡', label: 'Kesal', desc: 'Siswa sedang merasa kesal / jengkel hari ini.' }
+            };
+
+            const studentMood = (habit && habit.mood) ? habit.mood.toLowerCase() : 'biasa';
+            const moodData = moods[studentMood] || moods['biasa'];
+            moodEmojiEl.innerText = moodData.emoji;
+            moodStatusEl.innerText = moodData.label;
+            if (moodDescEl) moodDescEl.innerText = moodData.desc;
+
+            // 2. Habits evaluation checklist grid rendering
+            const habitsGrid = document.getElementById('detail-habits-grid');
+            const habitDetails = [
+                { id: 1, name: 'Bangun Pagi', emoji: '🌅' },
+                { id: 2, name: 'Beribadah', emoji: '🕌' },
+                { id: 3, name: 'Berolahraga', emoji: '🏃' },
+                { id: 4, name: 'Makan Sehat', emoji: '🍎' },
+                { id: 5, name: 'Gemar Belajar', emoji: '📚' },
+                { id: 6, name: 'Bermasyarakat', emoji: '👥' },
+                { id: 7, name: 'Tidur Cepat/Cukup', emoji: '🌙' }
+            ];
+
+            habitsGrid.innerHTML = habitDetails.map(item => {
+                const textVal = habit ? (habit[`habit_${item.id}`] || '').trim() : '';
+                const isCompleted = textVal !== '';
+                const statusColor = isCompleted ? 'text-emerald-400' : 'text-slate-500';
+                const displayVal = isCompleted ? textVal : 'Belum mencatat';
+                const textStyle = isCompleted ? 'text-slate-200' : 'text-slate-500 italic';
+                const bgBorderClass = isCompleted ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-slate-800/50 bg-slate-800/20';
+
+                return `
+                    <div class="${bgBorderClass} border rounded-xl p-3 flex flex-col gap-1 transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm">${item.emoji}</span>
+                            <span class="text-xs font-bold text-slate-350">${item.name}</span>
+                        </div>
+                        <p class="text-xs ${textStyle} pl-7 mt-0.5 break-words">${displayVal}</p>
+                    </div>
+                `;
+            }).join('');
+
+            // 3. Signatures rendering
+            const parentImg = document.getElementById('detail-sig-parent');
+            const parentPlaceholder = document.getElementById('detail-sig-parent-placeholder');
+            if (habit && habit.signature_parent) {
+                parentImg.src = habit.signature_parent;
+                parentImg.classList.remove('hidden');
+                parentPlaceholder.classList.add('hidden');
+            } else {
+                parentImg.src = '';
+                parentImg.classList.add('hidden');
+                parentPlaceholder.classList.remove('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeStudentDetail() {
+            const modal = document.getElementById('modal-detail-siswa');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
