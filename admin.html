@@ -203,13 +203,14 @@
 
         async function loginAdmin() {
             const pass = document.getElementById('admin-pass').value;
-            // Verifikasi password di server (tidak ada password polos di sisi client)
-            const { data: okAdmin, error: errAdmin } = await supabaseClient.rpc('verify_staff_password', {
+            // Verifikasi sandi di server & terbitkan token sesi staf
+            const { data: adminToken, error: errAdmin } = await supabaseClient.rpc('create_staff_session', {
                 p_role: 'admin',
                 p_password: pass
             });
             if (errAdmin) { alert('Gagal memverifikasi: ' + errAdmin.message); return; }
-            if (okAdmin === true) {
+            if (adminToken) {
+                localStorage.setItem('staff_token', adminToken);
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-view').classList.remove('hidden');
                 document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -235,7 +236,7 @@
             const kelas = document.getElementById('daily-kelas').value;
             const today = new Date().toISOString().split('T')[0];
             
-            const { data: students } = await supabaseClient.from('students').select('*').eq('kelas', kelas).order('nama');
+            const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas).order('nama');
             const { data: logs } = await supabaseClient.from('attendance_logs').select('*').gte('created_at', today+'T00:00:00Z').lte('created_at', today+'T23:59:59Z');
             
             studentsData = students;
@@ -309,13 +310,27 @@
             }).join('');
         }
 
+        function requireToken() {
+            const t = localStorage.getItem('staff_token');
+            if (!t) { alert('Sesi staf habis. Silakan login ulang.'); location.reload(); }
+            return t;
+        }
+
         async function mark(id, status) {
-            await supabaseClient.rpc('proses_absen_piket', { p_student_id: id, p_teacher_note: 'ADMIN', p_status: status });
+            const token = requireToken();
+            if (!token) return;
+            const { error } = await supabaseClient.rpc('proses_absen_piket', { p_student_id: id, p_teacher_note: 'ADMIN', p_status: status, p_token: token });
+            if (error) { alert('Gagal mencatat absen: ' + error.message); return; }
             loadDaily();
         }
 
         async function resetHP(id) {
-            if(confirm('Reset kunci HP?')) { await supabaseClient.rpc('reset_device_siswa', { p_student_id: id }); loadDaily(); }
+            if (!confirm('Reset kunci HP?')) return;
+            const token = requireToken();
+            if (!token) return;
+            const { error } = await supabaseClient.rpc('reset_device_siswa', { p_student_id: id, p_token: token });
+            if (error) { alert('Gagal reset HP: ' + error.message); return; }
+            loadDaily();
         }
 
         // --- REKAP LOGIC ---
@@ -329,7 +344,7 @@
             document.getElementById('print-subtitle').innerText = `${document.getElementById('recap-bulan').options[bulan].text.toUpperCase()} ${tahun}`;
             document.getElementById('sign-date').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
 
-            const { data: students } = await supabaseClient.from('students').select('*').eq('kelas', kelas).order('nama');
+            const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas).order('nama');
             const start = new Date(tahun, bulan, 1).toISOString();
             const end = new Date(tahun, bulan + 1, 0, 23, 59, 59).toISOString();
             const { data: logs } = await supabaseClient.from('attendance_logs').select('*').gte('created_at', start).lte('created_at', end);
@@ -376,7 +391,7 @@
             container.innerHTML = '<div class="col-span-full py-20 text-center opacity-50">Menganalisis pola ketidakhadiran...</div>';
 
             try {
-                const { data: students } = await supabaseClient.from('students').select('*').eq('kelas', kelas);
+                const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas);
                 const { data: logs } = await supabaseClient.from('attendance_logs').select('*').gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
 
                 const map = {};

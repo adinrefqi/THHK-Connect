@@ -534,8 +534,8 @@
                 return;
             }
 
-            // Verifikasi password di server (tidak ada password polos di sisi client)
-            const { data: okPiket, error: errPiket } = await supabaseClient.rpc('verify_staff_password', {
+            // Verifikasi sandi di server & terbitkan token sesi staf
+            const { data: piketToken, error: errPiket } = await supabaseClient.rpc('create_staff_session', {
                 p_role: 'piket',
                 p_password: pass
             });
@@ -543,7 +543,8 @@
                 alert('Gagal memverifikasi: ' + errPiket.message);
                 return;
             }
-            if (okPiket === true) {
+            if (piketToken) {
+                localStorage.setItem('staff_token', piketToken);
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('dashboard-view').classList.remove('hidden');
                 document.getElementById('today-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - Piket: ' + name;
@@ -575,7 +576,7 @@
                 // 1. Ambil semua siswa di kelas tersebut
                 const { data: students, error: sErr } = await supabaseClient
                     .from('students')
-                    .select('*')
+                    .select('id, nis, nama, kelas, device_id, created_at')
                     .eq('kelas', kelas)
                     .order('nama', { ascending: true });
 
@@ -781,8 +782,11 @@
             if (!ok) return;
 
             try {
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
                 const { error } = await supabaseClient.rpc('reset_device_siswa', {
-                    p_student_id: id
+                    p_student_id: id,
+                    p_token: token
                 });
 
                 if (error) throw error;
@@ -804,14 +808,17 @@
             if (!ok) return;
 
             try {
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
                 const { error } = await supabaseClient.rpc('proses_absen_piket', {
                     p_student_id: id,
                     p_teacher_note: 'GURU PIKET',
-                    p_status: status
+                    p_status: status,
+                    p_token: token
                 });
 
                 if (error) throw error;
-                
+
                 showAlert(`Berhasil mencatat ${statusFull[status]} untuk ${nama}`, 'success');
                 loadStudents();
             } catch (err) {
@@ -986,11 +993,14 @@
 
                 const statusChar = (type === 'Sakit') ? 'S' : 'I';
                 const note = `[IZIN] ${type} - ${reason}`;
-                
+
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
                 const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', {
                     p_student_id: userId,
                     p_teacher_note: note,
-                    p_status: statusChar
+                    p_status: statusChar,
+                    p_token: token
                 });
 
                 if (errRpc) throw errRpc;
@@ -1104,12 +1114,12 @@
 
         async function checkPendingBullyingBadge() {
             try {
-                const { count, error } = await supabaseClient
-                    .from('bullying_reports')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'PENDING');
-                
+                const token = localStorage.getItem('staff_token');
+                if (!token) return;
+                const { data, error } = await supabaseClient.rpc('get_bullying_reports', { p_token: token });
+
                 if (error) throw error;
+                const count = (data || []).filter(r => r.status === 'PENDING').length;
                 const badge = document.getElementById('badge-bullying');
                 if (count > 0) {
                     badge.innerText = count;
@@ -1131,10 +1141,9 @@
                 </div>
             `;
             try {
-                const { data, error } = await supabaseClient
-                    .from('bullying_reports')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                const { data, error } = await supabaseClient.rpc('get_bullying_reports', { p_token: token });
 
                 if (error) throw error;
 
@@ -1235,13 +1244,16 @@
             if (!ok) return;
             
             try {
-                const { error } = await supabaseClient
-                    .from('bullying_reports')
-                    .update({ status: newStatus })
-                    .eq('id', reportId);
-                
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                const { error } = await supabaseClient.rpc('update_bullying_status', {
+                    p_token: token,
+                    p_id: reportId,
+                    p_status: newStatus
+                });
+
                 if (error) throw error;
-                
+
                 showAlert('Status aduan berhasil diperbarui!', 'success');
                 
                 loadBullyingReports();

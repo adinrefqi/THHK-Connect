@@ -3826,8 +3826,8 @@
                         showToast("Sistem belum siap. Mohon refresh halaman.", "error");
                         return;
                     }
-                    // Verifikasi password di server (tidak ada password polos di sisi client)
-                    const { data: okPiket, error: errPiket } = await supabaseClient.rpc('verify_staff_password', {
+                    // Verifikasi sandi di server & terbitkan token sesi staf
+                    const { data: piketToken, error: errPiket } = await supabaseClient.rpc('create_staff_session', {
                         p_role: 'piket',
                         p_password: password
                     });
@@ -3835,8 +3835,9 @@
                         showToast('Gagal memverifikasi: ' + errPiket.message, 'error');
                         return;
                     }
-                    if (okPiket === true) {
+                    if (piketToken) {
                         localStorage.setItem('piket_session', nis);
+                        localStorage.setItem('staff_token', piketToken);
                         if (nis.toLowerCase() === 'adin') {
                             showToast('Selamat datang, Admin Adin!', 'success');
                             setView('admin-hub');

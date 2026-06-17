@@ -536,7 +536,7 @@
                 // 1. Ambil total siswa
                 const { count: totalSiswa, error: errCount } = await supabaseClient
                     .from('students')
-                    .select('*', { count: 'exact', head: true });
+                    .select('id', { count: 'exact', head: true });
 
                 if (errCount) throw errCount;
 
@@ -833,17 +833,38 @@
             document.getElementById('resetModal').classList.add('hidden');
         }
 
+        // Pastikan ada token sesi staf yang valid. Jika belum, minta sandi admin
+        // sekali lalu terbitkan token via server (create_staff_session).
+        async function ensureStaffToken() {
+            let token = localStorage.getItem('staff_token');
+            if (token) return token;
+            const pass = prompt('Masukkan password Admin untuk melanjutkan:');
+            if (!pass) return null;
+            const { data, error } = await supabaseClient.rpc('create_staff_session', {
+                p_role: 'admin',
+                p_password: pass
+            });
+            if (error) { showToast('Gagal verifikasi: ' + error.message, 'error'); return null; }
+            if (!data) { showToast('Password salah!', 'error'); return null; }
+            localStorage.setItem('staff_token', data);
+            return data;
+        }
+
         async function confirmReset() {
             if (!currentStudentIdToReset) return;
 
             const idToReset = currentStudentIdToReset;
             closeResetModal(); // Tutup modal
+
+            const token = await ensureStaffToken();
+            if (!token) return;
             showToast('Sedang mereset device...', 'info');
 
             try {
                 // Gunakan RPC reset_device_siswa yang aman dan terdaftar di DB
                 const { error } = await supabaseClient.rpc('reset_device_siswa', {
-                    p_student_id: idToReset
+                    p_student_id: idToReset,
+                    p_token: token
                 });
 
                 if (error) throw error;
@@ -1013,23 +1034,24 @@
                 return;
             }
             
+            const token = await ensureStaffToken();
+            if (!token) return;
+
             // Set loading state
             btn.disabled = true;
             btn.innerHTML = `<div class="w-4 h-4 rounded-full spinner"></div> <span>Menyimpan...</span>`;
-            
+
             try {
-                const { error } = await supabaseClient
-                    .from('settings')
-                    .upsert({
-                        key: 'geofence',
-                        value: {
-                            latitude: lat,
-                            longitude: lon,
-                            radius_meters: radius
-                        },
-                        updated_at: new Date().toISOString()
-                    });
-                
+                // Tulis lewat RPC bergerbang token; tabel settings kini terkunci RLS.
+                const { error } = await supabaseClient.rpc('update_geofence', {
+                    p_token: token,
+                    p_value: {
+                        latitude: lat,
+                        longitude: lon,
+                        radius_meters: radius
+                    }
+                });
+
                 if (error) throw error;
                 
                 showToast("Pengaturan Geofencing berhasil disimpan!", "success");
