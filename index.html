@@ -1406,6 +1406,199 @@
             animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        /* ===== VIEW TRANSITION ANIMATIONS ===== */
+
+        /* Fade + Slide In animation */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fade + Slide Out animation */
+        @keyframes fadeSlideDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-16px);
+            }
+        }
+
+        /* Quick fade in (for smaller elements) */
+        @keyframes quickFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Scale bounce in */
+        @keyframes scaleBounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            60% {
+                transform: scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Tab content transition */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(12px);
+            animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Section transition wrapper */
+        .section-transition {
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+        }
+        .section-transition.exiting {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        .section-transition.entering {
+            animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* View transition */
+        .view-transition {
+            animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Loading skeleton animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 0.5rem;
+        }
+
+        .skeleton-text {
+            height: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        .skeleton-text.medium {
+            width: 80%;
+        }
+
+        .skeleton-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+        }
+
+        .skeleton-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Button click ripple effect */
+        .ripple-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.6s ease-out;
+        }
+
+        .ripple-btn:active::after {
+            transform: scale(4);
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* Nav item active indicator animation */
+        .nav-indicator {
+            position: relative;
+        }
+
+        .nav-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #818cf8);
+            border-radius: 2px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-indicator.active::after {
+            width: 60%;
+            left: 20%;
+        }
+
+        /* Toast slide animation */
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+
         /* Ensure main content sits above body::before */
         .app-container {
             position: relative;
@@ -2161,10 +2354,43 @@
                     <div class="glass-panel rounded-2xl p-4">
                         <div id="history-list" class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
                             <!-- History Items injected here -->
-                            <div class="text-center py-10 opacity-50">
+                            <div id="history-loading" class="space-y-3">
+                                <!-- Skeleton Loader -->
+                                <div class="skeleton-card">
+                                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                                        <div class="skeleton skeleton-avatar"></div>
+                                        <div style="flex:1;">
+                                            <div class="skeleton skeleton-text medium"></div>
+                                            <div class="skeleton skeleton-text short" style="height:0.625rem;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                                        <div class="skeleton skeleton-avatar"></div>
+                                        <div style="flex:1;">
+                                            <div class="skeleton skeleton-text medium"></div>
+                                            <div class="skeleton skeleton-text short" style="height:0.625rem;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="skeleton-card">
+                                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                                        <div class="skeleton skeleton-avatar"></div>
+                                        <div style="flex:1;">
+                                            <div class="skeleton skeleton-text medium"></div>
+                                            <div class="skeleton skeleton-text short" style="height:0.625rem;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="history-empty" class="hidden text-center py-10 opacity-50">
                                 <div class="loader rounded-full border-2 border-t-2 border-white h-6 w-6 mx-auto mb-2">
                                 </div>
-                                <p class="text-sm">Memuat riwayat...</p>
+                                <p class="text-sm">Tidak ada data riwayat</p>
+                            </div>
+                            <div id="history-loading-error" class="hidden text-center py-10 text-red-300">
+                                <p class="text-sm">Gagal memuat riwayat</p>
                             </div>
                         </div>
                     </div>
@@ -2651,46 +2877,107 @@
                 }, 4000);
             }
 
+            // View transition state
+            let isTransitioning = false;
+
             function setView(viewName) {
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.add('hidden');
-                const adminHub = document.getElementById('view-admin-hub');
-                if (adminHub) adminHub.classList.add('hidden');
+                if (isTransitioning) return;
+                isTransitioning = true;
+
+                // Get all views
+                const views = {
+                    login: document.getElementById('view-login'),
+                    adminHub: document.getElementById('view-admin-hub'),
+                    dashboard: document.getElementById('view-dashboard')
+                };
                 const bottomNav = document.getElementById('bottom-nav');
 
-                if (viewName === 'login') {
-                    document.getElementById('view-login').classList.remove('hidden');
+                // Fade out current views
+                Object.values(views).forEach(view => {
+                    if (view && !view.classList.contains('hidden')) {
+                        view.style.opacity = '0';
+                        view.style.transform = 'translateY(-10px)';
+                        view.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
+                    }
+                });
+
+                // After fade out, switch views with fade in
+                setTimeout(() => {
+                    // Hide all views
+                    Object.values(views).forEach(view => {
+                        if (view) view.classList.add('hidden');
+                    });
                     if (bottomNav) bottomNav.classList.add('hidden');
-                    if (window.locationCheckInterval) clearInterval(window.locationCheckInterval);
-                } else if (viewName === 'admin-hub') {
-                    if (adminHub) adminHub.classList.remove('hidden');
-                    if (bottomNav) bottomNav.classList.add('hidden');
-                    if (window.locationCheckInterval) clearInterval(window.locationCheckInterval);
-                } else if (viewName === 'dashboard') {
-                    document.getElementById('view-dashboard').classList.remove('hidden');
-                    if (bottomNav) bottomNav.classList.remove('hidden');
-                    history.replaceState({ section: 'home' }, "");
-                    switchSection('home', false);
-                    startLocationChecking();
-                    checkTodayAttendance();
-                    fetchAttendanceHistory();
-                }
+
+                    // Show target view with animation
+                    let targetView;
+                    if (viewName === 'login') {
+                        targetView = views.login;
+                    } else if (viewName === 'admin-hub') {
+                        targetView = views.adminHub;
+                    } else if (viewName === 'dashboard') {
+                        targetView = views.dashboard;
+                        if (bottomNav) bottomNav.classList.remove('hidden');
+                    }
+
+                    if (targetView) {
+                        targetView.classList.remove('hidden');
+                        targetView.style.opacity = '0';
+                        targetView.style.transform = 'translateY(16px)';
+
+                        // Force reflow
+                        void targetView.offsetWidth;
+
+                        // Animate in
+                        targetView.style.transition = 'opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+                        targetView.style.opacity = '1';
+                        targetView.style.transform = 'translateY(0)';
+
+                        // Run dashboard setup after animation starts
+                        if (viewName === 'dashboard') {
+                            history.replaceState({ section: 'home' }, "");
+                            switchSection('home', false);
+                            startLocationChecking();
+                            checkTodayAttendance();
+                            fetchAttendanceHistory();
+                        }
+
+                        // Clear inline styles after animation completes
+                        setTimeout(() => {
+                            targetView.style.opacity = '';
+                            targetView.style.transform = '';
+                            targetView.style.transition = '';
+                            isTransitioning = false;
+                        }, 400);
+                    } else {
+                        isTransitioning = false;
+                    }
+                }, 250);
             }
+
+            // Section transition state
+            let isSectionTransitioning = false;
 
             // --- SECTION SWITCHER (Home vs History vs Habits) ---
             function switchSection(section, pushState = true) {
+                if (isSectionTransitioning) return;
+                isSectionTransitioning = true;
+
                 const homeSec = document.getElementById('section-home');
                 const historySec = document.getElementById('section-history');
                 const habitsSec = document.getElementById('section-habits');
-                
+
                 const navHome = document.getElementById('nav-home');
                 const navHistory = document.getElementById('nav-history');
                 const navHabits = document.getElementById('nav-habits');
 
-                // Sembunyikan semua section
-                homeSec.classList.add('hidden');
-                historySec.classList.add('hidden');
-                habitsSec.classList.add('hidden');
+                // Fade out current section
+                const currentSections = [homeSec, historySec, habitsSec].filter(s => s && !s.classList.contains('hidden'));
+                currentSections.forEach(sec => {
+                    sec.style.opacity = '0';
+                    sec.style.transform = 'translateY(-8px)';
+                    sec.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
+                });
 
                 // Non-aktifkan semua navigasi (inline style update)
                 [navHome, navHistory, navHabits].forEach(nav => {
@@ -2700,47 +2987,85 @@
                     }
                 });
 
-                if (section === 'home') {
-                    homeSec.classList.remove('hidden');
-                    if (navHome) {
-                        navHome.style.background = 'rgba(255,255,255,0.1)';
-                        navHome.style.color = '#fff';
-                    }
-                } else if (section === 'history') {
-                    historySec.classList.remove('hidden');
-                    if (navHistory) {
-                        navHistory.style.background = 'rgba(255,255,255,0.1)';
-                        navHistory.style.color = '#fff';
-                    }
-                    fetchAttendanceHistory();
-                } else if (section === 'habits') {
-                    habitsSec.classList.remove('hidden');
-                    if (navHabits) {
-                        navHabits.style.background = 'rgba(255,255,255,0.1)';
-                        navHabits.style.color = '#fff';
-                    }
-                    loadTodayHabits();
-                    setTimeout(() => {
-                        initSignaturePad('sig-canvas-parent');
-                        const dateInput = document.getElementById('habit-log-date');
-                        if (dateInput && !dateInput.value) {
-                            const getLocalDateString = (d) => {
-                                const year = d.getFullYear();
-                                const month = String(d.getMonth() + 1).padStart(2, '0');
-                                const day = String(d.getDate()).padStart(2, '0');
-                                return `${year}-${month}-${day}`;
-                            };
-                            dateInput.value = getLocalDateString(new Date());
+                // After fade out, switch sections with fade in
+                setTimeout(() => {
+                    // Hide all sections
+                    [homeSec, historySec, habitsSec].forEach(sec => {
+                        if (sec) sec.classList.add('hidden');
+                    });
+
+                    // Show target section with animation
+                    let targetSection;
+                    if (section === 'home') {
+                        homeSec.classList.remove('hidden');
+                        targetSection = homeSec;
+                        if (navHome) {
+                            navHome.style.background = 'rgba(255,255,255,0.1)';
+                            navHome.style.color = '#fff';
                         }
-                    }, 50);
-                }
+                    } else if (section === 'history') {
+                        historySec.classList.remove('hidden');
+                        targetSection = historySec;
+                        if (navHistory) {
+                            navHistory.style.background = 'rgba(255,255,255,0.1)';
+                            navHistory.style.color = '#fff';
+                        }
+                        fetchAttendanceHistory();
+                    } else if (section === 'habits') {
+                        habitsSec.classList.remove('hidden');
+                        targetSection = habitsSec;
+                        if (navHabits) {
+                            navHabits.style.background = 'rgba(255,255,255,0.1)';
+                            navHabits.style.color = '#fff';
+                        }
+                        loadTodayHabits();
+                        setTimeout(() => {
+                            initSignaturePad('sig-canvas-parent');
+                            const dateInput = document.getElementById('habit-log-date');
+                            if (dateInput && !dateInput.value) {
+                                const getLocalDateString = (d) => {
+                                    const year = d.getFullYear();
+                                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                                    const day = String(d.getDate()).padStart(2, '0');
+                                    return `${year}-${month}-${day}`;
+                                };
+                                dateInput.value = getLocalDateString(new Date());
+                            }
+                        }, 50);
+                    }
 
-                // Scroll ke atas saat pindah section
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (targetSection) {
+                        // Animate in
+                        targetSection.style.opacity = '0';
+                        targetSection.style.transform = 'translateY(12px)';
+                        targetSection.style.transition = 'opacity 0s'; // No transition initially
 
-                if (pushState) {
-                    history.pushState({ section: section }, "");
-                }
+                        // Force reflow
+                        void targetSection.offsetWidth;
+
+                        // Apply transition and animate
+                        targetSection.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+                        targetSection.style.opacity = '1';
+                        targetSection.style.transform = 'translateY(0)';
+
+                        // Clear inline styles after animation completes
+                        setTimeout(() => {
+                            targetSection.style.opacity = '';
+                            targetSection.style.transform = '';
+                            targetSection.style.transition = '';
+                            isSectionTransitioning = false;
+                        }, 350);
+                    } else {
+                        isSectionTransitioning = false;
+                    }
+
+                    // Scroll to top smoothly
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    if (pushState) {
+                        history.pushState({ section: section }, "");
+                    }
+                }, 220);
             }
 
             // --- MOOD & SIGNATURE DRAWING SYSTEM ---
@@ -4335,8 +4660,16 @@
                 if (!session || !session.id || !supabaseClient) return;
 
                 const listEl = document.getElementById('history-list');
+                const historyLoading = document.getElementById('history-loading');
+                const historyEmpty = document.getElementById('history-empty');
+                const historyLoadingError = document.getElementById('history-loading-error');
                 const refreshIcon = document.getElementById('refresh-icon');
                 refreshIcon.classList.add('animate-spin');
+
+                // Show skeleton loader, hide others
+                if (historyLoading) historyLoading.classList.remove('hidden');
+                if (historyEmpty) historyEmpty.classList.add('hidden');
+                if (historyLoadingError) historyLoadingError.classList.add('hidden');
 
                 // Dapatkan nilai filter bulan
                 const monthInput = document.getElementById('history-month-filter');
@@ -4408,6 +4741,9 @@
                     combinedData = combinedData.slice(0, 100);
 
                     if (combinedData.length === 0) {
+                        // Hide skeleton, show empty state
+                        if (historyLoading) historyLoading.classList.add('hidden');
+                        if (historyEmpty) historyEmpty.classList.remove('hidden');
                         listEl.innerHTML = `
                             <div class="text-center py-10 opacity-30">
                                 <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4511,7 +4847,11 @@
                             `;
                         });
 
-                        if (listEl) listEl.innerHTML = htmlItems.join('');
+                        if (listEl) {
+                            // Hide skeleton loader
+                            if (historyLoading) historyLoading.classList.add('hidden');
+                            listEl.innerHTML = htmlItems.join('');
+                        }
 
                         // Update stats
                         const sH = document.getElementById('stat-hadir');
@@ -4529,6 +4869,20 @@
                     }
                 } catch (err) {
                     console.error("Gagal memuat riwayat absensi:", err);
+                    // Show error state
+                    if (historyLoading) historyLoading.classList.add('hidden');
+                    if (historyLoadingError) historyLoadingError.classList.remove('hidden');
+                    if (listEl) {
+                        listEl.innerHTML = `
+                            <div class="text-center py-10 text-red-300">
+                                <svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <p class="text-sm">Gagal memuat data</p>
+                                <p class="text-xs opacity-60 mt-1">Coba refresh beberapa saat lagi</p>
+                            </div>
+                        `;
+                    }
                 } finally {
                     refreshIcon.classList.remove('animate-spin');
                 }

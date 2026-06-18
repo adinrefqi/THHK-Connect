@@ -197,6 +197,114 @@
         .alert-toast.show {
             transform: translateX(-50%) translateY(0);
         }
+
+        /* Tab transition animations */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes tabFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tab button styles */
+        .tab-nav-btn {
+            position: relative;
+            padding-bottom: 0.75rem;
+            transition: all 0.25s ease;
+        }
+
+        .tab-nav-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #818cf8, #6366f1);
+            border-radius: 2px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-nav-btn.active {
+            color: #818cf8 !important;
+        }
+
+        .tab-nav-btn.active::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .tab-nav-btn:not(.active):hover {
+            color: #cbd5e1 !important;
+        }
+
+        /* Card stagger animation */
+        .card-stagger {
+            opacity: 0;
+            transform: translateY(12px);
+            animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Skeleton loader */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0.3) 25%, rgba(30, 41, 59, 0.5) 50%, rgba(30, 41, 59, 0.3) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 0.75rem;
+        }
+
+        .skeleton-card {
+            background: rgba(30, 41, 59, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+        }
+
+        /* Student item enhanced animation */
+        .student-item {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        .student-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(30, 41, 59, 0.65);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Button micro-interaction */
+        .btn-micro {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-micro:hover {
+            transform: translateY(-1px);
+        }
+        .btn-micro:active {
+            transform: scale(0.97);
+        }
         .alert-toast.toast-success {
             background: rgba(16, 185, 129, 0.9);
             border: 1px solid rgba(52, 211, 153, 0.4);
@@ -282,16 +390,16 @@
 
         <!-- TABS -->
         <div class="flex border-b border-slate-800/80 mb-6 gap-6 tabs-scrollable">
-            <button onclick="switchTab('manual')" id="tab-manual" class="pb-3 text-indigo-400 border-b-2 border-indigo-500 font-bold transition-all">Absensi Manual</button>
-            <button onclick="switchTab('izin')" id="tab-izin" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+            <button onclick="switchTab('manual')" id="tab-manual" class="tab-nav-btn active text-indigo-400 font-bold">Absensi Manual</button>
+            <button onclick="switchTab('izin')" id="tab-izin" class="tab-nav-btn text-slate-500 hover:text-slate-300 font-bold relative">
                 Persetujuan Izin
                 <span id="badge-izin" class="absolute -top-1 -right-4 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-red-500/50">0</span>
             </button>
-            <button onclick="switchTab('bullying')" id="tab-bullying" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+            <button onclick="switchTab('bullying')" id="tab-bullying" class="tab-nav-btn text-slate-500 hover:text-slate-300 font-bold relative">
                 Laporan Perundungan
                 <span id="badge-bullying" class="absolute -top-1 -right-4 bg-rose-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-rose-500/50">0</span>
             </button>
-            <button onclick="switchTab('tugas')" id="tab-tugas" class="pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative">
+            <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-nav-btn text-slate-500 hover:text-slate-300 font-bold relative">
                 Tugas Titipan
                 <span id="badge-tugas" class="absolute -top-1 -right-4 bg-purple-500 text-white text-[10px] px-1.5 rounded-full hidden shadow-sm shadow-purple-500/50">0</span>
             </button>
@@ -299,17 +407,58 @@
 
 
         <!-- MANUAL TAB CONTENT -->
-        <div id="content-manual">
+        <div id="content-manual" class="tab-content">
             <!-- SEARCH BOX -->
             <div class="mb-6">
-                <input type="text" id="search-student" oninput="filterList()" placeholder="Cari nama siswa atau NIS..." 
+                <input type="text" id="search-student" oninput="filterList()" placeholder="Cari nama siswa atau NIS..."
                        class="w-full px-6 py-4 rounded-2xl input-glass placeholder-slate-500 shadow-inner text-sm">
             </div>
 
             <!-- LISTING CONTAINER -->
             <div id="student-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Dynamic data loaded here -->
-                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat data siswa...</div>
+                <div id="student-list-loading" class="col-span-full space-y-4">
+                    <!-- Skeleton Loader -->
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:120px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:80px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:140px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:70px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:110px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:90px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -502,6 +651,7 @@
         
         function logoutPiket() {
             localStorage.removeItem('piket_session');
+            localStorage.removeItem('staff_token');
             window.location.href = 'index.html';
         }
         
@@ -545,6 +695,7 @@
             }
             if (piketToken) {
                 localStorage.setItem('staff_token', piketToken);
+                localStorage.setItem('piket_session', name.toLowerCase());
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('dashboard-view').classList.remove('hidden');
                 document.getElementById('today-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - Piket: ' + name;
@@ -565,10 +716,51 @@
         async function loadStudents() {
             const kelas = document.getElementById('filter-kelas').value;
             const container = document.getElementById('student-list');
+            const loadingSkeleton = document.getElementById('student-list-loading');
+
+            // Show skeleton loader
+            if (loadingSkeleton) loadingSkeleton.classList.remove('hidden');
             container.innerHTML = `
-                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
-                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Menghubungkan ke basis data...</span>
+                <div id="student-list-loading" class="col-span-full space-y-4">
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:120px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:80px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:140px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:70px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div class="skeleton" style="width:110px;height:16px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:90px;height:10px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                                <div class="skeleton" style="width:40px;height:32px;border-radius:12px;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -686,9 +878,9 @@
         function renderList() {
             const container = document.getElementById('student-list');
             const search = document.getElementById('search-student').value.toLowerCase().trim();
-            
+
             const filtered = allStudents.filter(s => s.nama.toLowerCase().includes(search) || s.nis.toLowerCase().includes(search));
-            
+
             if (filtered.length === 0) {
                 container.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500 font-semibold">Siswa tidak ditemukan.</div>';
                 return;
@@ -829,45 +1021,79 @@
         function filterList() {
             renderList();
         }
+
+        // Tab transition state to prevent rapid switching
+        let isTabSwitching = false;
+
         function switchTab(tab) {
-            const tManual = document.getElementById('tab-manual');
-            const tIzin = document.getElementById('tab-izin');
-            const tBullying = document.getElementById('tab-bullying');
-            const tTugas = document.getElementById('tab-tugas');
-            const cManual = document.getElementById('content-manual');
-            const cIzin = document.getElementById('content-izin');
-            const cBullying = document.getElementById('content-bullying');
-            const cTugas = document.getElementById('content-tugas');
+            if (isTabSwitching) return;
+            isTabSwitching = true;
 
-            const inactiveClass = "pb-3 text-slate-500 hover:text-slate-300 font-bold transition-all relative";
-            const activeClass = "pb-3 text-indigo-400 border-b-2 border-indigo-500 font-bold transition-all relative";
+            const contents = {
+                manual: document.getElementById('content-manual'),
+                izin: document.getElementById('content-izin'),
+                bullying: document.getElementById('content-bullying'),
+                tugas: document.getElementById('content-tugas')
+            };
+            const tabs = {
+                manual: document.getElementById('tab-manual'),
+                izin: document.getElementById('tab-izin'),
+                bullying: document.getElementById('tab-bullying'),
+                tugas: document.getElementById('tab-tugas')
+            };
 
-            tManual.className = inactiveClass.replace(" relative", "");
-            tIzin.className = inactiveClass;
-            tBullying.className = inactiveClass;
-            tTugas.className = inactiveClass;
+            // Fade out current content
+            Object.values(contents).forEach(content => {
+                if (content && !content.classList.contains('hidden')) {
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateY(-6px)';
+                    content.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                }
+            });
 
-            cManual.classList.add('hidden');
-            cIzin.classList.add('hidden');
-            cBullying.classList.add('hidden');
-            cTugas.classList.add('hidden');
+            // Update tab button styles immediately
+            Object.keys(tabs).forEach(key => {
+                if (tabs[key]) {
+                    if (key === tab) {
+                        tabs[key].classList.add('active');
+                    } else {
+                        tabs[key].classList.remove('active');
+                    }
+                }
+            });
 
-            if (tab === 'manual') {
-                tManual.className = activeClass.replace(" relative", "");
-                cManual.classList.remove('hidden');
-            } else if (tab === 'izin') {
-                tIzin.className = activeClass;
-                cIzin.classList.remove('hidden');
-                loadLeaveRequests();
-            } else if (tab === 'bullying') {
-                tBullying.className = activeClass;
-                cBullying.classList.remove('hidden');
-                loadBullyingReports();
-            } else if (tab === 'tugas') {
-                tTugas.className = activeClass;
-                cTugas.classList.remove('hidden');
-                loadDelegatedTasks();
-            }
+            // After fade out, switch content with fade in
+            setTimeout(() => {
+                // Hide all content and remove animation classes
+                Object.values(contents).forEach(content => {
+                    if (content) {
+                        content.classList.add('hidden');
+                        content.classList.remove('tab-content');
+                    }
+                });
+
+                // Show target content with animation
+                const targetContent = contents[tab];
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                    // Force reflow for animation
+                    void targetContent.offsetWidth;
+                    targetContent.classList.add('tab-content');
+                }
+
+                // Load data for specific tabs
+                if (tab === 'izin') {
+                    loadLeaveRequests();
+                } else if (tab === 'bullying') {
+                    loadBullyingReports();
+                } else if (tab === 'tugas') {
+                    loadDelegatedTasks();
+                }
+
+                setTimeout(() => {
+                    isTabSwitching = false;
+                }, 300);
+            }, 220);
         }
 
         async function checkPendingLeaveBadge() {
@@ -893,9 +1119,35 @@
         async function loadLeaveRequests() {
             const container = document.getElementById('leave-requests-list');
             container.innerHTML = `
-                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
-                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data izin...</span>
+                <div class="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:100px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:140px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:50px;height:24px;border-radius:8px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:60px;margin-bottom:16px;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:120px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:130px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:50px;height:24px;border-radius:8px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:60px;margin-bottom:16px;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                        </div>
+                    </div>
                 </div>
             `;
             try {
@@ -1135,9 +1387,43 @@
         async function loadBullyingReports() {
             const container = document.getElementById('bullying-reports-list');
             container.innerHTML = `
-                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
-                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data aduan perundungan...</span>
+                <div class="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:140px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:160px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:70px;height:22px;border-radius:8px;"></div>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:12px;">
+                            <div class="skeleton" style="width:80px;height:20px;border-radius:6px;"></div>
+                            <div class="skeleton" style="width:60px;height:20px;border-radius:6px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:60px;margin-bottom:16px;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:120px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:150px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:70px;height:22px;border-radius:8px;"></div>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:12px;">
+                            <div class="skeleton" style="width:90px;height:20px;border-radius:6px;"></div>
+                            <div class="skeleton" style="width:70px;height:20px;border-radius:6px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:60px;margin-bottom:16px;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                            <div class="skeleton" style="flex:1;height:36px;border-radius:12px;"></div>
+                        </div>
+                    </div>
                 </div>
             `;
             try {
@@ -1293,9 +1579,37 @@
         async function loadDelegatedTasks() {
             const container = document.getElementById('tugas-list');
             container.innerHTML = `
-                <div class="col-span-full flex flex-col justify-center items-center py-20 gap-3">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-700 h-12 w-12"></div>
-                    <span class="text-sm text-slate-400 font-semibold animate-pulse">Mengambil data tugas titipan...</span>
+                <div class="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:130px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:180px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:90px;height:22px;border-radius:8px;"></div>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <div class="skeleton" style="width:100px;height:12px;margin-bottom:8px;"></div>
+                            <div class="skeleton" style="width:100%;height:50px;margin-bottom:8px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:12px;margin-bottom:16px;"></div>
+                        <div class="skeleton" style="width:100%;height:36px;border-radius:12px;"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                            <div>
+                                <div class="skeleton" style="width:150px;height:18px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:160px;height:10px;"></div>
+                            </div>
+                            <div class="skeleton" style="width:90px;height:22px;border-radius:8px;"></div>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <div class="skeleton" style="width:110px;height:12px;margin-bottom:8px;"></div>
+                            <div class="skeleton" style="width:100%;height:50px;margin-bottom:8px;"></div>
+                        </div>
+                        <div class="skeleton" style="width:100%;height:12px;margin-bottom:16px;"></div>
+                        <div class="skeleton" style="width:100%;height:36px;border-radius:12px;"></div>
+                    </div>
                 </div>
             `;
             try {

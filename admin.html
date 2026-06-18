@@ -11,6 +11,122 @@
         body { font-family: 'Outfit', sans-serif; background: #0f172a; color: white; min-height: 100vh; }
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+        /* Tab content transition animations */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes tabFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tab button transition */
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 2px;
+            transition: width 0.25s ease, left 0.25s ease;
+        }
+
+        .tab-btn.active::after {
+            width: 50%;
+            left: 25%;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Skeleton loader animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 0.5rem;
+        }
+
+        .skeleton-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        /* Loading spinner */
+        .loader {
+            border-top-color: #3b82f6;
+            animation: spinner 0.8s linear infinite;
+        }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Card hover animation */
+        .student-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .student-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Button click ripple */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple:active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+            transform: scale(4);
+            opacity: 1;
+        }
+
+        /* Alert card animation */
+        .alert-card {
+            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
         
         /* Hide scrollbars */
         .scrollbar-none::-webkit-scrollbar {
@@ -219,16 +335,70 @@
         }
 
         function setTab(tab) {
-            document.getElementById('content-daily').classList.toggle('hidden', tab !== 'daily');
-            document.getElementById('content-recap').classList.toggle('hidden', tab !== 'recap');
-            document.getElementById('content-analysis').classList.toggle('hidden', tab !== 'analysis');
-            
-            document.getElementById('tab-daily').classList.toggle('active', tab === 'daily');
-            document.getElementById('tab-recap').classList.toggle('active', tab === 'recap');
-            document.getElementById('tab-analysis').classList.toggle('active', tab === 'analysis');
-            
-            if (tab === 'daily') loadDaily();
-            if (tab === 'analysis') loadAnalysis();
+            // Prevent rapid switching
+            if (window.isTabTransitioning) return;
+            window.isTabTransitioning = true;
+
+            const contents = {
+                daily: document.getElementById('content-daily'),
+                recap: document.getElementById('content-recap'),
+                analysis: document.getElementById('content-analysis')
+            };
+            const tabs = {
+                daily: document.getElementById('tab-daily'),
+                recap: document.getElementById('tab-recap'),
+                analysis: document.getElementById('tab-analysis')
+            };
+
+            // Fade out current content
+            Object.values(contents).forEach(content => {
+                if (content && !content.classList.contains('hidden')) {
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateY(-6px)';
+                    content.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                }
+            });
+
+            // Update tab buttons (instant, no transition)
+            Object.keys(tabs).forEach(key => {
+                if (tabs[key]) {
+                    if (key === tab) {
+                        tabs[key].classList.add('active');
+                        tabs[key].classList.remove('text-white/60');
+                    } else {
+                        tabs[key].classList.remove('active');
+                        tabs[key].classList.add('text-white/60');
+                    }
+                }
+            });
+
+            // After fade out, switch content with fade in
+            setTimeout(() => {
+                // Hide all content
+                Object.values(contents).forEach(content => {
+                    if (content) content.classList.add('hidden');
+                });
+
+                // Show target content
+                const targetContent = contents[tab];
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('tab-content');
+
+                    // Reset animation by removing and re-adding class
+                    targetContent.classList.remove('tab-content');
+                    void targetContent.offsetWidth;
+                    targetContent.classList.add('tab-content');
+                }
+
+                // Load data for specific tabs
+                if (tab === 'daily') loadDaily();
+                if (tab === 'analysis') loadAnalysis();
+
+                setTimeout(() => {
+                    window.isTabTransitioning = false;
+                }, 300);
+            }, 220);
         }
 
         // --- HARIAN LOGIC ---
