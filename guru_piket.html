@@ -103,11 +103,11 @@
 
             /* Tabs scrollable */
             .tabs-scrollable {
-                overflow-x: auto;
+                overflow: visible;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
                 justify-content: center;
-                padding: 0 0.5rem;
+                padding: 0.5rem;
                 margin: 0 -0.5rem;
                 padding-bottom: 0.25rem;
             }
@@ -116,6 +116,7 @@
             }
             .tabs-scrollable button {
                 flex-shrink: 0;
+                position: relative;
             }
 
             /* Modal scrollable on small screens */
@@ -221,6 +222,7 @@
             padding: 0.75rem;
             border-radius: 1rem;
             transition: all 0.25s ease;
+            overflow: visible !important;
         }
 
         .tab-nav-btn::after {
@@ -364,7 +366,7 @@
     </div>
 
     <!-- PORTAL DASHBOARD -->
-    <div id="dashboard-view" class="hidden max-w-4xl mx-auto">
+    <div id="dashboard-view" class="hidden max-w-4xl mx-auto overflow-visible pb-8">
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-slate-800/80 pb-6 overflow-x-auto">
             <div>
                 <div class="flex items-center gap-2">
@@ -397,15 +399,15 @@
             </button>
             <button onclick="switchTab('izin')" id="tab-izin" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Persetujuan Izin">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span id="badge-izin" class="absolute -top-2 -right-2 min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm shadow-red-500/50 hidden">0</span>
+                <span id="badge-izin" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-red-500/50 hidden">0</span>
             </button>
             <button onclick="switchTab('bullying')" id="tab-bullying" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Laporan Perundungan">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                <span id="badge-bullying" class="absolute -top-2 -right-2 min-w-[20px] h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm shadow-rose-500/50 hidden">0</span>
+                <span id="badge-bullying" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-rose-500/50 hidden">0</span>
             </button>
             <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Tugas Titipan">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                <span id="badge-tugas" class="absolute -top-2 -right-2 min-w-[20px] h-5 bg-purple-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm shadow-purple-500/50 hidden">0</span>
+                <span id="badge-tugas" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-purple-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-purple-500/50 hidden">0</span>
             </button>
         </div>
 
