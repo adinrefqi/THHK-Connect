@@ -1010,7 +1010,10 @@
                 const lastDay = new Date(tahun, bulan + 1, 0).getDate();
                 dateStr = `${lastDay} ${bulanText} ${tahun}`;
             }
-            document.getElementById('sign-date').innerHTML = `Tegal, ${dateStr}<br>Wali Kelas`;
+            const signPrint = document.getElementById('sign-date-print');
+            const signPrint2 = document.getElementById('sign-date-print2');
+            if (signPrint) signPrint.innerText = dateStr;
+            if (signPrint2) signPrint2.innerText = dateStr;
         }
 
         async function fetchData() {
@@ -1184,7 +1187,6 @@
                 const avgHadirPerSiswa = (totalPresentAll / numSiswa).toFixed(1);
 
                 // Update stats period label
-                const bulanText = document.getElementById('sel-bulan').options[bulan + 1]?.text || document.getElementById('sel-bulan').options[bulan].text;
                 document.getElementById('stats-period').innerText = `Kelas ${kelas} - ${bulanText} ${tahun}`;
 
                 // Animate counters
