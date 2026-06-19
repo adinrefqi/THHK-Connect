@@ -8,7 +8,7 @@
     <!-- Session Check for Admin Adin -->
     <script>
         const session = localStorage.getItem('piket_session');
-        if (!session || session.toLowerCase() !== 'adin') {
+        if (!session || !['adin', 'morys'].includes(session.toLowerCase())) {
             window.location.href = 'index.html';
         }
     </script>
@@ -65,42 +65,14 @@
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
         }
 
-        /* Table custom structure & scrollbar */
+        /* Table custom styles */
         .table-container {
             overflow-x: auto;
-            border-radius: 16px;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 12px;
-        }
-
-        th, td {
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 8px 6px;
-            text-align: center;
-        }
-
-        th {
-            background: rgba(15, 23, 42, 0.75);
-            font-weight: 600;
-            color: #94a3b8;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .sticky-col {
-            position: sticky;
-            left: 0;
-            background: rgba(15, 23, 42, 0.95) !important;
-            z-index: 10;
-            border-right: 2px solid rgba(255, 255, 255, 0.15) !important;
-            min-width: 180px;
-            text-align: left;
-            padding-left: 16px;
+        .table-container table {
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .loader {
@@ -127,95 +99,185 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* ===== RESPONSIVE MOBILE FIXES ===== */
-        @media (max-width: 640px) {
+        /* ===== MOBILE-FIRST RESPONSIVE ===== */
+        @media (max-width: 768px) {
             body {
-                padding: 0.625rem !important;
+                padding: 0.75rem !important;
+                -webkit-tap-highlight-color: transparent;
             }
 
-            /* Header title smaller */
+            /* Back link */
+            .no-print a {
+                margin-bottom: 1rem;
+                display: inline-flex;
+            }
+
+            /* Header section */
+            header {
+                margin-bottom: 1rem;
+            }
+
+            header > div:first-child {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
             header h1 {
-                font-size: 1.375rem !important;
+                font-size: 1.125rem !important;
             }
-            header h1 svg {
-                width: 1.25rem !important;
-                height: 1.25rem !important;
-            }
+
             header p {
                 font-size: 0.6875rem !important;
             }
 
-            /* Controls tighter — exclude table container */
-            .glass-panel:not(.table-scroll-enhanced) {
-                padding: 0.875rem !important;
+            /* Stats - 2 column grid */
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .sm\:grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr) !important;
             }
 
-            /* Stat cards smaller text */
-            .stat-card-mobile .text-3xl {
-                font-size: 1.5rem !important;
+            /* Quick stats cards - smaller */
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 {
+                padding: 0.75rem !important;
             }
 
-            /* Chart heights smaller */
-            .chart-responsive {
-                height: 180px !important;
-                min-height: 180px !important;
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 .text-2xl {
+                font-size: 1.25rem !important;
             }
 
-            /* Legend + signature stacked */
-            .legend-sig-grid {
+            /* Summary status - horizontal scroll */
+            .grid-cols-5 {
+                display: flex;
+                overflow-x: auto;
+                gap: 0.5rem;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .grid-cols-5 > div {
+                flex: 0 0 auto;
+                min-width: 70px;
+                padding: 0.5rem !important;
+            }
+
+            .grid-cols-5 > div .text-xl {
+                font-size: 1rem !important;
+            }
+
+            /* Charts */
+            .lg\:grid-cols-2 {
                 grid-template-columns: 1fr !important;
-                gap: 1.5rem !important;
             }
 
-            /* Signature area */
-            .sig-grid-mobile {
-                grid-template-columns: 1fr !important;
-                gap: 1.5rem !important;
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 {
+                margin-bottom: 0.75rem;
             }
-            .sig-grid-mobile .h-36 {
-                height: auto !important;
-                min-height: 5rem;
+
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 .relative.h-\[180px\] {
+                height: 150px !important;
             }
 
             /* Report title */
-            #title-leger {
+            #report-header {
+                margin-bottom: 0.75rem;
+            }
+
+            #report-header h2 {
                 font-size: 0.875rem !important;
             }
-            #subtitle-leger {
-                font-size: 0.6875rem !important;
+
+            #report-header p {
+                font-size: 0.625rem !important;
             }
 
-            /* Status summary 5 cols → smaller */
-            .status-summary-grid {
-                grid-template-columns: repeat(5, 1fr) !important;
-                gap: 0.25rem !important;
-                font-size: 8px !important;
-            }
-            .status-summary-grid .text-sm {
-                font-size: 0.75rem !important;
+            /* Table - touch friendly */
+            .table-container {
+                margin: 0 -0.75rem;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
             }
 
-            /* Visualization section */
-            section .text-xl {
-                font-size: 1rem !important;
-            }
-        }
-
-        @media (max-width: 380px) {
-            body {
-                padding: 0.375rem !important;
+            .table-container th,
+            .table-container td {
+                padding: 0.375rem 0.25rem !important;
+                font-size: 9px !important;
             }
 
-            /* Sticky col thinner */
-            .sticky-col {
-                min-width: 120px !important;
-                padding-left: 8px !important;
+            .table-container th.sticky-col,
+            .table-container td.sticky-col {
+                min-width: 100px !important;
+                padding-left: 0.5rem !important;
                 font-size: 10px !important;
             }
 
-            /* Stat cards even smaller */
-            .stat-card-mobile .text-3xl {
-                font-size: 1.25rem !important;
+            .table-container .w-6.h-6.rounded-full {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 8px !important;
+            }
+
+            .status-badge {
+                min-width: 18px !important;
+                height: 18px !important;
+                font-size: 8px !important;
+            }
+
+            /* Stats section */
+            section {
+                margin-top: 1.5rem;
+            }
+
+            section h2 {
+                font-size: 0.875rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            /* Charts section header */
+            section .text-sm.font-bold.text-white.mb-3 {
+                font-size: 0.75rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem !important;
+            }
+
+            /* Quick filter pills */
+            .pill-select {
+                padding: 0.375rem 2rem 0.375rem 0.75rem !important;
+                font-size: 0.6875rem !important;
+            }
+
+            /* Stats cards */
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 {
+                padding: 0.625rem !important;
+            }
+
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 .text-\[10px\] {
+                font-size: 8px !important;
+            }
+
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 .text-2xl {
+                font-size: 1rem !important;
+            }
+
+            .bg-slate-900\/50.border.border-slate-800\/60.rounded-2xl.p-4 .w-7.h-7 {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            /* Swipe hint */
+            .block.md\:hidden.text-center.mb-3 {
+                margin-bottom: 0.5rem;
+            }
+
+            .block.md\:hidden.text-center.mb-3 span {
+                font-size: 9px !important;
+                padding: 0.375rem 0.75rem !important;
             }
         }
 
@@ -239,7 +301,216 @@
             z-index: 5;
         }
 
-        /* Custom print overrides */
+        /* Quick filter buttons */
+        .quick-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.4);
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .quick-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #a5b4fc;
+        }
+        .quick-btn.active {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: #6366f1;
+            color: #818cf8;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Counter animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .counter {
+            animation: countUp 0.4s ease-out forwards;
+        }
+
+        /* Pulse effect for stats cards */
+        .stat-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Interactive Table Styles */
+        .table-container table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-container th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(8px);
+        }
+
+        .table-container th.sticky-col {
+            z-index: 20;
+        }
+
+        .table-container td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: rgba(15, 23, 42, 0.98) !important;
+        }
+
+        .table-container tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-container tbody tr:nth-child(even) {
+            background: rgba(30, 41, 59, 0.15);
+        }
+
+        .table-container tbody tr:hover {
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        /* Alfa highlight - warning row */
+        .table-container tr.alfa-warning {
+            background: rgba(244, 63, 94, 0.08) !important;
+        }
+        .table-container tr.alfa-warning:hover {
+            background: rgba(244, 63, 94, 0.15) !important;
+        }
+        .table-container tr.alfa-high {
+            background: rgba(244, 63, 94, 0.15) !important;
+        }
+        .table-container tr.alfa-high:hover {
+            background: rgba(244, 63, 94, 0.25) !important;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 4px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Row entry animation */
+        @keyframes rowFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .table-row-animated {
+            animation: rowFadeIn 0.3s ease-out forwards;
+        }
+
+        /* Collapsible sections */
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .collapsible-header:active {
+            opacity: 0.7;
+        }
+
+        .collapsible-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-header.collapsed .collapsible-icon {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        /* Touch ripple effect */
+        .touch-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .touch-ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Mobile bottom safe area */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            body {
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+            }
+        }
+
+        /* Pill style selects */
+        .pill-select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+        }
+        .pill-select:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .pill-select option {
+            background: #0f172a;
+            color: #fff;
+        }
         @media print {
             @page {
                 size: landscape;
@@ -326,40 +597,64 @@
 
     <div class="max-w-7xl mx-auto">
         <!-- BACK TO DASHBOARD -->
-        <a href="admin_dashboard.html" class="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-semibold mb-6 no-print">
+        <a href="admin_dashboard.html" class="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-semibold mb-4 no-print">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Kembali ke Dashboard Admin
+            Kembali ke Dashboard
         </a>
 
-        <!-- HEADER VIEW -->
-        <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-6 no-print">
-            <div>
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
-                    <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        <!-- HEADER & FILTERS -->
+        <header class="mb-6 no-print">
+            <!-- Title -->
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-600/20 border border-indigo-500/30 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-white">Leger Absensi</h1>
+                        <p class="text-xs text-slate-400">Laporan kehadiran bulanan</p>
+                    </div>
+                </div>
+
+                <!-- Print Button -->
+                <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-slate-800/60 hover:bg-slate-700/80 border border-slate-700/50 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                     </svg>
-                    Leger & Rekap Absensi
-                </h1>
-                <p class="text-indigo-200/60 text-sm mt-1">Laporan kehadiran siswa bulanan kelas dengan visualisasi statistik premium</p>
+                    Cetak
+                </button>
             </div>
-            
-            <!-- CONTROLS CONTAINER -->
-            <div class="bg-slate-900/40 p-4 rounded-2xl border border-slate-800/80 glass-panel">
-                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3.5">
-                    <div class="flex flex-col">
-                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Kelas</label>
-                        <select id="sel-kelas" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+
+            <!-- Quick Filters -->
+            <div class="bg-slate-900/40 rounded-2xl border border-slate-800/60 p-4">
+                <!-- Quick Buttons -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="setQuickFilter('this-month')" id="btn-this-month" class="quick-btn active">
+                        Bulan Ini
+                    </button>
+                    <button onclick="setQuickFilter('last-month')" id="btn-last-month" class="quick-btn">
+                        Bulan Lalu
+                    </button>
+                </div>
+
+                <!-- Select Filters -->
+                <div class="flex flex-wrap items-end gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Kelas</label>
+                        <select id="sel-kelas" class="pill-select" onchange="fetchData()">
                             <option value="8">Kelas 8</option>
                             <option value="9">Kelas 9</option>
                             <option value="7">Kelas 7</option>
                         </select>
                     </div>
-                    
-                    <div class="flex flex-col">
-                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
-                        <select id="sel-bulan" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Bulan</label>
+                        <select id="sel-bulan" class="pill-select" onchange="updateQuickButtons()">
                             <option value="0">Januari</option>
                             <option value="1">Februari</option>
                             <option value="2">Maret</option>
@@ -374,194 +669,211 @@
                             <option value="11">Desember</option>
                         </select>
                     </div>
-                    
-                    <div class="flex flex-col col-span-2 sm:col-span-1">
-                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
-                        <select id="sel-tahun" class="bg-slate-800/80 border border-slate-700/60 text-white rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer w-full">
+
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Tahun</label>
+                        <select id="sel-tahun" class="pill-select" onchange="updateQuickButtons()">
                             <option value="2026">2026</option>
                             <option value="2025">2025</option>
                         </select>
-                    </div>
-
-                    <div class="flex-1 min-w-[120px]">
-                        <button onclick="fetchData()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Tampilkan
-                        </button>
-                    </div>
-
-                    <div class="flex-1 min-w-[120px]">
-                        <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                            </svg>
-                            Cetak PDF
-                        </button>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- TITLE FOR PRINT & VIEW -->
-        <div id="report-header" class="text-center mb-6">
-            <h2 class="text-xl md:text-2xl font-extrabold uppercase text-white print:text-black tracking-wider" id="title-leger">LEGER ABSENSI SISWA KELAS 8</h2>
-            <p class="font-semibold text-indigo-400 print:text-slate-800 uppercase tracking-widest text-sm mt-1" id="subtitle-leger">BULAN MEI 2026</p>
+        <div id="report-header" class="text-center mb-4">
+            <h2 class="text-lg md:text-xl font-bold uppercase text-white print:text-black tracking-wider" id="title-leger">LEGER ABSENSI SISWA KELAS 8</h2>
+            <p class="font-semibold text-indigo-400 print:text-slate-800 uppercase tracking-widest text-xs mt-1" id="subtitle-leger">BULAN MEI 2026</p>
         </div>
 
         <!-- Swipe instruction for mobile -->
-        <div class="block md:hidden text-center mb-4 no-print">
-            <span class="inline-flex items-center gap-1.5 text-xs text-indigo-300 font-bold bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/25 animate-pulse">
-                Swipe ke kanan/kiri untuk melihat leger lengkap ➡️
+        <div class="block md:hidden text-center mb-3 no-print">
+            <span class="inline-flex items-center gap-1.5 text-[10px] text-indigo-300 font-bold bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/25">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path></svg>
+                Swipe untuk melihat selengkapnya
             </span>
         </div>
 
         <!-- TABLE SECTION -->
-        <div class="glass-panel mb-8 border border-slate-800/80 shadow-2xl table-container relative table-scroll-enhanced" style="border-radius: 16px;">
-            <table id="leger-table" class="min-w-full divide-y divide-slate-800/60">
-                <thead>
-                    <tr id="table-head" class="bg-slate-900/40">
+        <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl overflow-hidden mb-6 no-print">
+            <div class="table-container relative table-scroll-enhanced">
+                <table id="leger-table" class="min-w-full">
+                    <thead id="table-head" class="bg-slate-800/60 sticky top-0 z-10">
                         <!-- Filled by JS -->
-                    </tr>
-                </thead>
-                <tbody id="table-body" class="divide-y divide-slate-800/40">
-                    <!-- Filled by JS -->
-                    <tr>
-                        <td class="py-12 text-center text-slate-500 font-medium" colspan="33">
-                            <div class="flex flex-col items-center justify-center gap-2">
-                                <div class="loader ease-linear rounded-full border-2 border-t-2 border-slate-700 h-6 w-6"></div>
-                                <span>Menyiapkan dokumen leger...</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-800/40">
+                        <!-- Filled by JS -->
+                        <tr>
+                            <td class="py-12 text-center text-slate-500 font-medium" colspan="33">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="loader ease-linear rounded-full border-2 border-t-2 border-slate-700 h-6 w-6"></div>
+                                    <span>Memuat data...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- LEGER LEGEND & SIGNATURE SECTION -->
-        <div class="mt-8 sm:mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start legend-sig-grid">
-            
-            <!-- LEGEND (Left) -->
-            <div class="lg:col-span-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl p-5 glass-panel print:border-none print:shadow-none print:p-0">
-                <h4 class="text-xs font-bold text-indigo-300 print:text-black uppercase tracking-wider mb-4 border-b border-slate-800/60 pb-2 print:border-black">KETERANGAN ABSENSI:</h4>
-                <ul class="space-y-2.5 text-xs text-slate-300 legend-print-list">
-                    <li class="flex items-center gap-2">
-                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">H</span>
-                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Kehadiran Tepat Waktu (Hadir)</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">T</span>
-                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Keterlambatan Masuk Sekolah (Terlambat)</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="bg-sky-500/10 text-sky-400 border border-sky-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">S</span>
-                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Ketidakhadiran karena Sakit (Sakit)</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">I</span>
-                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Ketidakhadiran Terkonfirmasi Izin (Izin)</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="bg-rose-500/10 text-rose-400 border border-rose-500/25 px-2 py-0.5 rounded font-bold inline-block w-8 text-center status-badge-print">A</span>
-                        <span class="font-medium text-slate-400 print:text-black">&bull;&nbsp; Tanpa Keterangan / Mangkir (Alfa)</span>
-                    </li>
-                </ul>
+        <!-- LEGER LEGEND & SIGNATURE SECTION (Print Only) -->
+        <div class="hidden print:block mt-6">
+            <!-- Keterangan -->
+            <div class="mb-4">
+                <h4 class="text-sm font-bold uppercase mb-2">Keterangan:</h4>
+                <div class="flex flex-wrap gap-4 text-xs">
+                    <span><strong>H</strong> = Hadir</span>
+                    <span><strong>T</strong> = Terlambat</span>
+                    <span><strong>S</strong> = Sakit</span>
+                    <span><strong>I</strong> = Izin</span>
+                    <span><strong>A</strong> = Alfa (Tanpa Keterangan)</span>
+                </div>
             </div>
 
-            <!-- SIGNATURES (Right) -->
-            <div class="lg:col-span-8 grid grid-cols-2 text-center text-xs gap-4 mt-4 lg:mt-0 signature-section sig-grid-mobile">
-                <div class="flex flex-col h-36 justify-between">
-                    <p class="font-semibold text-slate-300 print:text-black">Mengetahui,<br>Kepala Sekolah SMP THHK</p>
-                    <div class="mx-auto w-48 border-b border-slate-700/80 pb-1 signature-line">
-                        <span class="font-bold text-slate-100 print:text-black text-sm uppercase">Sutarno, S.Pd.</span>
+            <!-- Tanda Tangan -->
+            <div class="grid grid-cols-2 gap-8 mt-8">
+                <div class="text-center">
+                    <p>Tegal, <span id="sign-date-print">-</span></p>
+                    <p>Kepala Sekolah</p>
+                    <div class="mt-16">
+                        <p class="font-bold">Sutarno, S.Pd.</p>
                     </div>
                 </div>
-                <div class="flex flex-col h-36 justify-between">
-                    <p id="sign-date" class="font-semibold text-slate-300 print:text-black">Tegal, 20 Mei 2026<br>Wali Kelas</p>
-                    <div class="mx-auto w-48 border-b border-slate-700/80 pb-1 signature-line">
-                        <span class="font-bold text-slate-100 print:text-black text-sm uppercase">Wali Kelas</span>
+                <div class="text-center">
+                    <p>Tegal, <span id="sign-date-print2">-</span></p>
+                    <p>Wali Kelas</p>
+                    <div class="mt-16">
+                        <p class="font-bold border-b border-black pb-1">.....................</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- STATS VISUALIZATION DASHBOARD (no-print) -->
-        <section class="mt-12 border-t border-slate-800/80 pt-10 no-print">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <svg class="w-5.5 h-5.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-                </svg>
-                Dashboard Visualisasi Statistik Kelas
-            </h2>
+        <section class="mt-10 no-print">
+            <!-- Section Header -->
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Statistik Kelas
+                </h2>
+                <span id="stats-period" class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">-</span>
+            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- METRIC CARDS -->
-                <div class="lg:col-span-1 grid grid-cols-2 gap-3 sm:gap-4 stat-card-mobile">
-                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
-                        <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Total Siswa</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <span id="stat-siswa-total" class="text-3xl font-extrabold text-white">0</span>
-                            <span class="text-[10px] text-slate-500 font-semibold">Siswa</span>
+            <!-- Quick Stats Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <!-- Total Siswa -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Total Siswa</span>
+                        <div class="w-7 h-7 bg-indigo-500/15 rounded-lg flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
                         </div>
                     </div>
-                    
-                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
-                        <p class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">Rasio Kehadiran</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <span id="stat-rasio" class="text-3xl font-extrabold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.15)]">0%</span>
-                            <span class="text-[10px] text-slate-500 font-semibold">Persen</span>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
-                        <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Hari Belajar</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <span id="stat-hari-belajar" class="text-3xl font-extrabold text-indigo-400">0</span>
-                            <span class="text-[10px] text-slate-500 font-semibold">Hari</span>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between border border-slate-800/60 shadow-lg">
-                        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Rata Hadir/Siswa</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <span id="stat-avg-siswa" class="text-3xl font-extrabold text-slate-100">0</span>
-                            <span class="text-[10px] text-slate-500 font-semibold">Hari/Siswa</span>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel p-5 rounded-2xl col-span-2 border border-slate-800/60 shadow-lg bg-slate-900/25">
-                        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2.5">Ringkasan Total Status Kelas (Bulan Ini)</h4>
-                        <div class="grid grid-cols-5 text-center text-[10px] font-bold uppercase tracking-wider border-t border-slate-800/80 pt-2.5 gap-1 sm:gap-2 status-summary-grid">
-                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mx-auto"></span> Hadir<br><span id="total-lbl-H" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
-                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mx-auto"></span> Lambat<br><span id="total-lbl-T" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
-                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 mx-auto"></span> Sakit<br><span id="total-lbl-S" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
-                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 mx-auto"></span> Izin<br><span id="total-lbl-I" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
-                            <div class="flex flex-col gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mx-auto"></span> Alfa<br><span id="total-lbl-A" class="text-slate-100 text-sm font-black mt-0.5">0</span></div>
-                        </div>
+                    <div class="flex items-end gap-1">
+                        <span id="stat-siswa-total" class="text-2xl font-bold text-white counter">0</span>
+                        <span class="text-xs text-slate-500 mb-0.5">siswa</span>
                     </div>
                 </div>
 
-                <!-- TREND LINE CHART -->
-                <div class="glass-panel p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col justify-between">
-                    <h3 class="font-bold text-sm text-white mb-4 flex items-center justify-between">
-                        <span>Tren Kehadiran Harian (Hadir + Lambat)</span>
-                        <span class="text-[10px] text-indigo-400 font-extrabold uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25">Grafik Garis</span>
+                <!-- Hari Belajar -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider">Hari Aktif</span>
+                        <div class="w-7 h-7 bg-amber-500/15 rounded-lg flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end gap-1">
+                        <span id="stat-hari-belajar" class="text-2xl font-bold text-white counter">0</span>
+                        <span class="text-xs text-slate-500 mb-0.5">hari</span>
+                    </div>
+                </div>
+
+                <!-- Rata-rata Hadir -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">Rata-rata</span>
+                        <div class="w-7 h-7 bg-emerald-500/15 rounded-lg flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end gap-1">
+                        <span id="stat-avg-siswa" class="text-2xl font-bold text-white counter">0</span>
+                        <span class="text-xs text-slate-500 mb-0.5">hari/siswa</span>
+                    </div>
+                </div>
+
+                <!-- Rasio Kehadiran -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold text-rose-300 uppercase tracking-wider">Kehadiran</span>
+                        <div class="w-7 h-7 bg-rose-500/15 rounded-lg flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end gap-1">
+                        <span id="stat-rasio" class="text-2xl font-bold text-emerald-400 counter">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Status Cards -->
+            <div class="grid grid-cols-5 gap-2 mb-4">
+                <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+                    <span class="text-[10px] text-emerald-400 font-bold uppercase">Hadir</span>
+                    <div class="text-xl font-bold text-white mt-1"><span id="total-lbl-H" class="counter">0</span></div>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
+                    <span class="text-[10px] text-amber-400 font-bold uppercase">Lambat</span>
+                    <div class="text-xl font-bold text-white mt-1"><span id="total-lbl-T" class="counter">0</span></div>
+                </div>
+                <div class="bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 text-center">
+                    <span class="text-[10px] text-sky-400 font-bold uppercase">Sakit</span>
+                    <div class="text-xl font-bold text-white mt-1"><span id="total-lbl-S" class="counter">0</span></div>
+                </div>
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 text-center">
+                    <span class="text-[10px] text-indigo-400 font-bold uppercase">Izin</span>
+                    <div class="text-xl font-bold text-white mt-1"><span id="total-lbl-I" class="counter">0</span></div>
+                </div>
+                <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-center">
+                    <span class="text-[10px] text-rose-400 font-bold uppercase">Alfa</span>
+                    <div class="text-xl font-bold text-white mt-1"><span id="total-lbl-A" class="counter">0</span></div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Trend Line Chart -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        Tren Kehadiran Harian
                     </h3>
-                    <div class="relative flex-1 h-[210px] min-h-[210px] chart-responsive">
+                    <div class="relative h-[180px]">
                         <canvas id="attendanceTrendChart"></canvas>
                     </div>
                 </div>
 
-                <!-- DONUT DISTRIBUTION CHART -->
-                <div class="glass-panel p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col justify-between">
-                    <h3 class="font-bold text-sm text-white mb-4 flex items-center justify-between">
-                        <span>Proporsi Jenis Ketidakhadiran</span>
-                        <span class="text-[10px] text-indigo-400 font-extrabold uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25">Grafik Donat</span>
+                <!-- Donut Distribution Chart -->
+                <div class="bg-slate-900/50 border border-slate-800/60 rounded-2xl p-4">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        Proporsi Ketidakhadiran
                     </h3>
-                    <div class="relative flex-1 h-[210px] min-h-[210px] flex justify-center items-center chart-responsive">
-                        <canvas id="statusDistChart" class="max-h-[190px]"></canvas>
+                    <div class="relative h-[180px] flex justify-center">
+                        <canvas id="statusDistChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -578,6 +890,104 @@
         // Chart References
         let attendanceTrendChart = null;
         let statusDistChart = null;
+
+        // Quick Filter Functions
+        function setQuickFilter(filter) {
+            const now = new Date();
+            let month = now.getMonth();
+            let year = now.getFullYear();
+
+            if (filter === 'last-month') {
+                month = month - 1;
+                if (month < 0) {
+                    month = 11;
+                    year = year - 1;
+                }
+            }
+
+            document.getElementById('sel-bulan').value = month;
+            document.getElementById('sel-tahun').value = year;
+            updateQuickButtons();
+            fetchData();
+        }
+
+        function updateQuickButtons() {
+            const now = new Date();
+            const selectedMonth = parseInt(document.getElementById('sel-bulan').value);
+            const selectedYear = parseInt(document.getElementById('sel-tahun').value);
+
+            // Check if "this month"
+            const isThisMonth = (selectedMonth === now.getMonth() && selectedYear === now.getFullYear());
+
+            // Check if "last month"
+            let lastMonth = now.getMonth() - 1;
+            let lastMonthYear = now.getFullYear();
+            if (lastMonth < 0) {
+                lastMonth = 11;
+                lastMonthYear = lastMonthYear - 1;
+            }
+            const isLastMonth = (selectedMonth === lastMonth && selectedYear === lastMonthYear);
+
+            document.getElementById('btn-this-month').classList.toggle('active', isThisMonth);
+            document.getElementById('btn-last-month').classList.toggle('active', isLastMonth);
+        }
+
+        // Counter animation function
+        function animateCounter(elementId, targetValue, suffix = '') {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const isDecimal = String(targetValue).includes('.');
+            const start = 0;
+            const duration = 800;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = start + (targetValue - start) * easeOut;
+
+                if (isDecimal) {
+                    element.textContent = current.toFixed(1) + suffix;
+                } else {
+                    element.textContent = Math.round(current) + suffix;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Collapsible sections
+        function toggleSection(sectionId) {
+            const content = document.getElementById('section-' + sectionId);
+            const header = content.previousElementSibling;
+
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                header.classList.remove('collapsed');
+            } else {
+                content.classList.add('collapsed');
+                header.classList.add('collapsed');
+            }
+        }
+
+        // Initialize collapsible state on mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                const statsContent = document.getElementById('section-stats');
+                const statsHeader = statsContent.previousElementSibling;
+                if (statsHeader && statsHeader.classList.contains('collapsible-header')) {
+                    statsHeader.classList.add('collapsed');
+                    statsContent.classList.add('collapsed');
+                }
+            }
+        });
 
         // Initialize Dates
         const now = new Date();
@@ -607,22 +1017,22 @@
             const kelas = document.getElementById('sel-kelas').value;
             const bulan = parseInt(document.getElementById('sel-bulan').value);
             const tahun = parseInt(document.getElementById('sel-tahun').value);
-            
+
             // Update UI titles and dates
             const bulanText = document.getElementById('sel-bulan').options[bulan].text;
-            document.getElementById('title-leger').innerText = `LEGER ABSENSI SISWA KELAS ${kelas}`;
-            document.getElementById('subtitle-leger').innerText = `BULAN ${bulanText.toUpperCase()} ${tahun}`;
+            document.getElementById('title-leger').innerText = `LEGER ABSENSI KELAS ${kelas}`;
+            document.getElementById('subtitle-leger').innerText = `${bulanText} ${tahun}`;
             updateSignatureDate();
 
             // Set up Calendar Columns (1 to 28-31)
             const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
             const headRow = document.getElementById('table-head');
-            
-            headRow.innerHTML = `<th class="sticky-col">Nama Siswa</th>`;
+
+            headRow.innerHTML = `<th class="sticky-col py-3 px-4 text-left text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Nama Siswa</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
-                headRow.innerHTML += `<th class="w-8 border-l border-r border-slate-800/80">${d}</th>`;
+                headRow.innerHTML += `<th class="py-3 px-1 text-center text-[9px] font-semibold text-slate-400 w-7">${d}</th>`;
             }
-            headRow.innerHTML += `<th class="bg-indigo-500/20 text-indigo-300 font-bold border-l-2 border-indigo-500/35">Σ H</th>`;
+            headRow.innerHTML += `<th class="py-3 px-2 text-center text-[10px] font-bold text-indigo-300 uppercase tracking-wider bg-indigo-500/10">Total</th>`;
 
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = `
@@ -630,7 +1040,7 @@
                     <td class="py-12 text-center text-slate-500 font-medium" colspan="${daysInMonth + 2}">
                         <div class="flex flex-col items-center justify-center gap-2">
                             <div class="loader ease-linear rounded-full border-2 border-t-2 border-slate-700 h-6 w-6"></div>
-                            <span>Menghubungkan ke basis data Supabase...</span>
+                            <span>Memuat data...</span>
                         </div>
                     </td>
                 </tr>
@@ -692,18 +1102,27 @@
                 const dailyPresentCounts = Array(daysInMonth).fill(0);
                 const activeDaysSet = new Set();
 
+                // Track alfa count per student for highlighting
+                const studentAlfaCounts = {};
+
                 // Clear table body before rendering
                 tbody.innerHTML = '';
-                
-                students.forEach(s => {
-                    let rowHtml = `<tr class="hover:bg-slate-800/15 transition-colors">
-                        <td class="sticky-col font-medium text-slate-100 flex items-center gap-1">${s.nama}</td>`;
-                    
+
+                students.forEach((s, index) => {
+                    let alfaCount = 0;
+                    let rowHtml = `<tr class="table-row-animated" style="animation-delay: ${index * 30}ms">
+                        <td class="sticky-col py-2.5 px-4 font-medium text-slate-100 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-bold flex items-center justify-center">${index + 1}</span>
+                                <span>${s.nama}</span>
+                            </div>
+                        </td>`;
+
                     let countHadir = 0;
-                    
+
                     for (let d = 1; d <= daysInMonth; d++) {
                         const status = logMap[s.id] && logMap[s.id][d];
-                        
+
                         if (status) {
                             // Accumulate stats
                             if (status === 'H') {
@@ -711,32 +1130,49 @@
                                 countHadir++;
                                 dailyPresentCounts[d-1]++;
                                 activeDaysSet.add(d);
-                                rowHtml += `<td><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="status-badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">H</span></td>`;
                             } else if (status === 'T') {
                                 countT++;
                                 countHadir++;
                                 dailyPresentCounts[d-1]++;
                                 activeDaysSet.add(d);
-                                rowHtml += `<td><span class="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="status-badge bg-amber-500/15 text-amber-400 border border-amber-500/30">T</span></td>`;
                             } else if (status === 'S') {
                                 countS++;
-                                rowHtml += `<td><span class="bg-sky-500/10 text-sky-400 border border-sky-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="status-badge bg-sky-500/15 text-sky-400 border border-sky-500/30">S</span></td>`;
                             } else if (status === 'I') {
                                 countI++;
-                                rowHtml += `<td><span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="status-badge bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">I</span></td>`;
                             } else if (status === 'A') {
                                 countA++;
-                                rowHtml += `<td><span class="bg-rose-500/10 text-rose-400 border border-rose-500/25 px-1.5 py-0.5 rounded font-bold text-[10px] inline-block min-w-[20px] text-center status-badge-print">${status}</span></td>`;
+                                alfaCount++;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="status-badge bg-rose-500/15 text-rose-400 border border-rose-500/30">A</span></td>`;
                             } else {
-                                rowHtml += `<td><span class="text-slate-600 font-normal">.</span></td>`;
+                                rowHtml += `<td class="py-2 px-0.5 text-center"><span class="text-slate-600/60">-</span></td>`;
                             }
                         } else {
-                            rowHtml += `<td><span class="text-slate-600/60 font-normal">.</span></td>`;
+                            rowHtml += `<td class="py-2 px-0.5 text-center"><span class="text-slate-600/60">-</span></td>`;
                         }
                     }
-                    
+
                     totalPresentAll += countHadir;
-                    rowHtml += `<td class="bg-indigo-500/10 font-bold text-indigo-400 border-l-2 border-indigo-500/25">${countHadir}</td></tr>`;
+                    studentAlfaCounts[s.id] = alfaCount;
+
+                    // Determine alfa warning class based on count
+                    let alfaClass = '';
+                    if (alfaCount >= 5) {
+                        alfaClass = 'alfa-high';
+                    } else if (alfaCount >= 3) {
+                        alfaClass = 'alfa-warning';
+                    }
+
+                    rowHtml += `<td class="py-2.5 px-2 text-center font-bold text-indigo-300 bg-indigo-500/10">${countHadir}</td></tr>`;
+
+                    // Prepend alfa class to row if needed
+                    if (alfaClass) {
+                        rowHtml = rowHtml.replace('<tr class="table-row-animated"', `<tr class="table-row-animated ${alfaClass}"`);
+                    }
+
                     tbody.innerHTML += rowHtml;
                 });
 
@@ -747,17 +1183,23 @@
                 const ratioKehadiran = totalKehadiranMax > 0 ? ((totalPresentAll / totalKehadiranMax) * 100).toFixed(1) : 0;
                 const avgHadirPerSiswa = (totalPresentAll / numSiswa).toFixed(1);
 
-                document.getElementById('stat-siswa-total').innerText = numSiswa;
-                document.getElementById('stat-rasio').innerText = `${ratioKehadiran}%`;
-                document.getElementById('stat-hari-belajar').innerText = hariEfektif;
-                document.getElementById('stat-avg-siswa').innerText = `${avgHadirPerSiswa} Hari`;
+                // Update stats period label
+                const bulanText = document.getElementById('sel-bulan').options[bulan + 1]?.text || document.getElementById('sel-bulan').options[bulan].text;
+                document.getElementById('stats-period').innerText = `Kelas ${kelas} - ${bulanText} ${tahun}`;
 
-                // Update label breakdown
-                document.getElementById('total-lbl-H').innerText = countH;
-                document.getElementById('total-lbl-T').innerText = countT;
-                document.getElementById('total-lbl-S').innerText = countS;
-                document.getElementById('total-lbl-I').innerText = countI;
-                document.getElementById('total-lbl-A').innerText = countA;
+                // Animate counters
+                animateCounter('stat-siswa-total', numSiswa);
+                animateCounter('stat-rasio', ratioKehadiran, '%');
+                animateCounter('stat-hari-belajar', hariEfektif);
+                animateCounter('stat-avg-siswa', avgHadirPerSiswa);
+                document.getElementById('stat-avg-siswa').nextElementSibling.textContent = ' hari/siswa';
+
+                // Update label breakdown with animation
+                animateCounter('total-lbl-H', countH);
+                animateCounter('total-lbl-T', countT);
+                animateCounter('total-lbl-S', countS);
+                animateCounter('total-lbl-I', countI);
+                animateCounter('total-lbl-A', countA);
 
                 // 5. Render Charts
                 renderCharts(daysInMonth, dailyPresentCounts, countH, countT, countS, countI, countA);

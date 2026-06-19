@@ -8,7 +8,7 @@
     <!-- Session Check for Admin Adin -->
     <script>
         const session = localStorage.getItem('piket_session');
-        if (!session || session.toLowerCase() !== 'adin') {
+        if (!session || !['adin', 'morys'].includes(session.toLowerCase())) {
             window.location.href = 'index.html';
         }
     </script>

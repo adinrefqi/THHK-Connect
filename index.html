@@ -4044,7 +4044,7 @@
                     // Muat tugas titipan siswa jika ada
                     fetchStudentDelegatedTasks();
                     subscribeStudentTasksRealtime();
-                } else if (piketSession && piketSession.toLowerCase() === 'adin') {
+                } else if (piketSession && ['adin', 'morys'].includes(piketSession.toLowerCase())) {
                     setView('admin-hub');
                 } else {
                     setView('login');
