@@ -27,22 +27,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* === THEME SYSTEM === */
+        :root {
+            /* Light Mode (default - already light theme) */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --nav-bg: #1e40af;
+            --nav-text: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --input-focus-border: #3b82f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --nav-bg: #1e3a8a;
+            --nav-text: #ffffff;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --input-focus-border: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
 
     <!-- TOP NAVIGATION (Guru View) -->
-    <nav class="bg-primary text-white shadow-md z-20 relative">
+    <nav class="text-white shadow-md z-20 relative" style="background-color: var(--nav-bg);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-book-open text-2xl text-blue-300"></i>
-                    <span class="font-bold text-lg tracking-tight">Portal Guru - Buku Induk</span>
+                    <span class="font-bold text-lg tracking-tight" style="color: var(--nav-text);">Portal Guru - Buku Induk</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span id="user-name" class="font-medium text-sm hidden md:block">Nama Guru</span>
-                    <button onclick="logout()" class="p-2 bg-blue-800 rounded-lg hover:bg-red-600 transition" title="Keluar">
+                    <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all" style="background: rgba(255,255,255,0.1);" title="Ganti Tema">
+                        <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <span id="user-name" class="font-medium text-sm hidden md:block" style="color: var(--nav-text);">Nama Guru</span>
+                    <button onclick="logout()" class="p-2 rounded-lg transition" style="background: rgba(255,255,255,0.1);" title="Keluar">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
@@ -52,39 +94,39 @@
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden">
-        
+
         <!-- SEARCH BAR -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 shrink-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Pencarian Data Siswa</h2>
+        <div class="p-6 rounded-2xl shadow-sm border mb-6 shrink-0" style="background: var(--card-bg); border-color: var(--card-border);">
+            <h2 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Pencarian Data Siswa</h2>
             <div class="flex gap-4">
                 <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="guru-search" oninput="handleSearch()" placeholder="Masukkan NIS, NISN, atau Nama Siswa..." class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-secondary focus:ring-2 focus:ring-blue-100 transition">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2" style="color: var(--text-muted);"></i>
+                    <input type="text" id="guru-search" oninput="handleSearch()" placeholder="Masukkan NIS, NISN, atau Nama Siswa..." class="w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none transition" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
                 </div>
-                <button onclick="handleSearch()" class="bg-secondary hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-md transition flex items-center gap-2">
+                <button onclick="handleSearch()" class="text-white px-8 py-3 rounded-xl font-bold shadow-md transition flex items-center gap-2" style="background: var(--accent);">
                     Cari Data
                 </button>
             </div>
-            <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle text-blue-400"></i> Gunakan portal ini untuk melihat data demografi dan histori siswa secara cepat.</p>
+            <p class="text-xs mt-2" style="color: var(--text-muted);"><i class="fas fa-info-circle" style="color: var(--accent);"></i> Gunakan portal ini untuk melihat data demografi dan histori siswa secara cepat.</p>
         </div>
 
         <!-- SEARCH RESULTS (View Only) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex-1 overflow-hidden flex flex-col">
-            <div class="p-4 border-b border-gray-100 bg-gray-50">
-                <h3 class="font-bold text-gray-700">Hasil Pencarian (Menampilkan Semua)</h3>
+        <div class="rounded-2xl shadow-sm border flex-1 overflow-hidden flex flex-col" style="background: var(--card-bg); border-color: var(--card-border);">
+            <div class="p-4 border-b" style="background: var(--bg-secondary); border-color: var(--card-border);">
+                <h3 class="font-bold" style="color: var(--text-secondary);">Hasil Pencarian (Menampilkan Semua)</h3>
             </div>
             <div class="flex-1 overflow-auto p-0">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-white sticky top-0 z-10 shadow-sm border-b">
+                    <thead class="sticky top-0 z-10 shadow-sm border-b" style="background: var(--card-bg); border-color: var(--card-border);">
                         <tr>
-                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Identitas</th>
-                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Kontak Darurat</th>
-                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase">Kelas</th>
-                            <th class="py-3 px-6 text-xs font-bold text-gray-500 uppercase text-center">Aksi</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase" style="color: var(--text-muted);">Identitas</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase" style="color: var(--text-muted);">Kontak Darurat</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase" style="color: var(--text-muted);">Kelas</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase text-center" style="color: var(--text-muted);">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="student-table-body" class="divide-y divide-gray-100">
-                        <tr><td colspan="4" class="py-10 text-center text-gray-500">Memuat data...</td></tr>
+                    <tbody id="student-table-body" class="divide-y" style="border-color: var(--card-border);">
+                        <tr><td colspan="4" class="py-10 text-center" style="color: var(--text-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -134,14 +176,14 @@
                 renderTable(allData);
             } catch (err) {
                 console.error('Fetch error:', err);
-                document.getElementById('student-table-body').innerHTML = '<tr><td colspan="4" class="py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('student-table-body').innerHTML = '<tr><td colspan="4" class="py-10 text-center" style="color: #ef4444;">Gagal memuat data.</td></tr>';
             }
         }
 
         function renderTable(dataToRender) {
             const tbody = document.getElementById('student-table-body');
             if (dataToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center" style="color: var(--text-muted);">Tidak ada data siswa ditemukan.</td></tr>';
                 return;
             }
 
@@ -152,21 +194,21 @@
                 let contactPhone = student.no_telp_ortu || student.no_telp_siswa || '-';
 
                 html += `
-                    <tr class="hover:bg-blue-50/50 transition">
+                    <tr class="transition" style="border-color: var(--card-border);">
                         <td class="py-4 px-6">
-                            <p class="font-bold text-gray-800">${student.nama_lengkap}</p>
-                            <p class="text-xs text-gray-500">NIS: ${student.nis || '-'} • ${student.jenis_kelamin || '-'}</p>
+                            <p class="font-bold" style="color: var(--text-primary);">${student.nama_lengkap}</p>
+                            <p class="text-xs" style="color: var(--text-muted);">NIS: ${student.nis || '-'} • ${student.jenis_kelamin || '-'}</p>
                         </td>
                         <td class="py-4 px-6">
-                            <p class="text-sm text-gray-800">${contactName}</p>
-                            <p class="text-xs text-gray-500"><i class="fas fa-phone-alt"></i> ${contactPhone}</p>
+                            <p class="text-sm" style="color: var(--text-primary);">${contactName}</p>
+                            <p class="text-xs" style="color: var(--text-muted);"><i class="fas fa-phone-alt"></i> ${contactPhone}</p>
                         </td>
-                        <td class="py-4 px-6 font-medium text-gray-700">${student.kelas_sekarang || '-'}</td>
+                        <td class="py-4 px-6 font-medium" style="color: var(--text-secondary);">${student.kelas_sekarang || '-'}</td>
                         <td class="py-4 px-6 text-center space-x-1">
-                            <button onclick="alert('Profil Detail Segera Hadir')" class="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-semibold transition" title="Buka Detail Profil">
+                            <button onclick="alert('Profil Detail Segera Hadir')" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition" style="background: var(--accent); color: white;" title="Buka Detail Profil">
                                 <i class="fas fa-folder-open"></i> Buka
                             </button>
-                            <button onclick="window.open('print_induk.html?id=${student.id}', '_blank')" class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-semibold transition" title="Cetak Lembar Induk">
+                            <button onclick="window.open('print_induk.html?id=${student.id}', '_blank')" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition" style="background: #10b981; color: white;" title="Cetak Lembar Induk">
                                 <i class="fas fa-print"></i> Cetak
                             </button>
                         </td>
@@ -195,6 +237,38 @@
             localStorage.removeItem('bi_session');
             window.location.href = 'index.html';
         }
+
+        // ========== THEME TOGGLE ==========
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            if (sunIcon && moonIcon) {
+                if (theme === 'dark') {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
 </html>

@@ -20,19 +20,67 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
     <style>
+        /* === THEME SYSTEM === */
+        :root {
+            /* Dark Mode (default) */
+            --bg-primary: #0c111b;
+            --bg-secondary: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.15);
+            --header-bg: rgba(12, 17, 27, 0.85);
+            --header-border: rgba(255, 255, 255, 0.06);
+            --brand-icon: linear-gradient(135deg, #7c3aed, #6366f1);
+            --mesh-1: rgba(99, 102, 241, 0.08);
+            --mesh-2: rgba(139, 92, 246, 0.06);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+            --scrollbar-thumb-hover: rgba(255, 255, 255, 0.15);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --input-focus-border: rgba(99, 102, 241, 0.6);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --header-border: rgba(0, 0, 0, 0.1);
+            --brand-icon: linear-gradient(135deg, #7c3aed, #6366f1);
+            --mesh-1: rgba(99, 102, 241, 0.03);
+            --mesh-2: rgba(139, 92, 246, 0.03);
+            --scrollbar-thumb: rgba(0, 0, 0, 0.1);
+            --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: rgba(0, 0, 0, 0.1);
+            --input-focus-border: rgba(99, 102, 241, 0.6);
+        }
+
         /* === RESET & BASE === */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        
+
         html, body {
             height: 100%; width: 100%; overflow-x: hidden;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0c111b;
+            background: var(--bg-primary);
             min-height: 100vh;
             min-height: 100dvh;
-            color: #e2e8f0;
+            color: var(--text-primary);
             -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased;
         }
@@ -43,8 +91,8 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background:
-                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 85% 90%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+                radial-gradient(ellipse 70% 50% at 15% 10%, var(--mesh-1) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 85% 90%, var(--mesh-2) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
@@ -54,15 +102,15 @@
         /* === SCROLLBAR === */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
         /* === HEADER === */
         .app-header {
-            background: rgba(12, 17, 27, 0.85);
+            background: var(--header-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid var(--header-border);
             position: sticky;
             top: 0;
             z-index: 40;
@@ -83,7 +131,7 @@
         }
         .brand-icon {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            background: var(--brand-icon);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -94,12 +142,12 @@
         .brand-text h1 {
             font-size: 0.95rem;
             font-weight: 700;
-            color: white;
+            color: var(--text-primary);
             line-height: 1.2;
         }
         .brand-text p {
             font-size: 0.6rem;
-            color: #818cf8;
+            color: var(--accent);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -116,26 +164,26 @@
             padding: 0.4rem 0.75rem;
             font-size: 0.75rem;
             font-weight: 600;
-            color: #a5b4fc;
-            background: rgba(99, 102, 241, 0.08);
-            border: 1px solid rgba(99, 102, 241, 0.15);
+            color: var(--accent);
+            background: var(--accent-light);
+            border: 1px solid var(--glass-border);
             border-radius: 0.5rem;
             transition: all 0.2s;
             text-decoration: none;
         }
-        .btn-back:hover { background: rgba(99, 102, 241, 0.15); color: white; }
+        .btn-back:hover { background: var(--accent-light); color: var(--text-primary); }
         .btn-back:active { transform: scale(0.96); }
         .btn-back svg { width: 14px; height: 14px; }
         .avatar-circle {
             width: 34px; height: 34px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .avatar-circle svg { width: 16px; height: 16px; color: #818cf8; }
+        .avatar-circle svg { width: 16px; height: 16px; color: var(--accent); }
 
         /* === MAIN LAYOUT === */
         .main-content {
@@ -726,6 +774,10 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all" style="background: var(--accent-light); border: 1px solid var(--glass-border);" title="Ganti Tema">
+                    <svg id="theme-icon-sun" class="w-4 h-4 hidden" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-moon" class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
                 <a href="index.html" class="btn-back">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -1267,6 +1319,38 @@
                 })
                 .subscribe();
         }
+
+        // ========== THEME TOGGLE ==========
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            if (sunIcon && moonIcon) {
+                if (theme === 'dark') {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
 </html>

@@ -27,31 +27,79 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+        /* === THEME SYSTEM === */
+        :root {
+            /* Dark Mode (default) */
+            --bg-primary: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --bg-secondary: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --input-focus-bg: rgba(15, 23, 42, 0.8);
+            --input-focus-border: rgba(99, 102, 241, 0.6);
+            --input-focus-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.15);
+            --header-bg: rgba(15, 23, 42, 0.6);
+            --divider: rgba(255, 255, 255, 0.1);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+            --scrollbar-thumb-hover: rgba(255, 255, 255, 0.2);
+            --loader-color: #6366f1;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --bg-secondary: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: rgba(0, 0, 0, 0.1);
+            --input-focus-bg: #ffffff;
+            --input-focus-border: rgba(99, 102, 241, 0.6);
+            --input-focus-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --header-bg: rgba(255, 255, 255, 0.8);
+            --divider: rgba(0, 0, 0, 0.1);
+            --scrollbar-thumb: rgba(0, 0, 0, 0.1);
+            --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
+            --loader-color: #6366f1;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background: var(--bg-primary);
         }
 
         /* Glassmorphic Panel Styles */
         .glass-card {
-            background: rgba(30, 41, 59, 0.45);
+            background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
         }
 
         .input-glass {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
             transition: all 0.3s;
         }
         .input-glass:focus {
-            background: rgba(15, 23, 42, 0.8);
-            border-color: rgba(99, 102, 241, 0.6);
+            background: var(--input-focus-bg);
+            border-color: var(--input-focus-border);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+            box-shadow: var(--input-focus-shadow);
         }
 
         /* Micro-Animations & Transitions */
@@ -88,11 +136,11 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--scrollbar-thumb);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--scrollbar-thumb-hover);
         }
 
         /* ===== RESPONSIVE MOBILE FIXES ===== */
@@ -377,6 +425,10 @@
             </div>
             
             <div class="flex gap-2">
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 glass-card rounded-xl border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95" title="Ganti Tema">
+                    <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
                 <select id="filter-kelas" onchange="loadStudents()" 
                         class="bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
                     <option value="8" class="bg-slate-900 text-white">Kelas 8</option>
@@ -1995,6 +2047,38 @@
                 modal.classList.add('hidden');
             }
         }
+
+        // ========== THEME TOGGLE ==========
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            if (sunIcon && moonIcon) {
+                if (theme === 'dark') {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
 </html>

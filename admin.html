@@ -8,9 +8,107 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: white; min-height: 100vh; }
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        /* === THEME SYSTEM === */
+        :root {
+            /* Dark Mode (default) */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --input-focus-bg: rgba(255, 255, 255, 0.1);
+            --input-focus-border: rgba(59, 130, 246, 0.6);
+            --input-focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e1;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --divider: rgba(255, 255, 255, 0.05);
+            --tab-bg: rgba(255, 255, 255, 0.05);
+            --tab-border: rgba(255, 255, 255, 0.1);
+            --tab-hover: rgba(255, 255, 255, 0.08);
+            --tab-text: rgba(255, 255, 255, 0.6);
+            --tab-underline: rgba(255, 255, 255, 0.6);
+            --leger-bg: rgba(30, 41, 59, 0.45);
+            --leger-border: rgba(255, 255, 255, 0.08);
+            --leger-text: #f1f5f9;
+            --leger-cell-border: rgba(255, 255, 255, 0.06);
+            --leger-th-bg: rgba(15, 23, 42, 0.75);
+            --leger-th-text: #94a3b8;
+            --leger-sticky-bg: rgba(15, 23, 42, 0.95);
+            --leger-sticky-border: rgba(255, 255, 255, 0.15);
+            --leger-sticky-text: #f1f5f9;
+            --leger-total-bg: rgba(255, 255, 255, 0.05);
+            --select-bg: rgba(255, 255, 255, 0.1);
+            --select-border: rgba(255, 255, 255, 0.1);
+            --skeleton-from: rgba(255, 255, 255, 0.03);
+            --skeleton-to: rgba(255, 255, 255, 0.06);
+            --skeleton-card-bg: rgba(30, 41, 59, 0.3);
+            --skeleton-card-border: rgba(255, 255, 255, 0.04);
+            --login-icon-bg: #3b82f6;
+            --card-hover-border: rgba(99, 102, 241, 0.3);
+            --card-hover-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.15);
+            --header-border: rgba(255, 255, 255, 0.05);
+            --btn-theme-bg: rgba(255, 255, 255, 0.05);
+            --btn-theme-hover-bg: rgba(255, 255, 255, 0.1);
+            --btn-theme-border: rgba(255, 255, 255, 0.1);
+            --btn-theme-text: #94a3b8;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: rgba(0, 0, 0, 0.12);
+            --input-focus-bg: #ffffff;
+            --input-focus-border: rgba(59, 130, 246, 0.6);
+            --input-focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: rgba(30, 41, 59, 0.5);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --divider: rgba(0, 0, 0, 0.06);
+            --tab-bg: rgba(0, 0, 0, 0.04);
+            --tab-border: rgba(0, 0, 0, 0.08);
+            --tab-hover: rgba(0, 0, 0, 0.06);
+            --tab-text: rgba(30, 41, 59, 0.5);
+            --tab-underline: rgba(30, 41, 59, 0.4);
+            --leger-bg: rgba(255, 255, 255, 0.9);
+            --leger-border: rgba(0, 0, 0, 0.1);
+            --leger-text: #1e293b;
+            --leger-cell-border: rgba(0, 0, 0, 0.08);
+            --leger-th-bg: rgba(241, 245, 249, 0.95);
+            --leger-th-text: #475569;
+            --leger-sticky-bg: rgba(248, 250, 252, 0.98);
+            --leger-sticky-border: rgba(0, 0, 0, 0.12);
+            --leger-sticky-text: #1e293b;
+            --leger-total-bg: rgba(0, 0, 0, 0.03);
+            --select-bg: rgba(255, 255, 255, 0.9);
+            --select-border: rgba(0, 0, 0, 0.12);
+            --skeleton-from: rgba(0, 0, 0, 0.04);
+            --skeleton-to: rgba(0, 0, 0, 0.08);
+            --skeleton-card-bg: rgba(255, 255, 255, 0.6);
+            --skeleton-card-border: rgba(0, 0, 0, 0.06);
+            --login-icon-bg: #3b82f6;
+            --card-hover-border: rgba(59, 130, 246, 0.3);
+            --card-hover-shadow: 0 8px 20px -8px rgba(59, 130, 246, 0.12);
+            --header-border: rgba(0, 0, 0, 0.08);
+            --btn-theme-bg: rgba(0, 0, 0, 0.04);
+            --btn-theme-hover-bg: rgba(0, 0, 0, 0.08);
+            --btn-theme-border: rgba(0, 0, 0, 0.1);
+            --btn-theme-text: #64748b;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); transition: background 0.3s ease, border-color 0.3s ease; }
+        .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
 
         /* Tab content transition animations */
         .tab-content {
@@ -35,6 +133,7 @@
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            color: var(--tab-text);
         }
 
         .tab-btn::after {
@@ -44,7 +143,7 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--tab-underline);
             border-radius: 2px;
             transition: width 0.25s ease, left 0.25s ease;
         }
@@ -55,7 +154,11 @@
         }
 
         .tab-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--tab-hover);
+        }
+
+        .tab-btn.active {
+            color: white;
         }
 
         /* Skeleton loader animation */
@@ -65,22 +168,22 @@
         }
 
         .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+            background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-to) 50%, var(--skeleton-from) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s ease-in-out infinite;
             border-radius: 0.5rem;
         }
 
         .skeleton-card {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: var(--skeleton-card-bg);
+            border: 1px solid var(--skeleton-card-border);
             border-radius: 1rem;
             padding: 1rem;
         }
 
         /* Loading spinner */
         .loader {
-            border-top-color: #3b82f6;
+            border-top-color: var(--accent);
             animation: spinner 0.8s linear infinite;
         }
         @keyframes spinner {
@@ -93,8 +196,8 @@
         }
         .student-card:hover {
             transform: translateY(-2px);
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.15);
+            border-color: var(--card-hover-border);
+            box-shadow: var(--card-hover-shadow);
         }
 
         /* Button click ripple */
@@ -140,17 +243,18 @@
         /* Styles untuk Leger */
         .leger-container { 
             overflow-x: auto; 
-            background: rgba(30, 41, 59, 0.45); 
+            background: var(--leger-bg); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--leger-border);
             border-radius: 16px; 
-            color: #f1f5f9;
+            color: var(--leger-text);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         table { border-collapse: collapse; width: 100%; font-size: 12px; }
-        th, td { border: 1px solid rgba(255, 255, 255, 0.06); padding: 8px 6px; text-align: center; }
-        th { background: rgba(15, 23, 42, 0.75); color: #94a3b8; font-weight: 600; }
-        .sticky-col { position: sticky; left: 0; background: rgba(15, 23, 42, 0.95); z-index: 10; border-right: 2px solid rgba(255, 255, 255, 0.15); min-width: 140px; text-align: left; padding-left: 8px; }
+        th, td { border: 1px solid var(--leger-cell-border); padding: 8px 6px; text-align: center; transition: border-color 0.3s ease; }
+        th { background: var(--leger-th-bg); color: var(--leger-th-text); font-weight: 600; transition: background 0.3s ease, color 0.3s ease; }
+        .sticky-col { position: sticky; left: 0; background: var(--leger-sticky-bg); z-index: 10; border-right: 2px solid var(--leger-sticky-border); min-width: 140px; text-align: left; padding-left: 8px; transition: background 0.3s ease; }
 
         /* Leger status styles for screen and print */
         .st-H { color: #34d399 !important; } /* emerald-400 */
@@ -158,7 +262,37 @@
         .st-S { color: #facc15 !important; } /* yellow-400 */
         .st-I { color: #60a5fa !important; } /* blue-400 */
         .st-A { color: #f87171 !important; } /* red-400 */
-        .leger-total-col { background: rgba(255, 255, 255, 0.05) !important; color: #818cf8 !important; font-weight: bold; }
+        .leger-total-col { background: var(--leger-total-bg) !important; color: #818cf8 !important; font-weight: bold; }
+
+        /* Light mode status color adjustments */
+        [data-theme="light"] .st-H { color: #059669 !important; }
+        [data-theme="light"] .st-T { color: #ea580c !important; }
+        [data-theme="light"] .st-S { color: #ca8a04 !important; }
+        [data-theme="light"] .st-I { color: #2563eb !important; }
+        [data-theme="light"] .st-A { color: #dc2626 !important; }
+        [data-theme="light"] .leger-total-col { color: #4f46e5 !important; }
+
+        /* Light mode select/input overrides */
+        [data-theme="light"] select { color: var(--text-primary); }
+        [data-theme="light"] select option { background: #ffffff; color: #1e293b; }
+
+        /* Theme toggle button */
+        .theme-toggle-btn {
+            background: var(--btn-theme-bg);
+            border: 1px solid var(--btn-theme-border);
+            color: var(--btn-theme-text);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+        }
+        .theme-toggle-btn:hover {
+            background: var(--btn-theme-hover-bg);
+            color: var(--text-primary);
+        }
         
         @media print {
             .no-print { display: none !important; }
@@ -191,39 +325,49 @@
     <!-- LOGIN VIEW -->
     <div id="login-view" class="max-w-md mx-auto mt-20">
         <div class="glass-card rounded-3xl p-8 text-center shadow-2xl">
-            <div class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg" style="background: var(--login-icon-bg);">
                 <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
             <h1 class="text-2xl font-bold mb-8">THHK Connect Admin</h1>
-            <input type="password" id="admin-pass" placeholder="Password Admin" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="loginAdmin()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 transition">Masuk Ke Sistem</button>
+            <input type="password" id="admin-pass" placeholder="Password Admin" class="w-full rounded-xl px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary);">
+            <button onclick="loginAdmin()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 transition text-white">Masuk Ke Sistem</button>
         </div>
     </div>
 
     <!-- MAIN DASHBOARD -->
     <div id="main-view" class="hidden max-w-6xl mx-auto">
-        <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 no-print border-b border-white/5 pb-4">
+        <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 no-print pb-4" style="border-bottom: 1px solid var(--header-border);">
             <div class="flex items-center justify-between w-full md:w-auto">
                 <div>
                     <h1 class="text-3xl font-bold">Pusat Kendali Guru</h1>
                     <p class="text-blue-300 opacity-80 text-xs mt-0.5" id="current-date">Kamis, 7 Mei 2026</p>
                 </div>
-                <a href="index.html" class="flex md:hidden items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl text-xs font-bold text-blue-300 transition-all active:scale-95">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    <span>Kembali</span>
-                </a>
+                <div class="flex md:hidden items-center gap-2">
+                    <button id="theme-toggle-mobile" onclick="toggleTheme()" class="theme-toggle-btn" title="Ganti Tema">
+                        <svg id="theme-icon-sun-m" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg id="theme-icon-moon-m" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <a href="index.html" class="flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl text-xs font-bold text-blue-300 transition-all active:scale-95">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        <span>Kembali</span>
+                    </a>
+                </div>
             </div>
             <div class="flex items-center gap-3">
+                <button id="theme-toggle" onclick="toggleTheme()" class="hidden md:flex theme-toggle-btn" title="Ganti Tema">
+                    <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
                 <a href="index.html" class="hidden md:flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl text-xs font-bold text-blue-300 transition-all active:scale-95">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                     <span>Kembali</span>
                 </a>
-                <div class="flex bg-white/5 p-1 rounded-xl border border-white/10 overflow-x-auto scrollbar-none whitespace-nowrap max-w-full flex-1 md:flex-initial">
+                <div class="flex p-1 rounded-xl overflow-x-auto scrollbar-none whitespace-nowrap max-w-full flex-1 md:flex-initial" style="background: var(--tab-bg); border: 1px solid var(--tab-border);">
                     <button onclick="setTab('daily')" id="tab-daily" class="tab-btn active px-4 py-2 rounded-lg font-bold transition text-xs flex-shrink-0">Absensi Harian</button>
-                    <button onclick="setTab('recap')" id="tab-recap" class="tab-btn px-4 py-2 rounded-lg font-bold transition text-white/60 text-xs flex-shrink-0">Rekap & Leger</button>
-                    <button onclick="setTab('analysis')" id="tab-analysis" class="tab-btn px-4 py-2 rounded-lg font-bold transition text-white/60 text-xs flex-shrink-0">Analisis Pola</button>
+                    <button onclick="setTab('recap')" id="tab-recap" class="tab-btn px-4 py-2 rounded-lg font-bold transition text-xs flex-shrink-0">Rekap &amp; Leger</button>
+                    <button onclick="setTab('analysis')" id="tab-analysis" class="tab-btn px-4 py-2 rounded-lg font-bold transition text-xs flex-shrink-0">Analisis Pola</button>
                 </div>
             </div>
         </header>
@@ -232,9 +376,9 @@
         <div id="content-daily" class="space-y-6">
             <div class="flex flex-col md:flex-row gap-4 no-print">
                 <div class="flex-1">
-                    <input type="text" id="search-student" oninput="renderDaily()" placeholder="Cari nama siswa..." class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <input type="text" id="search-student" oninput="renderDaily()" placeholder="Cari nama siswa..." class="w-full rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary);">
                 </div>
-                <select id="daily-kelas" onchange="loadDaily()" class="bg-white/10 border border-white/10 rounded-xl px-4 py-2">
+                <select id="daily-kelas" onchange="loadDaily()" class="rounded-xl px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
                     <option value="8">Kelas 8</option>
                     <option value="9">Kelas 9</option>
                 </select>
@@ -248,21 +392,21 @@
         <!-- TAB 2: REKAP & LEGER -->
         <div id="content-recap" class="hidden space-y-6">
             <div class="flex flex-wrap gap-2 no-print">
-                <select id="recap-kelas" class="bg-white/10 border border-white/10 rounded-lg px-4 py-2">
+                <select id="recap-kelas" class="rounded-lg px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
                     <option value="8">Kelas 8</option>
                     <option value="9">Kelas 9</option>
                 </select>
-                <select id="recap-bulan" class="bg-white/10 border border-white/10 rounded-lg px-4 py-2">
+                <select id="recap-bulan" class="rounded-lg px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
                     <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
                     <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
                     <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
                     <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
                 </select>
-                <select id="recap-tahun" class="bg-white/10 border border-white/10 rounded-lg px-4 py-2">
+                <select id="recap-tahun" class="rounded-lg px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
                     <option value="2026">2026</option><option value="2025">2025</option>
                 </select>
-                <button onclick="loadRecap()" class="bg-blue-600 px-6 py-2 rounded-lg font-bold">Tampilkan</button>
-                <button onclick="window.print()" class="bg-slate-700 px-6 py-2 rounded-lg font-bold">Cetak PDF</button>
+                <button onclick="loadRecap()" class="bg-blue-600 px-6 py-2 rounded-lg font-bold text-white hover:bg-blue-500 transition">Tampilkan</button>
+                <button onclick="window.print()" class="bg-slate-700 px-6 py-2 rounded-lg font-bold text-white hover:bg-slate-600 transition">Cetak PDF</button>
             </div>
 
             <div id="print-header" class="hidden print:block text-center mb-6 text-black">
@@ -297,7 +441,7 @@
                     <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
                     Sinyal Peringatan Siswa
                 </h2>
-                <select id="analysis-kelas" onchange="loadAnalysis()" class="bg-white/10 border border-white/10 rounded-lg px-4 py-2">
+                <select id="analysis-kelas" onchange="loadAnalysis()" class="rounded-lg px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
                     <option value="8">Kelas 8</option>
                     <option value="9">Kelas 9</option>
                 </select>
@@ -364,10 +508,8 @@
                 if (tabs[key]) {
                     if (key === tab) {
                         tabs[key].classList.add('active');
-                        tabs[key].classList.remove('text-white/60');
                     } else {
                         tabs[key].classList.remove('active');
-                        tabs[key].classList.add('text-white/60');
                     }
                 }
             });
@@ -458,14 +600,14 @@
                     <div class="glass-card rounded-2xl p-4.5 flex flex-col justify-between gap-4">
                         <div class="flex justify-between items-start gap-2">
                             <div class="min-w-0 flex-1">
-                                <h3 class="font-bold text-sm text-slate-100 break-words pr-2" title="${s.nama}">${s.nama}</h3>
+                                <h3 class="font-bold text-sm text-slate-100 break-words pr-2" title="${s.nama}" style="color: var(--text-primary)">${s.nama}</h3>
                                 <p class="text-[10px] opacity-60 mt-0.5">NIS: ${s.nis}</p>
                                 ${isIzin && keteranganIzin ? `<p class="text-[10px] text-blue-300 mt-1.5 italic max-w-xs truncate" title="${keteranganIzin}">Ket: ${keteranganIzin}</p>` : ''}
                                 ${(log && log.latitude && log.longitude) ? `<p class="text-[10px] text-yellow-350 mt-1.5"><a href="https://maps.google.com/?q=${log.latitude},${log.longitude}" target="_blank" class="hover:underline inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-yellow-450" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Audit Lokasi GPS</a></p>` : ''}
                             </div>
                             ${isRealDevice ? `<button onclick="resetHP('${s.id}')" class="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition active:scale-95" title="Reset Device Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg></button>` : ''}
                         </div>
-                        <div class="w-full mt-1 border-t border-white/5 pt-3">
+                        <div class="w-full mt-1 pt-3" style="border-top: 1px solid var(--divider);">
                             ${log ? `<span class="${styles[statusKode] || 'bg-white/10 text-white border-white/20'} border px-4 py-2 rounded-xl text-xs font-bold w-full block text-center">${names[statusKode] || statusKode}</span>` : `
                                 <div class="grid grid-cols-4 gap-1.5">
                                     <button onclick="mark('${s.id}','H')" class="bg-green-600/15 hover:bg-green-600/25 border border-green-500/25 text-green-400 py-2 px-1 rounded-xl text-[11px] font-bold transition active:scale-95">Hadir</button>
@@ -544,10 +686,10 @@
             const colors = { 'H': 'st-H', 'T': 'st-T', 'S': 'st-S', 'I': 'st-I', 'A': 'st-A' };
             document.getElementById('leger-body').innerHTML = students.map(s => {
                 let hTotal = 0;
-                let cells = `<td class="sticky-col font-medium text-slate-100 print:text-black">${s.nama}</td>`;
+                let cells = `<td class="sticky-col font-medium print:text-black" style="color: var(--leger-sticky-text)">${s.nama}</td>`;
                 for(let d=1; d<=daysInMonth; d++) {
                     const st = map[s.id] && map[s.id][d];
-                    cells += `<td class="font-bold ${colors[st]||''}">${st||'.'}</td>`;
+                    cells += `<td class="font-bold ${colors[st]||""}">${st||'.'}</td>`;
                     if(st === 'H' || st === 'T') hTotal++;
                 }
                 return `<tr>${cells}<td class="leger-total-col font-bold">${hTotal}</td></tr>`;
@@ -625,10 +767,49 @@
                     </div>
                     <h3 class="font-bold text-lg mb-2">${name}</h3>
                     <p class="text-sm opacity-60 leading-relaxed">${desc}</p>
-                    <button class="mt-6 w-full py-2 bg-white/5 rounded-xl text-xs font-bold hover:bg-white/10 transition">Tindak Lanjuti</button>
+                    <button class="mt-6 w-full py-2 rounded-xl text-xs font-bold transition" style="background: var(--tab-bg); border: 1px solid var(--glass-border);" onmouseover="this.style.background='var(--tab-hover)'" onmouseout="this.style.background='var(--tab-bg)'">Tindak Lanjuti</button>
                 </div>
             `;
         }
+
+        // ========== THEME TOGGLE ==========
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            // Desktop icons
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            // Mobile icons
+            const sunIconM = document.getElementById('theme-icon-sun-m');
+            const moonIconM = document.getElementById('theme-icon-moon-m');
+
+            if (theme === 'dark') {
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+                if (sunIconM) sunIconM.classList.add('hidden');
+                if (moonIconM) moonIconM.classList.remove('hidden');
+            } else {
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+                if (sunIconM) sunIconM.classList.remove('hidden');
+                if (moonIconM) moonIconM.classList.add('hidden');
+            }
+        }
+
+        // Initialize theme on page load
+        initTheme();
     </script>
 </body>
 </html>
