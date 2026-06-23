@@ -747,6 +747,22 @@
             color: #334155;
             font-weight: 600;
         }
+
+        /* ============================================================
+           LIGHT MODE READABILITY OVERRIDES  (scoped to data-theme="light")
+           These classes hard-code white / pale text meant for the dark
+           background. On light surfaces that text becomes invisible, so we
+           re-color it. Scoped to light → dark mode is completely unaffected.
+           White text on solid/gradient surfaces (.btn-submit, .fab svg,
+           .brand-icon svg, .toast) is intentionally NOT touched.
+           ============================================================ */
+        [data-theme="light"] .section-title { color: var(--text-primary); }
+        [data-theme="light"] .task-teacher { color: var(--text-primary); }
+        [data-theme="light"] .btn-refresh:hover { color: var(--text-primary); }
+        [data-theme="light"] .upload-indicator { color: #4f46e5; }
+        [data-theme="light"] .task-info-item a { color: #4f46e5; }
+        [data-theme="light"] .task-info-item a:hover { color: #4338ca; }
+        [data-theme="light"] select.filter-input option { background: var(--bg-secondary); color: var(--text-primary); }
     </style>
 </head>
 <body>

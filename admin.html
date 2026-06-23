@@ -276,6 +276,19 @@
         [data-theme="light"] select { color: var(--text-primary); }
         [data-theme="light"] select option { background: #ffffff; color: #1e293b; }
 
+        /* Light mode: Tailwind pale text utilities used in dynamically-rendered
+           cards/badges (status pills, alert cards, swipe hint, izin note) become
+           invisible on light surfaces. Darken them to readable accents. Scoped to
+           light → dark mode untouched. Solid colored badge backgrounds keep their
+           tinted look; only the text is darkened for contrast. */
+        [data-theme="light"] .text-blue-300,
+        [data-theme="light"] .text-blue-400 { color: #2563eb !important; }
+        [data-theme="light"] .text-green-400 { color: #059669 !important; }
+        [data-theme="light"] .text-yellow-400 { color: #b45309 !important; }
+        [data-theme="light"] .text-orange-400 { color: #ea580c !important; }
+        [data-theme="light"] .text-red-400 { color: #dc2626 !important; }
+        [data-theme="light"] .text-slate-100 { color: var(--text-primary) !important; }
+
         /* Theme toggle button */
         .theme-toggle-btn {
             background: var(--btn-theme-bg);

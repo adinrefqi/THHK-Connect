@@ -372,6 +372,81 @@
             border: 1px solid rgba(129, 140, 248, 0.4);
             color: white;
         }
+
+        /* ============================================================
+           LIGHT MODE READABILITY OVERRIDES  (scoped to data-theme="light")
+           The UI hard-codes white / pale Tailwind text for the dark
+           background. On light glass surfaces that text turns invisible,
+           so we re-color it. Scoped to [data-theme="light"] → dark mode is
+           completely untouched.
+           Intentionally-dark islands keep their light text — see the
+           EXCEPTIONS block: the student-detail modal, confirm dialog,
+           colored alert toasts, the push-notification toasts and solid
+           colored buttons/badges all sit on their own dark/colored
+           backgrounds in BOTH themes.
+           ============================================================ */
+
+        /* ---- base body + utility text classes -> readable dark ---- */
+        [data-theme="light"] body { color: var(--text-primary); }
+        [data-theme="light"] .text-white { color: var(--text-primary); }
+        [data-theme="light"] .text-slate-100,
+        [data-theme="light"] .text-slate-200,
+        [data-theme="light"] .text-slate-300 { color: var(--text-primary); }
+        [data-theme="light"] .text-slate-400 { color: var(--text-secondary); }
+        [data-theme="light"] .text-slate-500 { color: rgba(30, 41, 59, 0.6); }
+
+        /* ---- pale accent text -> readable accent equivalents ---- */
+        [data-theme="light"] .text-indigo-200\/60,
+        [data-theme="light"] .text-indigo-200,
+        [data-theme="light"] .text-indigo-300,
+        [data-theme="light"] .text-indigo-400,
+        [data-theme="light"] .text-blue-300 { color: #4f46e5; }
+        [data-theme="light"] .text-sky-400 { color: #0284c7; }
+        [data-theme="light"] .text-emerald-400 { color: #059669; }
+        [data-theme="light"] .text-amber-400,
+        [data-theme="light"] .text-yellow-300,
+        [data-theme="light"] .text-yellow-400 { color: #b45309; }
+        [data-theme="light"] .text-rose-300,
+        [data-theme="light"] .text-rose-400,
+        [data-theme="light"] .text-red-400 { color: #dc2626; }
+
+        /* inline hard-coded white text (e.g. confirm-box title) handled in EXCEPTIONS */
+
+        /* ==================== EXCEPTIONS (keep light text) ==================== */
+
+        /* Intentionally-dark islands: student-detail modal, confirm dialog,
+           push-notification toasts. Their backgrounds stay dark in light mode,
+           so their text must remain light. Set a light default first (covers
+           un-classed nodes like emojis), then the specific tints. */
+        [data-theme="light"] #modal-detail-siswa,
+        [data-theme="light"] #piket-toast-container,
+        [data-theme="light"] .confirm-box { color: #e2e8f0; }
+        [data-theme="light"] #modal-detail-siswa .text-white { color: #ffffff; }
+        [data-theme="light"] #modal-detail-siswa .text-slate-100,
+        [data-theme="light"] #modal-detail-siswa .text-slate-200,
+        [data-theme="light"] #modal-detail-siswa .text-slate-300 { color: #cbd5e1; }
+        [data-theme="light"] #modal-detail-siswa .text-slate-400 { color: #94a3b8; }
+        [data-theme="light"] #modal-detail-siswa .text-slate-500 { color: #64748b; }
+        [data-theme="light"] #piket-toast-container .text-white { color: #ffffff; }
+        [data-theme="light"] #piket-toast-container .text-slate-300,
+        [data-theme="light"] #piket-toast-container .text-slate-400 { color: #cbd5e1; }
+        [data-theme="light"] .confirm-box [style*="color:#fff"] { color: #ffffff !important; }
+
+        /* Colored alert toasts keep white text (solid colored background) */
+        [data-theme="light"] .alert-toast { color: #ffffff; }
+
+        /* Solid colored buttons & badges keep white text. The hover:text-white
+           utility is a separate class and is untouched, so colored hover states
+           stay correct automatically. */
+        [data-theme="light"] .bg-indigo-600.text-white,
+        [data-theme="light"] .bg-red-500.text-white,
+        [data-theme="light"] .bg-rose-500.text-white,
+        [data-theme="light"] .bg-purple-500.text-white,
+        [data-theme="light"] .bg-emerald-600.text-white,
+        [data-theme="light"] .bg-indigo-600 .text-white { color: #ffffff; }
+
+        /* Native <option> lists render on their own dark bg-slate-900 */
+        [data-theme="light"] option.text-white { color: #ffffff; }
     </style>
 </head>
 <body class="text-slate-100 antialiased min-h-screen p-4 md:p-8 pb-12">

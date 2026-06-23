@@ -2046,6 +2046,102 @@
                 padding-top: calc(1rem + env(safe-area-inset-top));
             }
         }
+
+        /* ============================================================
+           LIGHT MODE READABILITY OVERRIDES  (scoped to data-theme="light")
+           The UI hard-codes white / pale text intended for the dark
+           background. On the light surfaces that text becomes invisible,
+           so we re-color it here. Dark mode is completely unaffected.
+           Intentionally-dark islands (the Izin & Bullying modals and the
+           bottom nav) and solid colored buttons keep their light text —
+           see the EXCEPTIONS block at the end.
+           ============================================================ */
+
+        /* ---- utility text-colour classes ---- */
+        [data-theme="light"] .text-white { color: var(--text-primary); }
+        [data-theme="light"] .text-white\/80 { color: rgba(30, 41, 59, 0.78); }
+        [data-theme="light"] .text-white\/70 { color: rgba(30, 41, 59, 0.68); }
+        [data-theme="light"] .text-white\/50 { color: rgba(30, 41, 59, 0.55); }
+        [data-theme="light"] .text-white\/40 { color: rgba(30, 41, 59, 0.45); }
+        [data-theme="light"] .text-blue-100 { color: #1e40af; }
+        [data-theme="light"] .text-blue-200 { color: #1d4ed8; }
+        [data-theme="light"] .text-blue-300 { color: #2563eb; }
+        [data-theme="light"] .text-blue-400 { color: #2563eb; }
+        [data-theme="light"] .text-sky-400 { color: #0284c7; }
+        [data-theme="light"] .text-green-300,
+        [data-theme="light"] .text-green-400 { color: #059669; }
+        [data-theme="light"] .text-yellow-300,
+        [data-theme="light"] .text-yellow-300\/80,
+        [data-theme="light"] .text-yellow-400 { color: #b45309; }
+        [data-theme="light"] .text-red-300,
+        [data-theme="light"] .text-red-300\/70,
+        [data-theme="light"] .text-red-300\/50,
+        [data-theme="light"] .text-red-400 { color: #dc2626; }
+
+        /* ---- component CSS rules that hard-code white (container/inherited) ---- */
+        [data-theme="light"] #section-habits { color: var(--text-primary); }
+        [data-theme="light"] .habit-input { color: var(--text-primary); }
+        [data-theme="light"] .habit-input::placeholder { color: rgba(30, 41, 59, 0.4); }
+        [data-theme="light"] .mood-label { color: rgba(30, 41, 59, 0.55); }
+        [data-theme="light"] .badge-card .badge-name { color: rgba(30, 41, 59, 0.6); }
+
+        /* ---- inline hard-coded white text -> readable dark ---- */
+        [data-theme="light"] [style*="color:#fff"],
+        [data-theme="light"] [style*="color: #fff"],
+        [data-theme="light"] [style*="color:#ffffff"],
+        [data-theme="light"] [style*="color: #ffffff"],
+        [data-theme="light"] [style*="color:white"],
+        [data-theme="light"] [style*="color: white"],
+        [data-theme="light"] [style*="color:rgba(255,255,255"],
+        [data-theme="light"] [style*="color: rgba(255, 255, 255"] {
+            color: var(--text-primary) !important;
+        }
+        /* inline pale-blue accent labels -> readable blue (all spacing variants) */
+        [data-theme="light"] [style*="rgba(147,197,253"],
+        [data-theme="light"] [style*="rgba(147, 197, 253"] {
+            color: #1d4ed8 !important;
+        }
+        /* .section-label class + inline rose/pink accents -> readable */
+        [data-theme="light"] .section-label { color: #1d4ed8; }
+        [data-theme="light"] [style*="color:#fda4af"],
+        [data-theme="light"] [style*="color:#fca5a5"],
+        [data-theme="light"] [style*="color: #fca5a5"],
+        [data-theme="light"] [style*="color:#fb7185"] {
+            color: #dc2626 !important;
+        }
+
+        /* ==================== EXCEPTIONS (keep light text) ==================== */
+
+        /* solid colored / gradient buttons keep white text */
+        [data-theme="light"] #btn-login,
+        [data-theme="light"] #btn-login .text-white,
+        [data-theme="light"] .bg-blue-500,
+        [data-theme="light"] .bg-blue-500 .text-white,
+        [data-theme="light"] .bg-gradient-to-br .text-white,
+        [data-theme="light"] .bg-gradient-to-br svg,
+        [data-theme="light"] .habit-num,
+        [data-theme="light"] [style*="linear-gradient(135deg, #"][style*="color"],
+        [data-theme="light"] [style*="linear-gradient(135deg,#"][style*="color"] {
+            color: #fff !important;
+        }
+
+        /* intentionally-dark Izin & Bullying modals + bottom nav keep light text */
+        [data-theme="light"] #modal-izin [style*="color:rgba(255,255,255"],
+        [data-theme="light"] #modal-bullying [style*="color:rgba(255,255,255"],
+        [data-theme="light"] #bottom-nav [style*="color:rgba(255,255,255"] {
+            color: rgba(255, 255, 255, 0.55) !important;
+        }
+        [data-theme="light"] #modal-izin [style*="color:#fff"],
+        [data-theme="light"] #modal-izin [style*="color: #fff"],
+        [data-theme="light"] #modal-bullying [style*="color:#fff"],
+        [data-theme="light"] #modal-bullying [style*="color: #fff"],
+        [data-theme="light"] #bottom-nav [style*="color:#fff"] {
+            color: #fff !important;
+        }
+        [data-theme="light"] #modal-izin [style*="color:rgba(147,197,253"],
+        [data-theme="light"] #modal-bullying [style*="color:rgba(147,197,253"] {
+            color: rgba(147, 197, 253, 0.85) !important;
+        }
     </style>
 
 </head>

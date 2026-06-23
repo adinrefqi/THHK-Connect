@@ -869,6 +869,53 @@
                 page-break-after: avoid;
             }
         }
+
+        /* ============================================================
+           LIGHT MODE READABILITY OVERRIDES  (scoped to data-theme="light")
+           Header title, stat numbers, summary cards and section headings
+           hard-code white / pale Tailwind text for the dark background. On
+           the light glass surfaces that text is invisible, so we re-color it.
+           Scoped to [data-theme="light"] → dark mode is untouched.
+           The table's sticky header/first column and the .pill-select dropdowns
+           keep their hard-coded dark backgrounds in both themes, so their light
+           text is preserved in the EXCEPTIONS block.
+           ============================================================ */
+
+        /* ---- utility text classes on glass surfaces -> readable dark ---- */
+        [data-theme="light"] .text-white { color: var(--text-primary); }
+        [data-theme="light"] .text-slate-100,
+        [data-theme="light"] .text-slate-200,
+        [data-theme="light"] .text-slate-300 { color: var(--text-primary); }
+        [data-theme="light"] .text-slate-400 { color: var(--text-secondary); }
+        [data-theme="light"] .text-slate-500 { color: rgba(30, 41, 59, 0.6); }
+
+        /* ---- pale accent text -> readable accent equivalents ---- */
+        [data-theme="light"] .text-indigo-300,
+        [data-theme="light"] .text-indigo-400 { color: #4f46e5; }
+        [data-theme="light"] .text-sky-400 { color: #0284c7; }
+        [data-theme="light"] .text-emerald-300,
+        [data-theme="light"] .text-emerald-400 { color: #059669; }
+        [data-theme="light"] .text-amber-300,
+        [data-theme="light"] .text-amber-400 { color: #b45309; }
+        [data-theme="light"] .text-rose-300,
+        [data-theme="light"] .text-rose-400 { color: #dc2626; }
+
+        /* ==================== EXCEPTIONS (keep light text) ==================== */
+
+        /* Sticky table header + first column have a hard-coded dark background
+           that does not change with theme, so their text stays light. */
+        [data-theme="light"] .table-container thead th,
+        [data-theme="light"] .table-container thead th .text-white,
+        [data-theme="light"] .table-container td.sticky-col,
+        [data-theme="light"] .table-container th.sticky-col { color: #f1f5f9; }
+
+        /* .pill-select dropdowns keep their dark pill + white text */
+        [data-theme="light"] .pill-select,
+        [data-theme="light"] .pill-select option { color: #ffffff; }
+
+        /* Header buttons that toggle to white on hover keep their slate base
+           (handled by .text-slate-300 above) — colored hover utilities are a
+           separate class and remain untouched. */
     </style>
 </head>
 <body class="p-3 sm:p-4 md:p-8 min-h-screen">
