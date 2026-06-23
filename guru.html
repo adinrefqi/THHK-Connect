@@ -71,20 +71,20 @@
 <body class="flex flex-col h-screen overflow-hidden">
 
     <!-- TOP NAVIGATION (Guru View) -->
-    <nav class="text-white shadow-md z-20 relative" style="background-color: var(--nav-bg);">
+    <nav class="shadow-md z-20 relative" style="background-color: var(--nav-bg);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <i class="fas fa-book-open text-2xl text-blue-300"></i>
+                    <i class="fas fa-book-open text-2xl" style="color: #93c5fd;"></i>
                     <span class="font-bold text-lg tracking-tight" style="color: var(--nav-text);">Portal Guru - Buku Induk</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all" style="background: rgba(255,255,255,0.1);" title="Ganti Tema">
+                    <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all" style="background: rgba(255,255,255,0.2);" title="Ganti Tema">
                         <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                     </button>
                     <span id="user-name" class="font-medium text-sm hidden md:block" style="color: var(--nav-text);">Nama Guru</span>
-                    <button onclick="logout()" class="p-2 rounded-lg transition" style="background: rgba(255,255,255,0.1);" title="Keluar">
+                    <button onclick="logout()" class="p-2 rounded-lg transition" style="background: rgba(255,255,255,0.2);" title="Keluar">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>

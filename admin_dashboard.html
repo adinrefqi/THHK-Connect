@@ -58,6 +58,7 @@
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
             --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.15);
             --header-bg: rgba(15, 23, 42, 0.6);
             --divider: rgba(255, 255, 255, 0.1);
             --spinner-border: rgba(255, 255, 255, 0.1);
@@ -80,6 +81,7 @@
             --text-secondary: #475569;
             --text-muted: #94a3b8;
             --accent: #6366f1;
+            --accent-light: rgba(99, 102, 241, 0.1);
             --header-bg: rgba(255, 255, 255, 0.8);
             --divider: rgba(0, 0, 0, 0.1);
             --spinner-border: rgba(0, 0, 0, 0.1);
@@ -216,47 +218,47 @@
         }
     </style>
 </head>
-<body class="text-slate-100 antialiased min-h-screen flex flex-col pb-12">
+<body class="antialiased min-h-screen flex flex-col pb-12" style="color: var(--text-primary);">
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed top-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-[-20px] opacity-0">
-        <div id="toast-content" class="px-6 py-4 rounded-xl shadow-2xl font-medium flex items-center gap-3 text-white">
+        <div id="toast-content" class="px-6 py-4 rounded-xl shadow-2xl font-medium flex items-center gap-3 text-white" style="background: var(--glass-bg);">
             <span id="toast-message">Notifikasi</span>
         </div>
     </div>
 
     <!-- HEADER -->
-    <header class="bg-slate-900/60 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-30 shadow-lg">
+    <header class="sticky top-0 z-30 shadow-lg" style="background: var(--header-bg); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(16px);">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style="background: var(--accent);">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-white leading-tight">THHK Connect</h1>
-                    <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">Panel Admin &bull; Waka Kurikulum</p>
+                    <h1 class="text-lg font-bold leading-tight" style="color: var(--text-primary);">THHK Connect</h1>
+                    <p class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--accent);">Panel Admin &bull; Waka Kurikulum</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-xl border border-slate-700/50 text-slate-400 hover:text-slate-200 transition-all" title="Ganti Tema">
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-xl border transition-all" title="Ganti Tema" style="background: var(--glass-bg); border-color: var(--glass-border); color: var(--text-muted);">
                     <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
-                <a href="index.html" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-xs font-bold text-indigo-300 transition-all active:scale-95">
+                <a href="index.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95" style="background: var(--accent-light); border: 1px solid var(--glass-border); color: var(--accent);">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                     <span>Kembali</span>
                 </a>
                 <div class="text-right hidden sm:block">
-                    <span class="text-sm font-medium text-slate-300 block">Waka Kurikulum</span>
-                    <span class="text-[10px] text-slate-500">Super Administrator</span>
+                    <span class="text-sm font-medium block" style="color: var(--text-secondary);">Waka Kurikulum</span>
+                    <span class="text-[10px]" style="color: var(--text-muted);">Super Administrator</span>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shadow-inner">
-                    <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 rounded-full border flex items-center justify-center shadow-inner" style="background: var(--glass-bg); border-color: var(--glass-border);">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style="color: var(--accent);">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                     </svg>
                 </div>
@@ -272,8 +274,8 @@
             <!-- Donut Chart Card -->
             <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center lg:col-span-1">
                 <div class="flex justify-between items-center w-full mb-4">
-                    <h3 class="font-bold text-base text-white">Proporsi Kehadiran</h3>
-                    <button onclick="fetchTodayStats()" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 transition" title="Refresh Statistik">
+                    <h3 class="font-bold text-base" style="color: var(--text-primary);">Proporsi Kehadiran</h3>
+                    <button onclick="fetchTodayStats()" class="p-1.5 rounded-lg transition" style="background: var(--glass-bg); color: var(--text-muted);" title="Refresh Statistik">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
@@ -282,57 +284,57 @@
                 <div class="relative w-44 h-44 mb-4">
                     <canvas id="todayChart"></canvas>
                 </div>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-wider w-full mt-2 border-t border-slate-800 pt-4">
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-wider w-full mt-2 border-t pt-4" style="border-color: var(--divider);">
                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hadir (<span id="pct-hadir">0%</span>)</div>
                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Terlambat (<span id="pct-terlambat">0%</span>)</div>
                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Sakit (<span id="pct-sakit">0%</span>)</div>
                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Izin (<span id="pct-izin">0%</span>)</div>
-                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 col-span-2"></span> Alfa (<span id="pct-alfa">0%</span>)</div>
+                    <div class="flex items-center gap-1.5 col-span-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Alfa (<span id="pct-alfa">0%</span>)</div>
                 </div>
             </div>
 
             <!-- Attendance Stats Counters -->
             <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 stat-grid-mobile">
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hadir</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Hadir</p>
                     <div class="flex justify-between items-end mt-4">
                         <span id="stat-hadir" class="text-4xl font-extrabold text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.25)]">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Terlambat</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Terlambat</p>
                     <div class="flex justify-between items-end mt-4">
                         <span id="stat-terlambat" class="text-4xl font-extrabold text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.25)]">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-sky-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sakit</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Sakit</p>
                     <div class="flex justify-between items-end mt-4">
                         <span id="stat-sakit" class="text-4xl font-extrabold text-sky-400 drop-shadow-[0_0_8px_rgba(14,165,233,0.25)]">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Izin</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Izin</p>
                     <div class="flex justify-between items-end mt-4">
                         <span id="stat-izin" class="text-4xl font-extrabold text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.25)]">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-rose-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Alfa / Belum Absen</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Alfa / Belum Absen</p>
                     <div class="flex justify-between items-end mt-4">
                         <span id="stat-alfa" class="text-4xl font-extrabold text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.25)]">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
-                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between hover:border-slate-500/30 transition duration-350">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Siswa</p>
+                <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between transition duration-350">
+                    <p class="text-[10px] font-bold uppercase tracking-widest" style="color: var(--text-muted);">Total Siswa</p>
                     <div class="flex justify-between items-end mt-4">
-                        <span id="stat-total" class="text-4xl font-extrabold text-slate-100">0</span>
-                        <span class="text-xs text-slate-500">siswa</span>
+                        <span id="stat-total" class="text-4xl font-extrabold" style="color: var(--text-primary);">0</span>
+                        <span class="text-xs" style="color: var(--text-muted);">siswa</span>
                     </div>
                 </div>
             </div>
@@ -340,22 +342,22 @@
 
         <!-- GEOFENCE MANAGEMENT SECTION -->
         <div class="glass-panel rounded-2xl p-6 mb-6">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: var(--text-primary);">
+                <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
                 Pengaturan Geofencing Sekolah (Batas Absensi)
             </h2>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 geofence-grid">
                 <!-- Map Container (col-span-2) -->
-                <div class="lg:col-span-2 rounded-xl overflow-hidden border border-slate-700/60 h-[280px] relative" id="geofence-map-container">
+                <div class="lg:col-span-2 rounded-xl overflow-hidden border h-[280px] relative" style="border-color: var(--glass-border);" id="geofence-map-container">
                     <div id="geofence-map" class="w-full h-full z-10"></div>
                     <!-- Map loading placeholder -->
-                    <div class="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center gap-2 z-20 transition" id="map-loader">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 z-20 transition" style="background: var(--bg-secondary);" id="map-loader">
                         <div class="w-6 h-6 rounded-full spinner"></div>
-                        <span class="text-xs text-slate-400 font-medium">Inisialisasi Peta Geofence...</span>
+                        <span class="text-xs font-medium" style="color: var(--text-muted);">Inisialisasi Peta Geofence...</span>
                     </div>
                 </div>
                 
@@ -363,25 +365,25 @@
                 <div class="flex flex-col justify-between gap-4">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Latitude Sekolah</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary);">Latitude Sekolah</label>
                             <input type="number" step="any" id="geo-lat" class="block w-full px-4 py-2.5 rounded-xl input-glass text-sm font-semibold" readonly>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Longitude Sekolah</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary);">Longitude Sekolah</label>
                             <input type="number" step="any" id="geo-lon" class="block w-full px-4 py-2.5 rounded-xl input-glass text-sm font-semibold" readonly>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
-                                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Radius Absensi</label>
-                                <span class="text-xs font-bold text-indigo-400" id="radius-val">50m</span>
+                                <label class="block text-xs font-semibold uppercase tracking-wider" style="color: var(--text-secondary);">Radius Absensi</label>
+                                <span class="text-xs font-bold" style="color: var(--accent);" id="radius-val">50m</span>
                             </div>
-                            <input type="range" id="geo-radius" min="10" max="500" step="5" value="50" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-                            <p class="text-[10px] text-slate-500 mt-1 italic">Geser slider atau tarik pin di peta untuk mengubah parameter</p>
+                            <input type="range" id="geo-radius" min="10" max="500" step="5" value="50" class="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-indigo-500" style="background: var(--input-bg);">
+                            <p class="text-[10px] mt-1 italic" style="color: var(--text-muted);">Geser slider atau tarik pin di peta untuk mengubah parameter</p>
                         </div>
                     </div>
-                    
+
                     <button onclick="saveGeofenceSettings()" id="btn-save-geofence"
-                            class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 flex justify-center items-center gap-2">
+                            class="w-full font-bold py-3 px-8 rounded-xl transition-all duration-300 flex justify-center items-center gap-2" style="background: var(--accent); color: white;">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         <span>Simpan Pengaturan</span>
                     </button>
@@ -391,22 +393,22 @@
 
         <!-- SEARCH SECTION -->
         <div class="glass-panel rounded-2xl p-6 mb-6">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: var(--text-primary);">
+                <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
                 Pencarian Siswa
             </h2>
-            
+
             <form onsubmit="searchStudents(event)" class="flex flex-col sm:flex-row gap-4 items-end">
                 <div class="flex-1 w-full">
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider pl-1">Nama atau NISN</label>
-                    <input type="text" id="searchInput" placeholder="Masukkan kata kunci nama atau nomor induk..." 
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5 pl-1" style="color: var(--text-secondary);">Nama atau NISN</label>
+                    <input type="text" id="searchInput" placeholder="Masukkan kata kunci nama atau nomor induk..."
                            class="block w-full px-4 py-2.5 rounded-xl input-glass placeholder-slate-500 text-sm">
                 </div>
-                
-                <button type="submit" 
-                        class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-2.5 px-8 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 flex justify-center items-center gap-2">
+
+                <button type="submit"
+                        class="w-full sm:w-auto font-bold py-2.5 px-8 rounded-xl transition-all duration-300 flex justify-center items-center gap-2" style="background: var(--accent); color: white;">
                     <span>Cari Siswa</span>
                 </button>
             </form>
@@ -414,31 +416,31 @@
 
         <!-- TABLE SECTION -->
         <div class="glass-panel rounded-2xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/35">
-                <h3 class="font-bold text-white text-base flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="px-6 py-4 border-b flex justify-between items-center" style="background: var(--bg-secondary); border-color: var(--glass-border);">
+                <h3 class="font-bold text-base flex items-center gap-2" style="color: var(--text-primary);">
+                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
                     Daftar Status Device Siswa
                 </h3>
-                <span id="resultCount" class="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 py-1 px-3 rounded-full uppercase tracking-wider">0 Siswa</span>
+                <span id="resultCount" class="text-[10px] font-bold py-1 px-3 rounded-full uppercase tracking-wider" style="background: var(--accent-light); color: var(--accent); border: 1px solid var(--glass-border);">0 Siswa</span>
             </div>
-            
+
             <!-- Desktop View (Tabel) -->
             <div class="hidden md:block overflow-x-auto table-scroll-smooth">
-                <table class="min-w-full divide-y divide-slate-800/80">
-                    <thead class="bg-slate-900/20">
+                <table class="min-w-full">
+                    <thead style="background: var(--bg-secondary);">
                         <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest w-32">NISN</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Nama Siswa</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Status Device</th>
-                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-widest w-32">Aksi</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest w-32" style="color: var(--text-muted);">NISN</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color: var(--text-muted);">Nama Siswa</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color: var(--text-muted);">Status Device</th>
+                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold uppercase tracking-widest w-32" style="color: var(--text-muted);">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-800/60">
+                    <tbody id="tableBody" class="divide-y" style="border-color: var(--glass-border);">
                         <!-- Default empty state -->
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-slate-500 font-medium">
+                            <td colspan="4" class="px-6 py-12 text-center font-medium" style="color: var(--text-muted);">
                                 Gunakan kolom pencarian di atas untuk memuat data siswa.
                             </td>
                         </tr>
@@ -447,8 +449,8 @@
             </div>
 
             <!-- Mobile View (Daftar Kartu) -->
-            <div id="mobileCardList" class="block md:hidden divide-y divide-slate-800/60">
-                <div class="px-6 py-12 text-center text-slate-500 font-medium">
+            <div id="mobileCardList" class="block md:hidden divide-y" style="border-color: var(--glass-border);">
+                <div class="px-6 py-12 text-center font-medium" style="color: var(--text-muted);">
                     Gunakan kolom pencarian di atas untuk memuat data siswa.
                 </div>
             </div>
@@ -459,37 +461,37 @@
     <!-- CONFIRMATION MODAL -->
     <div id="resetModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
-        
+        <div class="absolute inset-0 backdrop-blur-md transition-opacity" style="background: var(--bg-secondary); opacity: 0.8;"></div>
+
         <!-- Modal Content -->
-        <div class="relative bg-slate-900 border border-slate-700/60 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:max-w-lg w-full z-10">
+        <div class="relative rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:max-w-lg w-full z-10" style="background: var(--glass-bg); border: 1px solid var(--glass-border);">
             <div class="px-6 pt-6 pb-4">
                 <div class="sm:flex sm:items-start">
-                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0">
                         <svg class="h-6 w-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                         </svg>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-bold text-white" id="modal-title">
+                        <h3 class="text-lg leading-6 font-bold" id="modal-title" style="color: var(--text-primary);">
                             Konfirmasi Reset HP
                         </h3>
                         <div class="mt-2">
-                            <p class="text-sm text-slate-400">
-                                Apakah Anda yakin ingin mereset kuncian HP untuk <strong id="modal-student-name" class="text-white">Siswa</strong>?<br>
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                Apakah Anda yakin ingin mereset kuncian HP untuk <strong id="modal-student-name" style="color: var(--text-primary);">Siswa</strong>?<br>
                                 Tindakan ini akan mengizinkan siswa tersebut untuk login dan absen dari perangkat (HP) yang baru.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="bg-slate-950/40 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-slate-800/80 gap-2">
-                <button type="button" onclick="confirmReset()" 
-                        class="w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 bg-rose-600 text-sm font-bold text-white hover:bg-rose-500 active:scale-95 shadow-lg shadow-rose-500/20 transition-all duration-300">
+            <div class="px-6 py-4 sm:flex sm:flex-row-reverse border-t gap-2" style="background: var(--bg-secondary); border-color: var(--glass-border);">
+                <button type="button" onclick="confirmReset()"
+                        class="w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 font-bold text-sm transition-all duration-300" style="background: #ef4444; color: white;">
                     Ya, Reset HP
                 </button>
-                <button type="button" onclick="closeResetModal()" 
-                        class="mt-3 sm:mt-0 w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-sm font-bold text-slate-300 transition-all">
+                <button type="button" onclick="closeResetModal()"
+                        class="mt-3 sm:mt-0 w-full sm:w-auto inline-flex justify-center items-center rounded-xl px-5 py-2.5 font-bold text-sm transition-all" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">
                     Batal
                 </button>
             </div>
@@ -722,7 +724,7 @@
             const loadingHtml = `
                 <div class="flex flex-col items-center justify-center py-12">
                     <div class="w-8 h-8 rounded-full spinner mb-3"></div>
-                    <span class="text-sm text-slate-400 font-medium animate-pulse">Mencari data siswa...</span>
+                    <span class="text-sm font-medium animate-pulse" style="color: var(--text-muted);">Mencari data siswa...</span>
                 </div>
             `;
             tableBody.innerHTML = `
@@ -756,10 +758,10 @@
                 console.error('Error fetching students:', error);
                 const errorMsg = `Gagal mengambil data: ${error.message}`;
                 tableBody.innerHTML = `
-                    <tr><td colspan="4" class="px-6 py-6 text-center text-rose-500 font-medium">${errorMsg}</td></tr>
+                    <tr><td colspan="4" class="px-6 py-6 text-center font-medium" style="color: #ef4444;">${errorMsg}</td></tr>
                 `;
                 mobileCardList.innerHTML = `
-                    <div class="px-6 py-6 text-center text-rose-500 font-medium">${errorMsg}</div>
+                    <div class="px-6 py-6 text-center font-medium" style="color: #ef4444;">${errorMsg}</div>
                 `;
                 document.getElementById('resultCount').innerText = 'Error';
             }
@@ -773,10 +775,10 @@
             if (data.length === 0) {
                 const emptyMsg = 'Tidak ada data siswa yang cocok dengan pencarian Anda.';
                 tableBody.innerHTML = `
-                    <tr><td colspan="4" class="px-6 py-10 text-center text-slate-500 font-medium">${emptyMsg}</td></tr>
+                    <tr><td colspan="4" class="px-6 py-10 text-center font-medium" style="color: var(--text-muted);">${emptyMsg}</td></tr>
                 `;
                 mobileCardList.innerHTML = `
-                    <div class="px-6 py-10 text-center text-slate-500 font-medium">${emptyMsg}</div>
+                    <div class="px-6 py-10 text-center font-medium" style="color: var(--text-muted);">${emptyMsg}</div>
                 `;
                 return;
             }
@@ -833,23 +835,23 @@
                 const safeKelas = student.kelas || '-';
 
                 desktopHtml += `
-                    <tr class="hover:bg-slate-800/30 transition duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-300">${safeNis}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-100 font-semibold">${safeNama} <span class="text-xs text-slate-400 ml-1.5 px-2 py-0.5 bg-slate-800/50 rounded-full border border-slate-700/30">Kelas ${safeKelas}</span></td>
+                    <tr class="transition duration-200" style="border-color: var(--glass-border);">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold" style="color: var(--text-secondary);">${safeNis}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" style="color: var(--text-primary);">${safeNama} <span class="text-xs px-2 py-0.5 rounded-full border" style="color: var(--text-muted); background: var(--glass-bg); border-color: var(--glass-border);">Kelas ${safeKelas}</span></td>
                         <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">${actionBtn}</td>
                     </tr>
                 `;
 
                 mobileHtml += `
-                    <div class="p-4 flex flex-col gap-3 hover:bg-slate-800/10 transition">
+                    <div class="p-4 flex flex-col gap-3 transition" style="border-color: var(--glass-border);">
                         <div class="flex justify-between items-start gap-3">
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-1.5 mb-1.5 flex-wrap">
-                                    <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">NISN: ${safeNis}</span>
-                                    <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700/50">Kelas ${safeKelas}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border" style="color: var(--accent); background: var(--accent-light); border-color: var(--accent);">NISN: ${safeNis}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border" style="color: var(--text-muted); background: var(--glass-bg); border-color: var(--glass-border);">Kelas ${safeKelas}</span>
                                 </div>
-                                <h4 class="text-sm font-bold text-slate-100 leading-snug break-words">${safeNama}</h4>
+                                <h4 class="text-sm font-bold leading-snug break-words" style="color: var(--text-primary);">${safeNama}</h4>
                             </div>
                         </div>
                         <div class="flex flex-col gap-2 mt-1 pt-3 border-t border-slate-800/40">
