@@ -1,0 +1,69 @@
+# Prompt untuk Android Studio - THHK Connect WebView App
+
+Copy paste prompt di bawah ini ke Android Studio (New Project):
+
+---
+
+## PROMPT LENGKAP
+
+Buatkan aplikasi Android native menggunakan Kotlin dengan Android Studio yang berfungsi sebagai WebView untuk membuka website https://thhkconnect.vercel.app/
+
+### Syarat:
+1. **WebView** yang membuka URL https://thhkconnect.vercel.app/ secara fullscreen
+2. **Fullscreen mode** - tanpa address bar browser, tampilkan hanya konten website
+3. **Bottom Navigation** dengan 3 tab:
+   - Tab 1: Beranda (icon home) - buka https://thhkconnect.vercel.app/
+   - Tab 2: Absen (icon edit/check) - buka https://thhkconnect.vercel.app/#attendance
+   - Tab 3: Profil (icon user) - buka https://thhkconnect.vercel.app/#profile
+4. **Fitur native tambahan**:
+   - Pull-to-refresh untuk refresh halaman
+   - Progress bar saat loading halaman
+   - JavaScript enabled
+   - ViewPort meta tag support
+   - Hardware acceleration enabled
+   - Cache mode untuk loading lebih cepat
+   - Local storage enabled (untuk login session)
+5. **Permission**: Internet
+6. **Design**: Material Design 3, Dark/Light theme mengikuti sistem HP
+7. **Splash screen** saat awal buka aplikasi dengan logo/icon sekolah
+8. **Error handling**: Tampilkan pesan jika tidak ada koneksi internet
+9. **Back button**: Tekan back akan kembali ke halaman sebelumnya (tidak keluar app langsung)
+
+### Teknologi:
+- Kotlin
+- Android SDK minimum 24 (Android 7.0)
+- Target SDK 34 (Android 14)
+- Jetpack Compose atau XML Layout (pilih yang lebih mudah)
+
+### Package name: com.thhk.connect
+
+---
+
+## ATURAN PENTING:
+
+1. Buat project baru di Android Studio (File > New > New Project > Empty Activity)
+2. Copy paste prompt ini ke Claude AI atau AI assistant
+3. Minta AI untuk generate semua kode yang diperlukan
+4. Replace semua file yang diperlukan dengan kode hasil generate
+5. Build dan test di emulator atau device
+
+---
+
+## FITUR PRIORITAS (WAJIB ADA):
+
+1. ✅ WebView buka https://thhkconnect.vercel.app/
+2. ✅ Fullscreen (tanpa browser chrome)
+3. ✅ Bottom Navigation 3 tab
+4. ✅ Pull to refresh
+5. ✅ Progress indicator saat loading
+6. ✅ Handle back button dengan benar
+7. ✅ Tampilkan error message jika offline
+
+---
+
+## OPTIONAL (JIKA MUDAH):
+
+1. Splash screen dengan logo
+2. Dark/Light mode mengikuti sistem
+3. Notification permission untuk push notifications
+4. Biometric authentication saat buka app

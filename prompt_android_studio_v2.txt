@@ -1,0 +1,148 @@
+# PROMPT UNTUK MEMBUAT APP ANDROID THHK CONNECT
+
+## Buka Android Studio, buat project baru (Empty Activity), lalu gunakan prompt di bawah:
+
+---
+
+```
+Buatkan aplikasi Android native menggunakan Kotlin dengan Android Studio yang berfungsi sebagai WebView untuk membuka website https://thhkconnect.vercel.app/
+
+Syarat:
+1. WebView yang membuka URL https://thhkconnect.vercel.app/ secara fullscreen
+2. Fullscreen mode - tanpa address bar browser, tampilkan hanya konten website
+3. Bottom Navigation dengan 3 tab:
+   - Tab 1: Beranda (icon home) - buka https://thhkconnect.vercel.app/
+   - Tab 2: Absen (icon edit/check) - buka https://thhkconnect.vercel.app/#attendance
+   - Tab 3: Profil (icon user) - buka https://thhkconnect.vercel.app/#profile
+4. Fitur native tambahan:
+   - Pull-to-refresh untuk refresh halaman
+   - Progress bar saat loading halaman
+   - JavaScript enabled
+   - ViewPort meta tag support
+   - Hardware acceleration enabled
+   - Cache mode untuk loading lebih cepat
+   - Local storage enabled (untuk login session)
+
+PERMISSION WAJIB:
+- Internet (android.permission.INTERNET)
+- Lokasi/GPS (android.permission.ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+- Kamera (android.permission.CAMERA)
+- Baca Galeri (android.permission.READ_EXTERNAL_STORAGE, READ_MEDIA_IMAGES)
+
+FITUR LOKASI:
+- Request permission lokasi saat app pertama kali dibuka
+- Jika permission lokasi ditolak, tampilkan snackbar/peringatan agar user mengaktifkan
+- Kirim data lokasi (latitude, longitude) ke JavaScript WebView jika website membutuhkan
+- Gunakan Geofencing API untuk memastikan siswa dalam radius sekolah
+
+FITUR KAMERA & GALERI:
+- Jika user klik tombol upload foto surat izin, tampilkan dialog pilihan:
+  "Ambil Foto" atau "Pilih dari Galeri"
+- Jika "Ambil Foto": Buka kamera native Android, ambil foto
+- Jika "Pilih dari Galeri": Buka galeri, pilih gambar
+- SETELAH foto dipilih/diambil:
+  - Kompres gambar menjadi maks 300KB
+  - Resize panjang maks 1024px (untuk optimize)
+  - Konversi ke Base64 atau simpan ke temporary file
+  - Kirim ke WebView melalui JavaScript interface
+- Format yang didukung: JPEG, PNG
+- Gunakan library Glide atau Coil untuk loading gambar
+
+KOMPRESI GAMBAR (WAJIB):
+- Maksimum ukuran file: 300KB
+- Panjang/lebar maks: 1024px
+- Quality JPEG: 70-80%
+- Library yang bisa digunakan: Android Bitmap Compression, atau custom implementation
+
+DESIGN:
+- Material Design 3
+- Dark/Light theme mengikuti sistem HP (ikuti setingan HP user)
+- Splash screen saat awal buka aplikasi
+- Error handling: Tampilkan pesan jika tidak ada koneksi internet
+- Loading indicator saat proses kompresi gambar
+
+BACK BUTTON:
+- Handle back button dengan benar (bukan keluar app langsung)
+- Kembalikan ke halaman sebelumnya dalam WebView
+
+TEKNOLOGI:
+- Kotlin
+- Android SDK minimum 24 (Android 7.0)
+- Target SDK 34 (Android 14)
+- Jetpack Compose
+- ViewModel, LiveData/StateFlow
+- Hilt untuk Dependency Injection (optional)
+
+PACKAGE NAME: com.thhk.connect
+
+TAMPILKAN ERROR DENGAN BAIK:
+- Jika offline: "Tidak ada koneksi internet. Periksa koneksi WiFi atau data seluler Anda."
+- Jika lokasi tidak aktif: "Lokasi diperlukan untuk absensi. Aktifkan GPS di pengaturan."
+- Jika kamera gagal: "Tidak dapat mengakses kamera. Periksa permission aplikasi."
+- Jika gambar terlalu besar: Otomatis kompres (tidak perlu tampilkan error ke user)
+
+LOGIKA ALUR ABSENSI:
+1. User klik tombol Absen
+2. App request lokasi GPS
+3. Jika lokasi valid (dalam radius sekolah), lanjut ke step 4
+4. Jika lokasi invalid, tampilkan error "Anda berada di luar area sekolah"
+5. User bisa upload foto surat izin (jika ada)
+6. Data dikirim ke WebView untuk diproses
+```
+
+---
+
+## 📋 LANGKAH-LANGKAH DI ANDROID STUDIO:
+
+1. Buka Android Studio
+2. File > New > New Project > Empty Activity
+3. Nama project: **THHK Connect**
+4. Package name: **com.thhk.connect**
+5. Minimum SDK: **API 24**
+6. Klik **Create**
+7. Buka folder project yang sudah dibuat
+8. Copy-paste kode di bawah ke file-file yang sesuai:
+   - MainActivity.kt (Activity utama dengan WebView)
+   - AndroidManifest.xml (permission & konfigurasi)
+   - activity_main.xml (layout WebView + BottomNav)
+   - JavaScript Interface (komunikasi WebView ↔ Android native)
+   - Image Compression Utility
+
+9. Build & Run di emulator atau HP
+
+---
+
+## 📁 STRUKTUR FILE YANG DIPERLUKAN:
+
+```
+app/
+├── src/main/
+│   ├── java/com/thhk/connect/
+│   │   ├── MainActivity.kt
+│   │   ├── WebAppInterface.kt        # JavaScript Interface
+│   │   ├── ImageCompressor.kt         # Kompresi gambar
+│   │   └── LocationHelper.kt         # Helper lokasi GPS
+│   ├── res/
+│   │   ├── layout/activity_main.xml
+│   │   ├── values/colors.xml
+│   │   ├── values/themes.xml
+│   │   └── drawable/ (icon)
+│   └── AndroidManifest.xml
+├── build.gradle.kts
+└── app/build.gradle.kts
+```
+
+---
+
+## ⚠️ PENTING - CATATAN TEKNIS:
+
+1. **JavaScript Interface**: Buat bridge agar WebView bisa akses native Android (kamera, lokasi, file)
+2. **Permission Handling**: Always check & request permission dengan rationale dialog
+3. **Kompresi Gambar**: Gunakan Background Thread (Coroutine) untuk proses compress agar UI tidak lag
+4. **Location**: Use FusedLocationProviderClient untuk akurasi lebih baik
+5. **Camera**: Gunakan CameraX atau Intent ke Camera app (lebih simple)
+6. **File Provider**: Setup FileProvider untuk sharing file kamera ke app
+
+---
+
+Prompt di atas sudah disimpan di file `prompt_android_studio_v2.txt`
