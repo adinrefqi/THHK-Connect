@@ -6,11 +6,8 @@
 -- Urutan: Kelas 8 terlebih dahulu, lalu Kelas 9
 -- ==============================================================================
 
--- 1. BUAT ULANG TABEL STUDENTS (Drop jika sudah ada agar bersih)
-DROP TABLE IF EXISTS public.attendance_logs;
-DROP TABLE IF EXISTS public.students;
-
-CREATE TABLE public.students (
+-- 1. BUAT TABEL STUDENTS (Jika belum ada)
+CREATE TABLE IF NOT EXISTS public.students (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nis TEXT UNIQUE NOT NULL,
     nama TEXT NOT NULL,
@@ -20,8 +17,8 @@ CREATE TABLE public.students (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. BUAT ULANG TABEL ATTENDANCE LOGS
-CREATE TABLE public.attendance_logs (
+-- 2. BUAT TABEL ATTENDANCE LOGS (Jika belum ada)
+CREATE TABLE IF NOT EXISTS public.attendance_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES public.students(id),
     latitude FLOAT8,
@@ -35,15 +32,40 @@ CREATE TABLE public.attendance_logs (
 ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attendance_logs ENABLE ROW LEVEL SECURITY;
 
--- Policy: Izinkan semua operasi untuk anon (karena login custom, bukan via auth)
-CREATE POLICY "Allow all for students" ON public.students FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for attendance_logs" ON public.attendance_logs FOR ALL USING (true) WITH CHECK (true);
+-- Policy: RLS Hardened (Hanya SELECT yang diizinkan untuk client, tulis wajib via RPC)
+DROP POLICY IF EXISTS "Allow all for students" ON public.students;
+DROP POLICY IF EXISTS "students_select" ON public.students;
+CREATE POLICY "students_select" ON public.students FOR SELECT USING (true);
+
+REVOKE ALL ON public.students FROM anon, authenticated;
+GRANT SELECT (id, nis, nama, kelas, device_id, created_at) ON public.students TO anon, authenticated;
+
+DROP POLICY IF EXISTS "Allow all for attendance_logs" ON public.attendance_logs;
+DROP POLICY IF EXISTS "attendance_select" ON public.attendance_logs;
+CREATE POLICY "attendance_select" ON public.attendance_logs FOR SELECT USING (true);
+
+REVOKE INSERT, UPDATE, DELETE ON public.attendance_logs FROM anon, authenticated;
+GRANT SELECT ON public.attendance_logs TO anon, authenticated;
 
 -- ==============================================================================
--- 4. INSERT DATA SISWA (Urut: Kelas 8 dulu, lalu Kelas 9)
+-- 4. INSERT DATA SISWA (Urut: Kelas 7, Kelas 8, lalu Kelas 9)
 -- ==============================================================================
 
 INSERT INTO public.students (nis, nama, kelas) VALUES
+-- ==========================================
+-- KELAS 7 (07-001 s/d 07-010)
+-- ==========================================
+('07-001', 'Aerilyn Felycia Natania Andrian', '7'),
+('07-002', 'Amon Micha Wiyanto', '7'),
+('07-003', 'Gabriela Princessha Christabele', '7'),
+('07-004', 'Griselda Aurelia', '7'),
+('07-005', 'Jadden Nathanael Kang', '7'),
+('07-006', 'King Joshua Salim', '7'),
+('07-007', 'Lionel Melvin', '7'),
+('07-008', 'Mutiara Angelina', '7'),
+('07-009', 'Sendi Kurniawan', '7'),
+('07-010', 'Velove Chloe Himawan', '7'),
+
 -- ==========================================
 -- KELAS 8 (08-001 s/d 08-014)
 -- ==========================================
@@ -91,7 +113,10 @@ INSERT INTO public.students (nis, nama, kelas) VALUES
 ('09-024', 'Reynaldo Xavier Alexander Gunawan', '9'),
 ('09-025', 'Sebastian Moses Firlandi', '9'),
 ('09-026', 'Yuriko Jessi Setiawan', '9'),
-('09-027', 'Desiani Natalia Siallagan', '9');
+('09-027', 'Desiani Natalia Siallagan', '9')
+ON CONFLICT (nis) DO UPDATE SET
+    nama = EXCLUDED.nama,
+    kelas = EXCLUDED.kelas;
 
 -- ==============================================================================
 -- 5. FUNGSI RPC: LOGIN SISWA (Sederhana, tanpa auth.users)
@@ -129,9 +154,9 @@ $$;
 -- ==============================================================================
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-DROP FUNCTION IF EXISTS proses_absen_siswa(UUID, FLOAT8, FLOAT8, TEXT);
+DROP FUNCTION IF EXISTS public.proses_absen_siswa(UUID, FLOAT8, FLOAT8, TEXT);
 
-CREATE OR REPLACE FUNCTION proses_absen_siswa(
+CREATE OR REPLACE FUNCTION public.proses_absen_siswa(
     p_user_id UUID,
     p_lat FLOAT8,
     p_lon FLOAT8,
@@ -144,9 +169,10 @@ AS $$
 DECLARE
     v_student RECORD;
     v_distance FLOAT8;
-    v_target_lat FLOAT8 := -6.858194;
-    v_target_lon FLOAT8 := 109.137222;
-    v_max_radius FLOAT8 := 50.0;
+    v_geofence JSONB;
+    v_target_lat FLOAT8;
+    v_target_lon FLOAT8;
+    v_max_radius FLOAT8;
     v_status VARCHAR(1) := 'H';
     v_now_wib TIMESTAMP;
 BEGIN
@@ -172,23 +198,37 @@ BEGIN
         END IF;
     END IF;
 
-    -- 3. Validasi Geofencing (PostGIS)
+    -- 3. Ambil Pengaturan Geofence dari Database secara Dinamis
+    SELECT value INTO v_geofence FROM public.settings WHERE key = 'geofence';
+    
+    IF v_geofence IS NOT NULL THEN
+        v_target_lat := (v_geofence->>'latitude')::FLOAT8;
+        v_target_lon := (v_geofence->>'longitude')::FLOAT8;
+        v_max_radius := (v_geofence->>'radius_meters')::FLOAT8;
+    ELSE
+        -- Fallback default koordinat SMP THHK Tegal jika pengaturan kosong
+        v_target_lat := -6.858194;
+        v_target_lon := 109.137222;
+        v_max_radius := 50.0;
+    END IF;
+
+    -- 4. Validasi Geofencing (PostGIS)
     v_distance := ST_DistanceSphere(
         ST_MakePoint(p_lon, p_lat),
         ST_MakePoint(v_target_lon, v_target_lat)
     );
 
     IF v_distance > v_max_radius THEN
-        RAISE EXCEPTION 'Posisi Anda di luar area sekolah (Jarak: % meter)', ROUND(v_distance::numeric);
+        RAISE EXCEPTION 'Posisi Anda di luar area sekolah (Jarak: % meter, Batas Maks: % meter)', ROUND(v_distance::numeric), ROUND(v_max_radius::numeric);
     END IF;
 
-    -- 4. Deteksi Keterlambatan Otomatis (WIB Timezone)
+    -- 5. Deteksi Keterlambatan Otomatis (WIB Timezone)
     v_now_wib := NOW() AT TIME ZONE 'Asia/Jakarta';
     IF (v_now_wib::time > '07:00:00'::time) THEN
         v_status := 'T';
     END IF;
 
-    -- 5. Simpan log absensi
+    -- 6. Simpan log absensi
     INSERT INTO public.attendance_logs (user_id, latitude, longitude, device_id, status)
     VALUES (p_user_id, p_lat, p_lon, p_device_id, v_status);
 
@@ -201,8 +241,8 @@ END;
 $$;
 
 -- Alias proses_absen_siswa_v3
-DROP FUNCTION IF EXISTS proses_absen_siswa_v3(UUID, FLOAT8, FLOAT8, TEXT);
-CREATE OR REPLACE FUNCTION proses_absen_siswa_v3(
+DROP FUNCTION IF EXISTS public.proses_absen_siswa_v3(UUID, FLOAT8, FLOAT8, TEXT);
+CREATE OR REPLACE FUNCTION public.proses_absen_siswa_v3(
     p_user_id UUID,
     p_lat FLOAT8,
     p_lon FLOAT8,
@@ -221,17 +261,24 @@ END;
 $$;
 
 -- RPC proses_absen_piket
-DROP FUNCTION IF EXISTS proses_absen_piket(UUID, TEXT, TEXT);
-CREATE OR REPLACE FUNCTION proses_absen_piket(
+DROP FUNCTION IF EXISTS public.proses_absen_piket(UUID, TEXT, TEXT);
+DROP FUNCTION IF EXISTS public.proses_absen_piket(UUID, TEXT, TEXT, TEXT);
+CREATE OR REPLACE FUNCTION public.proses_absen_piket(
     p_student_id UUID,
     p_teacher_note TEXT,
-    p_status TEXT
+    p_status TEXT,
+    p_token TEXT
 )
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
+    IF NOT public.is_valid_staff_token(p_token) THEN
+        RAISE EXCEPTION 'Tidak diizinkan: sesi staf tidak valid atau kedaluwarsa.';
+    END IF;
+
     INSERT INTO public.attendance_logs (user_id, latitude, longitude, device_id, status)
     VALUES (p_student_id, NULL, NULL, p_teacher_note, p_status);
 
@@ -239,16 +286,25 @@ BEGIN
 END;
 $$;
 
+GRANT EXECUTE ON FUNCTION public.proses_absen_piket(UUID, TEXT, TEXT, TEXT) TO anon, authenticated;
+
 -- RPC reset_device_siswa
-DROP FUNCTION IF EXISTS reset_device_siswa(UUID);
-CREATE OR REPLACE FUNCTION reset_device_siswa(
-    p_student_id UUID
+DROP FUNCTION IF EXISTS public.reset_device_siswa(UUID);
+DROP FUNCTION IF EXISTS public.reset_device_siswa(UUID, TEXT);
+CREATE OR REPLACE FUNCTION public.reset_device_siswa(
+    p_student_id UUID,
+    p_token TEXT
 )
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
+    IF NOT public.is_valid_staff_token(p_token) THEN
+        RAISE EXCEPTION 'Tidak diizinkan: sesi staf tidak valid atau kedaluwarsa.';
+    END IF;
+
     UPDATE public.students
     SET device_id = NULL
     WHERE id = p_student_id;
@@ -256,3 +312,5 @@ BEGIN
     RETURN json_build_object('status', 'success');
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.reset_device_siswa(UUID, TEXT) TO anon, authenticated;
