@@ -763,7 +763,8 @@
 
         function checkPiketSession() {
             const session = localStorage.getItem('piket_session');
-            if (session) {
+            const token = localStorage.getItem('staff_token');
+            if (session && token) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('dashboard-view').classList.remove('hidden');
                 const name = session.charAt(0).toUpperCase() + session.slice(1);
@@ -778,7 +779,7 @@
                 subscribeTasksRealtime();
                 subscribeLeaveRealtime();
             } else {
-                window.location.href = 'index.html';
+                logoutPiket();
             }
         }
         
@@ -1108,7 +1109,7 @@
 
             try {
                 const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
                 const { error } = await supabaseClient.rpc('reset_device_siswa', {
                     p_student_id: id,
                     p_token: token
@@ -1119,6 +1120,9 @@
                 loadStudents();
             } catch (err) {
                 showAlert('Gagal: ' + err.message, 'error');
+                if (err.message && (err.message.includes('Tidak diizinkan') || err.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
@@ -1134,7 +1138,7 @@
 
             try {
                 const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
                 const { error } = await supabaseClient.rpc('proses_absen_piket', {
                     p_student_id: id,
                     p_teacher_note: 'GURU PIKET',
@@ -1148,6 +1152,9 @@
                 loadStudents();
             } catch (err) {
                 showAlert('Gagal mencatat absen: ' + err.message, 'error');
+                if (err.message && (err.message.includes('Tidak diizinkan') || err.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
@@ -1380,7 +1387,7 @@
                 const note = `[IZIN] ${type} - ${reason}`;
 
                 const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
                 const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', {
                     p_student_id: userId,
                     p_teacher_note: note,
@@ -1397,6 +1404,9 @@
             } catch(e) {
                 console.error(e);
                 showAlert('Terjadi kesalahan: ' + e.message, 'error');
+                if (e.message && (e.message.includes('Tidak diizinkan') || e.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
@@ -1561,7 +1571,7 @@
             `;
             try {
                 const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
                 const { data, error } = await supabaseClient.rpc('get_bullying_reports', { p_token: token });
 
                 if (error) throw error;
@@ -1581,22 +1591,28 @@
                     return;
                 }
 
+                // Render cards
+                const styles = {
+                    'PENDING': 'bg-red-500/20 text-red-400 border-red-500/30',
+                    'DIPROSES': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+                    'SELESAI': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                };
+
                 container.innerHTML = data.map(req => {
-                    const date = new Date(req.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    
+                    const date = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                     const fileLink = req.attachment_url 
-                        ? `<a href="${req.attachment_url}" target="_blank" class="text-rose-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Bukti</a>` 
-                        : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada lampiran</span>`;
+                        ? `<a href="${req.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Aduan</a>` 
+                        : '';
                     
-                    let statusLabel = 'Baru Masuk';
-                    let statusCss = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+                    let statusLabel = 'Pending';
+                    let statusCss = 'bg-red-500/20 text-red-400 border-red-500/30';
                     let actionButtons = '';
                     
                     if (req.status === 'PENDING') {
-                        statusLabel = 'Baru Masuk';
-                        statusCss = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+                        statusLabel = 'Pending';
+                        statusCss = 'bg-red-500/20 text-red-400 border-red-500/30';
                         actionButtons = `
-                            <button onclick="updateBullyingStatus('${req.id}', 'DIPROSES')" class="flex-1 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-amber-500/30 active:scale-95">Proses</button>
+                            <button onclick="updateBullyingStatus('${req.id}', 'DIPROSES')" class="flex-1 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-900 rounded-xl text-sm font-bold transition-all border border-amber-500/30 active:scale-95">Proses</button>
                             <button onclick="updateBullyingStatus('${req.id}', 'SELESAI')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Selesaikan</button>
                         `;
                     } else if (req.status === 'DIPROSES') {
@@ -1608,9 +1624,7 @@
                     } else {
                         statusLabel = 'Selesai';
                         statusCss = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-                        actionButtons = `
-                            <span class="w-full text-center py-2 text-slate-400 text-xs font-semibold">Telah ditangani oleh Guru Piket</span>
-                        `;
+                        actionButtons = `<span class="w-full text-center py-2 text-slate-400 text-xs font-semibold">Telah ditangani oleh Guru Piket</span>`;
                     }
                     
                     const isAnon = req.reporter_name_display === 'Anonim';
@@ -1620,35 +1634,38 @@
                         
                     return `
                     <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-purple-500/30 transition-all">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 class="font-bold text-lg text-white">Korban: ${req.victim_name}</h3>
-                                    <p class="text-xs text-slate-400">${date} • Lokasi: ${req.incident_location}</p>
-                                </div>
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusCss} border">
-                                    ${statusLabel}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-2 mt-2">
-                                ${reporterInfoHtml}
-                                <span class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 text-[10px] font-bold border border-rose-500/25 uppercase tracking-wider">Jenis: ${req.bullying_type}</span>
-                            </div>
-                            <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
-                                <p class="text-sm text-slate-300">"${req.description}"</p>
-                                ${fileLink}
-                            </div>
-                        </div>
-                        <div class="flex gap-2 mt-4">
-                            ${actionButtons}
-                        </div>
-                    </div>
-                    `;
+                         <div>
+                             <div class="flex justify-between items-start mb-2">
+                                 <div>
+                                     <h3 class="font-bold text-lg text-white">Korban: ${req.victim_name}</h3>
+                                     <p class="text-xs text-slate-400">${date} • Lokasi: ${req.incident_location}</p>
+                                 </div>
+                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusCss} border">
+                                     ${statusLabel}
+                                 </span>
+                             </div>
+                             <div class="flex items-center gap-2 mt-2">
+                                 ${reporterInfoHtml}
+                                 <span class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 text-[10px] font-bold border border-rose-500/25 uppercase tracking-wider">Jenis: ${req.bullying_type}</span>
+                             </div>
+                             <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
+                                 <p class="text-sm text-slate-300">"${req.description}"</p>
+                                 ${fileLink}
+                             </div>
+                         </div>
+                         <div class="flex gap-2 mt-4">
+                             ${actionButtons}
+                         </div>
+                     </div>
+                     `;
                 }).join('');
 
             } catch (err) {
                 console.error(err);
                 container.innerHTML = '<div class="col-span-full text-center py-20 text-red-400">Gagal memuat data: ' + err.message + '</div>';
+                if (err.message && (err.message.includes('Tidak diizinkan') || err.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
@@ -1664,7 +1681,7 @@
             
             try {
                 const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); location.reload(); return; }
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
                 const { error } = await supabaseClient.rpc('update_bullying_status', {
                     p_token: token,
                     p_id: reportId,
@@ -1680,6 +1697,9 @@
             } catch (e) {
                 console.error(e);
                 showAlert('Gagal memperbarui status: ' + e.message, 'error');
+                if (e.message && (e.message.includes('Tidak diizinkan') || e.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
