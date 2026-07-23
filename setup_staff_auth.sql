@@ -70,9 +70,28 @@ $$;
 GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, authenticated;
 
 -- ------------------------------------------------------------------------------
+-- RPC: Backward compatibility untuk verify_admin_login
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.verify_admin_login(
+    input_password TEXT,
+    input_username TEXT DEFAULT 'admin'
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+BEGIN
+    RETURN public.verify_staff_password('admin', input_password);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT) TO anon, authenticated;
+
+-- ------------------------------------------------------------------------------
 -- Cara mengganti password di kemudian hari (jalankan manual saat dibutuhkan):
 --
 --   UPDATE public.staff_credentials
 --   SET password_hash = crypt('PASSWORD_BARU', gen_salt('bf')), updated_at = NOW()
---   WHERE role = 'piket';
+--   WHERE role = 'admin';
 -- ------------------------------------------------------------------------------
