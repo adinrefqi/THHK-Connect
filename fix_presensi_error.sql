@@ -1,16 +1,12 @@
 -- ==============================================================================
--- FIX LENGKAP: 
--- 1. Error verify_admin_login (PGRST202 / 42P13)
--- 2. Ganti Password Admin menjadi admin11
--- 3. Solusi Akses Tabel Settings & Geofence
--- 
--- JALANKAN SELURUH KODE INI DI SUPABASE DASHBOARD > SQL EDITOR
+-- FIX SEPENUHNYA: PASSWORD ADMIN -> admin11 & AKUN ADMIN UNTUK SEMUA TABEL
+-- Jalankan seluruh script ini di SUPABASE SQL EDITOR
 -- ==============================================================================
 
--- 1. EKTENSI HASHING
+-- 1. EXTENSION FOR BCRYPT
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- 2. TABEL STAFF CREDENTIALS & PASSWORD ADMIN ADMIN11
+-- 2. TABEL STAFF CREDENTIALS (ADMIN & PIKET)
 CREATE TABLE IF NOT EXISTS public.staff_credentials (
     role          TEXT PRIMARY KEY,
     password_hash TEXT NOT NULL,
@@ -19,14 +15,43 @@ CREATE TABLE IF NOT EXISTS public.staff_credentials (
 
 ALTER TABLE public.staff_credentials ENABLE ROW LEVEL SECURITY;
 
+-- Set password admin menjadi 'admin11' (bcrypt hash)
 INSERT INTO public.staff_credentials (role, password_hash) VALUES
     ('admin', crypt('admin11',   gen_salt('bf'))),
     ('piket', crypt('admin54321', gen_salt('bf')))
 ON CONFLICT (role) DO UPDATE
-    SET password_hash = EXCLUDED.password_hash,
+    SET password_hash = crypt('admin11', gen_salt('bf')),
         updated_at    = NOW();
 
--- 3. DYNAMIC DROP FUNGSI LAMA VERIFY_STAFF_PASSWORD & VERIFY_ADMIN_LOGIN
+-- 3. JIKA ADA TABEL sintadu_teachers (Presensi GTT / Sintadu)
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_name = 'sintadu_teachers'
+    ) THEN
+        INSERT INTO public.sintadu_teachers (username, name, password)
+        VALUES ('admin', 'Administrator', 'admin11')
+        ON CONFLICT (username) DO UPDATE
+        SET password = 'admin11';
+    END IF;
+END $$;
+
+-- 4. JIKA ADA TABEL teachers LAINNYA
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_name = 'teachers'
+    ) THEN
+        INSERT INTO public.teachers (username, name, password)
+        VALUES ('admin', 'Administrator', 'admin11')
+        ON CONFLICT (username) DO UPDATE
+        SET password = 'admin11';
+    END IF;
+END $$;
+
+-- 5. DYNAMIC DROP FUNGSI LAMA (Bebas dari Error 42P13)
 DO $$
 DECLARE
     r RECORD;
@@ -42,7 +67,7 @@ BEGIN
     END LOOP;
 END $$;
 
--- 4. FUNGSI VERIFY_STAFF_PASSWORD
+-- 6. FUNGSI VERIFY_STAFF_PASSWORD
 CREATE OR REPLACE FUNCTION public.verify_staff_password(
     p_role     TEXT,
     p_password TEXT
@@ -69,7 +94,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, authenticated;
 
--- 5. FUNGSI VERIFY_ADMIN_LOGIN (COMPATIBILITY UNTUK WEB DEPLOYMENT VERCEL)
+-- 7. FUNGSI VERIFY_ADMIN_LOGIN
 CREATE OR REPLACE FUNCTION public.verify_admin_login(
     input_password TEXT DEFAULT NULL,
     input_username TEXT DEFAULT 'admin',
@@ -96,7 +121,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
 
--- 6. TABEL SETTINGS (GEOFENCE)
+-- 8. TABEL SETTINGS & GEOFENCE
 DO $$
 BEGIN
     IF EXISTS (
@@ -127,4 +152,5 @@ GRANT ALL ON public.settings TO authenticated;
 GRANT ALL ON public.settings TO service_role;
 ALTER TABLE public.settings DISABLE ROW LEVEL SECURITY;
 
--- SELESAI
+-- VERIFIKASI AKUN ADMIN
+SELECT * FROM public.staff_credentials WHERE role = 'admin';
