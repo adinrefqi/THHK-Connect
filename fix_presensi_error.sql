@@ -27,31 +27,14 @@ ON CONFLICT (role) DO UPDATE
 DO $$
 BEGIN
     IF EXISTS (
-        SELECT 1 FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'sintadu_teachers'
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' AND table_name = 'sintadu_teachers' AND column_name = 'username'
     ) THEN
-        INSERT INTO public.sintadu_teachers (username, name, password)
-        VALUES ('admin', 'Administrator', 'admin11')
-        ON CONFLICT (username) DO UPDATE
-        SET password = 'admin11';
+        EXECUTE 'INSERT INTO public.sintadu_teachers (username, name, password) VALUES (''admin'', ''Administrator'', ''admin11'') ON CONFLICT (username) DO UPDATE SET password = ''admin11''';
     END IF;
 END $$;
 
--- 4. JIKA ADA TABEL teachers LAINNYA
-DO $$
-BEGIN
-    IF EXISTS (
-        SELECT 1 FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'teachers'
-    ) THEN
-        INSERT INTO public.teachers (username, name, password)
-        VALUES ('admin', 'Administrator', 'admin11')
-        ON CONFLICT (username) DO UPDATE
-        SET password = 'admin11';
-    END IF;
-END $$;
-
--- 5. DYNAMIC DROP FUNGSI LAMA (Bebas dari Error 42P13)
+-- 4. DYNAMIC DROP FUNGSI LAMA (Bebas dari Error 42P13)
 DO $$
 DECLARE
     r RECORD;
@@ -67,7 +50,7 @@ BEGIN
     END LOOP;
 END $$;
 
--- 6. FUNGSI VERIFY_STAFF_PASSWORD
+-- 5. FUNGSI VERIFY_STAFF_PASSWORD
 CREATE OR REPLACE FUNCTION public.verify_staff_password(
     p_role     TEXT,
     p_password TEXT
@@ -94,7 +77,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, authenticated;
 
--- 7. FUNGSI VERIFY_ADMIN_LOGIN
+-- 6. FUNGSI VERIFY_ADMIN_LOGIN
 CREATE OR REPLACE FUNCTION public.verify_admin_login(
     input_password TEXT DEFAULT NULL,
     input_username TEXT DEFAULT 'admin',
@@ -121,7 +104,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
 
--- 8. TABEL SETTINGS & GEOFENCE
+-- 7. TABEL SETTINGS & GEOFENCE
 DO $$
 BEGIN
     IF EXISTS (
