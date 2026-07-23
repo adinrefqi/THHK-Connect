@@ -1,53 +1,130 @@
 -- ==============================================================================
--- FIX: Error "column value does not exist" saat presensi
+-- FIX LENGKAP: 
+-- 1. Error verify_admin_login (PGRST202 / 42P13)
+-- 2. Ganti Password Admin menjadi admin11
+-- 3. Solusi Akses Tabel Settings & Geofence
 -- 
--- PENYEBAB: Fungsi RPC proses_absen_siswa mencoba SELECT value FROM settings
---           tetapi tabel settings di database belum memiliki kolom key/value.
---
--- JALANKAN SQL INI DI SUPABASE SQL EDITOR
+-- JALANKAN SELURUH KODE INI DI SUPABASE DASHBOARD > SQL EDITOR
 -- ==============================================================================
 
--- 1. Buat tabel settings (key-value) jika belum ada
---    Jika tabel settings sudah ada dengan skema berbeda, rename dulu:
+-- 1. EKTENSI HASHING
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- 2. TABEL STAFF CREDENTIALS & PASSWORD ADMIN ADMIN11
+CREATE TABLE IF NOT EXISTS public.staff_credentials (
+    role          TEXT PRIMARY KEY,
+    password_hash TEXT NOT NULL,
+    updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.staff_credentials ENABLE ROW LEVEL SECURITY;
+
+INSERT INTO public.staff_credentials (role, password_hash) VALUES
+    ('admin', crypt('admin11',   gen_salt('bf'))),
+    ('piket', crypt('admin54321', gen_salt('bf')))
+ON CONFLICT (role) DO UPDATE
+    SET password_hash = EXCLUDED.password_hash,
+        updated_at    = NOW();
+
+-- 3. DYNAMIC DROP FUNGSI LAMA VERIFY_STAFF_PASSWORD & VERIFY_ADMIN_LOGIN
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN 
+        SELECT p.oid::regprocedure AS func_sig
+        FROM pg_proc p
+        JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE p.proname IN ('verify_staff_password', 'verify_admin_login')
+          AND n.nspname = 'public'
+    LOOP
+        EXECUTE 'DROP FUNCTION IF EXISTS ' || r.func_sig || ' CASCADE';
+    END LOOP;
+END $$;
+
+-- 4. FUNGSI VERIFY_STAFF_PASSWORD
+CREATE OR REPLACE FUNCTION public.verify_staff_password(
+    p_role     TEXT,
+    p_password TEXT
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+DECLARE
+    v_hash TEXT;
+BEGIN
+    SELECT password_hash INTO v_hash
+    FROM public.staff_credentials
+    WHERE role = p_role;
+
+    IF v_hash IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    RETURN v_hash = crypt(p_password, v_hash);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, authenticated;
+
+-- 5. FUNGSI VERIFY_ADMIN_LOGIN (COMPATIBILITY UNTUK WEB DEPLOYMENT VERCEL)
+CREATE OR REPLACE FUNCTION public.verify_admin_login(
+    input_password TEXT DEFAULT NULL,
+    input_username TEXT DEFAULT 'admin',
+    p_password TEXT DEFAULT NULL,
+    p_username TEXT DEFAULT NULL,
+    password TEXT DEFAULT NULL,
+    username TEXT DEFAULT NULL
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+DECLARE
+    v_pass TEXT;
+BEGIN
+    v_pass := COALESCE(input_password, p_password, password);
+    IF v_pass IS NULL THEN
+        RETURN FALSE;
+    END IF;
+    RETURN public.verify_staff_password('admin', v_pass);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
+
+-- 6. TABEL SETTINGS (GEOFENCE)
 DO $$
 BEGIN
-    -- Cek apakah tabel settings ada
     IF EXISTS (
         SELECT 1 FROM information_schema.tables 
         WHERE table_schema = 'public' AND table_name = 'settings'
     ) THEN
-        -- Cek apakah kolom 'key' sudah ada
         IF NOT EXISTS (
             SELECT 1 FROM information_schema.columns 
             WHERE table_schema = 'public' AND table_name = 'settings' AND column_name = 'key'
         ) THEN
-            -- Tabel settings ada tapi bukan format key-value
-            -- Rename tabel lama agar tidak hilang
             EXECUTE 'ALTER TABLE public.settings RENAME TO settings_old';
-            RAISE NOTICE 'Tabel settings lama di-rename ke settings_old';
         END IF;
     END IF;
 END $$;
 
--- 2. Buat tabel settings format key-value (jika belum ada setelah rename)
 CREATE TABLE IF NOT EXISTS public.settings (
     key VARCHAR(50) PRIMARY KEY,
     value JSONB NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Masukkan data geofence default (koordinat SMP THHK Tegal)
 INSERT INTO public.settings (key, value)
 VALUES ('geofence', '{"latitude": -6.858194, "longitude": 109.137222, "radius_meters": 50.0}'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
--- 4. Berikan izin akses
 GRANT ALL ON public.settings TO anon;
 GRANT ALL ON public.settings TO authenticated;
 GRANT ALL ON public.settings TO service_role;
-
--- 5. Nonaktifkan RLS pada tabel settings agar RPC SECURITY DEFINER bisa akses
 ALTER TABLE public.settings DISABLE ROW LEVEL SECURITY;
 
--- 6. Verifikasi — jalankan query ini untuk memastikan fix berhasil:
--- SELECT * FROM public.settings WHERE key = 'geofence';
+-- SELESAI

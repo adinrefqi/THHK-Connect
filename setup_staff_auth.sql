@@ -71,25 +71,48 @@ GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, auth
 
 -- ------------------------------------------------------------------------------
 -- RPC: Backward compatibility untuk verify_admin_login
+-- Dynamic DROP untuk menghapus SEMUA versi/signature lama dari verify_admin_login
 -- ------------------------------------------------------------------------------
-DROP FUNCTION IF EXISTS public.verify_admin_login(TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.verify_admin_login(TEXT);
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN 
+        SELECT p.oid::regprocedure AS func_sig
+        FROM pg_proc p
+        JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE p.proname = 'verify_admin_login'
+          AND n.nspname = 'public'
+    LOOP
+        EXECUTE 'DROP FUNCTION IF EXISTS ' || r.func_sig || ' CASCADE';
+    END LOOP;
+END $$;
 
 CREATE OR REPLACE FUNCTION public.verify_admin_login(
-    input_password TEXT,
-    input_username TEXT DEFAULT 'admin'
+    input_password TEXT DEFAULT NULL,
+    input_username TEXT DEFAULT 'admin',
+    p_password TEXT DEFAULT NULL,
+    p_username TEXT DEFAULT NULL,
+    password TEXT DEFAULT NULL,
+    username TEXT DEFAULT NULL
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, extensions
 AS $$
+DECLARE
+    v_pass TEXT;
 BEGIN
-    RETURN public.verify_staff_password('admin', input_password);
+    v_pass := COALESCE(input_password, p_password, password);
+    IF v_pass IS NULL THEN
+        RETURN FALSE;
+    END IF;
+    RETURN public.verify_staff_password('admin', v_pass);
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.verify_admin_login(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
 
 -- ------------------------------------------------------------------------------
 -- Cara mengganti password di kemudian hari (jalankan manual saat dibutuhkan):
