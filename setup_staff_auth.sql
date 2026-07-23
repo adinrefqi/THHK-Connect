@@ -7,7 +7,7 @@
 -- CARA PAKAI:
 --   1. Buka Supabase Dashboard > SQL Editor.
 --   2. Jalankan seluruh isi file ini SATU KALI.
---   3. GANTI password default di bawah ('admin123' & 'admin54321') dengan
+--   3. GANTI password default di bawah ('admin11' & 'admin54321') dengan
 --      password baru yang kuat, lalu jalankan ulang bagian INSERT/UPDATE.
 -- ==============================================================================
 
@@ -29,7 +29,7 @@ ALTER TABLE public.staff_credentials ENABLE ROW LEVEL SECURITY;
 -- crypt(... gen_salt('bf')) menghasilkan hash bcrypt yang tidak bisa dibalik.
 -- ------------------------------------------------------------------------------
 INSERT INTO public.staff_credentials (role, password_hash) VALUES
-    ('admin', crypt('admin123',   gen_salt('bf'))),
+    ('admin', crypt('admin11',   gen_salt('bf'))),
     ('piket', crypt('admin54321', gen_salt('bf')))
 ON CONFLICT (role) DO UPDATE
     SET password_hash = EXCLUDED.password_hash,

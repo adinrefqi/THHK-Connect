@@ -4531,6 +4531,9 @@
                 }
             }
 
+            // Flag global: mencegah tombol aktif kembali setelah sudah absen
+            let alreadyAttendedToday = false;
+
             function updateDistanceUI(mainText, subText, dotColorClass, isValid) {
                 const infoEl = document.getElementById('distance-info');
                 const subEl = document.getElementById('distance-subtext');
@@ -4553,8 +4556,8 @@
                     }
                 }
 
-                if (isValid) {
-                    // Tombol Aktif
+                if (isValid && !alreadyAttendedToday) {
+                    // Tombol Aktif (hanya jika belum absen hari ini)
                     btn.disabled = false;
                     btn.className = "btn-ripple bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-bold py-3.5 rounded-xl shadow-[0_8px_16px_rgba(59,130,246,0.3)] transform transition active:scale-95 flex items-center justify-center gap-2.5 w-full text-sm relative overflow-hidden";
                     textAbsen.innerText = "Klik untuk Absen";
@@ -4661,6 +4664,12 @@
             }
 
             async function absenSekarang() {
+                // Cegah klik ganda: jika sudah absen hari ini, tolak langsung
+                if (alreadyAttendedToday) {
+                    showToast('⚠️ Anda sudah melakukan presensi hari ini.', 'warning');
+                    return;
+                }
+
                 toggleBtnLoading('btn-absen', true);
 
                 try {
@@ -4751,6 +4760,18 @@
                         showToast(successMsg, 'success');
                     }
 
+                    // Tandai sudah absen hari ini — kunci tombol agar tidak bisa diklik lagi
+                    alreadyAttendedToday = true;
+                    const btnAfter = document.getElementById('btn-absen');
+                    const textAfter = document.getElementById('text-absen');
+                    const iconAfter = document.getElementById('icon-absen');
+                    if (btnAfter) {
+                        btnAfter.disabled = true;
+                        btnAfter.className = "btn-ripple bg-green-500/20 text-green-300 cursor-not-allowed border border-green-500/30 font-bold py-3.5 rounded-xl shadow-lg transform transition flex items-center justify-center gap-2.5 w-full text-sm relative overflow-hidden";
+                    }
+                    if (textAfter) textAfter.innerText = "✅ Sudah Absen Hari Ini";
+                    if (iconAfter) iconAfter.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+
                     checkTodayAttendance(); // Refresh badge status
 
                 } catch (error) {
@@ -4819,7 +4840,20 @@
                             badge.className = `px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-tighter flex items-center gap-1.5 status-badge ${isLate ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300' : 'bg-green-500/20 border-green-500/50 text-green-300'}`;
                             badge.innerHTML = `<span class="w-2 h-2 rounded-full ${isLate ? 'bg-yellow-400' : 'bg-green-400'}"></span> ${isLate ? 'Terlambat' : 'Hadir'} • ${timeStr}`;
                         }
+
+                        // KUNCI TOMBOL: Siswa sudah absen hari ini, jangan biarkan absen lagi
+                        alreadyAttendedToday = true;
+                        const btnAbsen = document.getElementById('btn-absen');
+                        const textAbsen = document.getElementById('text-absen');
+                        const iconAbsen = document.getElementById('icon-absen');
+                        if (btnAbsen) {
+                            btnAbsen.disabled = true;
+                            btnAbsen.className = "btn-ripple bg-green-500/20 text-green-300 cursor-not-allowed border border-green-500/30 font-bold py-3.5 rounded-xl shadow-lg transform transition flex items-center justify-center gap-2.5 w-full text-sm relative overflow-hidden";
+                        }
+                        if (textAbsen) textAbsen.innerText = "✅ Sudah Absen Hari Ini";
+                        if (iconAbsen) iconAbsen.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
                     } else {
+                        alreadyAttendedToday = false;
                         badge.className = "px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/50 text-red-300 text-[10px] font-bold uppercase tracking-tighter flex items-center gap-1.5 status-badge";
                         badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Belum Absen`;
                     }

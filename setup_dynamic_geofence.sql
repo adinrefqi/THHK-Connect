@@ -42,12 +42,28 @@ DECLARE
     v_max_radius FLOAT8;
     v_status VARCHAR(1) := 'H';
     v_now_wib TIMESTAMP;
+    v_today_start TIMESTAMPTZ;
+    v_today_end TIMESTAMPTZ;
 BEGIN
     -- 1. Ambil data siswa
     SELECT id, device_id INTO v_student FROM public.students WHERE id = p_user_id;
     
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Siswa tidak ditemukan dalam database';
+    END IF;
+
+    -- 1b. Cek duplikasi: apakah siswa sudah absen hari ini (zona WIB)?
+    v_now_wib := NOW() AT TIME ZONE 'Asia/Jakarta';
+    v_today_start := (v_now_wib::date)::timestamp AT TIME ZONE 'Asia/Jakarta';
+    v_today_end := v_today_start + INTERVAL '1 day';
+
+    IF EXISTS (
+        SELECT 1 FROM public.attendance_logs
+        WHERE user_id = p_user_id
+          AND created_at >= v_today_start
+          AND created_at < v_today_end
+    ) THEN
+        RAISE EXCEPTION 'Anda sudah melakukan presensi hari ini.';
     END IF;
 
     -- 2. Validasi Device Binding
