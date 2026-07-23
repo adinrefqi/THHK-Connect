@@ -2572,6 +2572,10 @@
                             <h3 style="font-size:1.125rem;font-weight:700;color:#fff;letter-spacing:-0.01em;line-height:1.2;">Gerakan 7 Kebiasaan</h3>
                             <p style="font-size:0.625rem;color:rgba(147,197,253,0.7);font-weight:600;margin-top:2px;">Jurnal Karakter Anak Indonesia</p>
                         </div>
+                        <button onclick="printMonthlyHabitReport()" style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.5rem 0.75rem;border-radius:0.75rem;background:linear-gradient(135deg,rgba(59,130,246,0.25) 0%,rgba(99,102,241,0.25) 100%);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg,rgba(59,130,246,0.4) 0%,rgba(99,102,241,0.4) 100%)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(59,130,246,0.25) 0%,rgba(99,102,241,0.25) 100%)'">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            Cetak Rekap
+                        </button>
                     </div>
 
                     <!-- ─── Welcome Illustration ─── -->
@@ -3569,6 +3573,25 @@
                 }
 
                 return streakCount;
+            }
+
+            function printMonthlyHabitReport() {
+                const session = getSession();
+                if (!session || !session.id) {
+                    showToast('Sesi siswa tidak ditemukan, silakan login kembali.', 'error');
+                    return;
+                }
+                const dateInput = document.getElementById('habit-log-date');
+                let targetDate = new Date();
+                if (dateInput && dateInput.value) {
+                    const parts = dateInput.value.split('-');
+                    if (parts.length === 3) {
+                        targetDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    }
+                }
+                const month = targetDate.getMonth() + 1; // 1-12
+                const year = targetDate.getFullYear();
+                window.open(`print_habit.html?id=${session.id}&month=${month}&year=${year}`, '_blank');
             }
 
             // --- PENGAJUAN IZIN LOGIC ---

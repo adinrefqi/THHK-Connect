@@ -672,6 +672,14 @@
                         <span id="detail-sig-parent-placeholder" class="text-[10px] text-slate-500 italic">Belum Tanda Tangan</span>
                     </div>
                 </div>
+
+                <!-- Print Habit Report Action -->
+                <div class="mt-5 pt-4 border-t border-slate-800/80">
+                    <button onclick="printStudentHabitReport()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/25 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Cetak Rekap Bulanan 7 Kebiasaan
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2059,7 +2067,10 @@
         }
 
 
+        var currentDetailStudentId = null;
+
         function showStudentDetail(studentId, name, nis) {
+            currentDetailStudentId = studentId;
             const modal = document.getElementById('modal-detail-siswa');
             if (!modal) return;
 
@@ -2141,6 +2152,17 @@
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
+        }
+
+        function printStudentHabitReport() {
+            if (!currentDetailStudentId) {
+                alert("ID Siswa tidak ditemukan.");
+                return;
+            }
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+            window.open(`print_habit.html?id=${currentDetailStudentId}&month=${month}&year=${year}`, '_blank');
         }
 
         // ========== THEME TOGGLE ==========

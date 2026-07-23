@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Bulanan Jurnal 7 Kebiasaan - THHK Connect</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm 12mm 10mm 12mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #1e293b;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .a4-container {
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 12mm 15mm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Kop Surat */
+        .kop-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px double #0f172a;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .kop-text {
+            text-align: center;
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .kop-text h2 {
+            font-size: 13pt;
+            font-weight: 800;
+            margin: 0;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .kop-text h3 {
+            font-size: 10.5pt;
+            font-weight: 700;
+            margin: 2px 0 0 0;
+            color: #2563eb;
+            text-transform: uppercase;
+        }
+
+        .kop-text p {
+            font-size: 8pt;
+            margin: 2px 0 0 0;
+            color: #475569;
+        }
+
+        /* Document Title */
+        .doc-title {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .doc-title h1 {
+            font-size: 11pt;
+            font-weight: 800;
+            margin: 0;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: underline;
+        }
+
+        .doc-title p {
+            font-size: 9pt;
+            font-weight: 600;
+            margin: 2px 0 0 0;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        /* Student Metadata Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 9pt;
+            margin-bottom: 12px;
+        }
+
+        .meta-item {
+            display: flex;
+        }
+
+        .meta-label {
+            width: 100px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .meta-val {
+            flex: 1;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Stats Badge Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 11pt;
+            font-weight: 800;
+            color: #2563eb;
+            line-height: 1.1;
+        }
+
+        .stat-lbl {
+            font-size: 7pt;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Table Matrix */
+        .habit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.5pt;
+            margin-bottom: 12px;
+        }
+
+        .habit-table th, .habit-table td {
+            border: 1px solid #94a3b8;
+            padding: 4px 2px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .habit-table th {
+            background: #1e293b;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 7pt;
+            text-transform: uppercase;
+        }
+
+        .habit-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .check-done {
+            color: #16a34a;
+            font-weight: 800;
+            font-size: 9.5pt;
+        }
+
+        .check-empty {
+            color: #cbd5e1;
+            font-size: 7.5pt;
+        }
+
+        .sig-thumb {
+            max-height: 20px;
+            max-width: 40px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Legend Footer */
+        .legend-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 7.5pt;
+            color: #334155;
+            margin-bottom: 16px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px 10px;
+            margin-top: 3px;
+        }
+
+        /* Signatures Section */
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 8.5pt;
+            page-break-inside: avoid;
+        }
+
+        .sig-col p {
+            margin: 0 0 50px 0;
+        }
+
+        .sig-col .sig-name {
+            font-weight: 700;
+            text-decoration: underline;
+            margin: 0;
+        }
+
+        .sig-col .sig-nip {
+            font-size: 7.5pt;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* Action bar for print button */
+        .no-print-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .btn-action {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-print {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .btn-print:hover {
+            background: #1d4ed8;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .a4-container {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="a4-container" id="printable-area">
+        <!-- Kop Surat -->
+        <div class="kop-header">
+            <div style="width:55px; height:55px; background:#eff6ff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; border:2px solid #2563eb;">⭐</div>
+            <div class="kop-text">
+                <h2>THHK CONNECT - SISTEM PENDIDIKAN KARAKTER</h2>
+                <h3>LEMBAR KENDALI GERAKAN 7 KEBIASAAN ANAK INDONESIA</h3>
+                <p>Dokumen Resmi Laporan Capaian Pembiasaan Karakter Positif Siswa Harian & Bulanan</p>
+            </div>
+            <div style="width:55px; height:55px; background:#f0fdf4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; border:2px solid #16a34a;">🇮🇩</div>
+        </div>
+
+        <!-- Document Title -->
+        <div class="doc-title">
+            <h1>REKAPITULASI JURNAL 7 KEBIASAAN SISWA</h1>
+            <p id="doc-subtitle">PERIODE BULAN JULI 2026</p>
+        </div>
+
+        <!-- Student Profile Metadata -->
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Nama Siswa:</span>
+                <span class="meta-val" id="val-nama">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Kelas / Tingkat:</span>
+                <span class="meta-val" id="val-kelas">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">NIS / NISN:</span>
+                <span class="meta-val" id="val-nis">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Tahun Ajaran:</span>
+                <span class="meta-val" id="val-ta">2026/2027</span>
+            </div>
+        </div>
+
+        <!-- Performance Summary Badges -->
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-num" id="stat-percent">0%</div>
+                <div class="stat-lbl">Kepatuhan Karakter</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="stat-filled">0 / 0</div>
+                <div class="stat-lbl">Kebiasaan Terlaksana</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="stat-active-days">0 Hari</div>
+                <div class="stat-lbl">Hari Pengisian</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="stat-dominant-mood">😊 Senang</div>
+                <div class="stat-lbl">Mood Dominan</div>
+            </div>
+        </div>
+
+        <!-- Matrix Table -->
+        <table class="habit-table">
+            <thead>
+                <tr>
+                    <th style="width: 26px;">Tgl</th>
+                    <th style="width: 34px;">Hari</th>
+                    <th>1. Bangun Pagi</th>
+                    <th>2. Beribadah</th>
+                    <th>3. Olahraga</th>
+                    <th>4. Makan Sehat</th>
+                    <th>5. Gemar Belajar</th>
+                    <th>6. Bermasyarakat</th>
+                    <th>7. Tidur Cukup</th>
+                    <th style="width: 60px;">Perasaan</th>
+                    <th style="width: 65px;">TTD / Paraf</th>
+                </tr>
+            </thead>
+            <tbody id="habit-table-body">
+                <tr>
+                    <td colspan="11" style="padding: 15px; text-align: center; color: #64748b;">Memuat data jurnal kebiasaan...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Legend & Description -->
+        <div class="legend-box">
+            <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">Keterangan 7 Kebiasaan Anak Indonesia:</div>
+            <div class="legend-grid">
+                <div><b>1. Bangun Pagi:</b> Bangun sebelum subuh / tepat waktu.</div>
+                <div><b>2. Beribadah:</b> Sholat / Berdoa tepat waktu.</div>
+                <div><b>3. Olahraga:</b> Senam / Olahraga rutin.</div>
+                <div><b>4. Makan Sehat:</b> Makanan bergizi seimbang.</div>
+                <div><b>5. Gemar Belajar:</b> Membaca & belajar mandiri.</div>
+                <div><b>6. Bermasyarakat:</b> Membantu ortu & ramah.</div>
+                <div><b>7. Tidur Cepat:</b> Istirahat cukup / tidak begadang.</div>
+                <div><b>Simbol:</b> <span class="check-done">✓</span> (Terlaksana) | <span class="check-empty">-</span> (Belum Diisi)</div>
+            </div>
+        </div>
+
+        <!-- Formal Signatures -->
+        <div class="signatures">
+            <div class="sig-col">
+                <p>Orang Tua / Wali Siswa,</p>
+                <div class="sig-name" id="sig-ortu-name">( ........................................ )</div>
+                <div class="sig-nip">Orang Tua / Wali</div>
+            </div>
+            <div class="sig-col">
+                <p>Mengetahui,<br>Wali Kelas,</p>
+                <div class="sig-name" id="sig-wali-name">( ........................................ )</div>
+                <div class="sig-nip">NIP. ........................................</div>
+            </div>
+            <div class="sig-col">
+                <p>Kota Tegal, <span id="sig-date-today">-</span><br>Kepala Sekolah,</p>
+                <div class="sig-name">( ........................................ )</div>
+                <div class="sig-nip">NIP. ........................................</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating action bar -->
+    <div class="no-print-bar">
+        <button onclick="window.close()" class="btn-action btn-close">
+            <span>❌</span> Tutup
+        </button>
+        <button onclick="window.print()" class="btn-action btn-print">
+            <span>🖨️</span> Cetak PDF / Print
+        </button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const monthNamesID = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        const dayNamesID = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+        async function loadReport() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            const studentNis = urlParams.get('nis');
+            const monthParam = parseInt(urlParams.get('month')) || (new Date().getMonth() + 1); // 1-12
+            const yearParam = parseInt(urlParams.get('year')) || new Date().getFullYear();
+
+            // Format Subtitle
+            const monthText = monthNamesID[monthParam - 1] || 'Juli';
+            document.getElementById('doc-subtitle').innerText = `PERIODE BULAN ${monthText.toUpperCase()} ${yearParam}`;
+
+            // Today Date for Signature
+            const now = new Date();
+            document.getElementById('sig-date-today').innerText = `${now.getDate()} ${monthNamesID[now.getMonth()]} ${now.getFullYear()}`;
+
+            try {
+                // 1. Fetch Student Profile
+                let studentData = null;
+                if (studentId) {
+                    const { data, error } = await supabaseClient
+                        .from('students')
+                        .select('*')
+                        .eq('id', studentId)
+                        .maybeSingle();
+                    if (!error && data) studentData = data;
+                }
+                
+                if (!studentData && studentNis) {
+                    const { data, error } = await supabaseClient
+                        .from('students')
+                        .select('*')
+                        .eq('nis', studentNis)
+                        .maybeSingle();
+                    if (!error && data) studentData = data;
+                }
+
+                // If not found in students, try buku_induk
+                if (!studentData && (studentId || studentNis)) {
+                    let query = supabaseClient.from('buku_induk').select('*');
+                    if (studentId) query = query.eq('id', studentId);
+                    else query = query.eq('nis', studentNis);
+                    const { data } = await query.maybeSingle();
+                    if (data) {
+                        studentData = {
+                            id: data.id,
+                            nama: data.nama_lengkap,
+                            nis: data.nis,
+                            kelas: data.kelas_sekarang || '-'
+                        };
+                    }
+                }
+
+                if (!studentData) {
+                    alert("Data profil siswa tidak ditemukan.");
+                    return;
+                }
+
+                // Set student meta fields
+                document.getElementById('val-nama').innerText = studentData.nama || '-';
+                document.getElementById('val-kelas').innerText = studentData.kelas ? `Kelas ${studentData.kelas}` : '-';
+                document.getElementById('val-nis').innerText = studentData.nis || '-';
+                document.getElementById('sig-ortu-name').innerText = `( Orang Tua / Wali ${studentData.nama || ''} )`;
+
+                // 2. Fetch Habit Logs for specified month & year
+                const startDateStr = `${yearParam}-${String(monthParam).padStart(2, '0')}-01`;
+                const lastDay = new Date(yearParam, monthParam, 0).getDate();
+                const endDateStr = `${yearParam}-${String(monthParam).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+                const { data: logs, error: logsErr } = await supabaseClient
+                    .from('habit_logs')
+                    .select('*')
+                    .eq('user_id', studentData.id)
+                    .gte('log_date', startDateStr)
+                    .lte('log_date', endDateStr);
+
+                if (logsErr) throw logsErr;
+
+                // Create map of log_date -> log object
+                const logMap = {};
+                if (logs && logs.length > 0) {
+                    logs.forEach(l => {
+                        logMap[l.log_date] = l;
+                    });
+                }
+
+                // 3. Render Matrix Table & Compute Stats
+                const tbody = document.getElementById('habit-table-body');
+                tbody.innerHTML = '';
+
+                let totalCompletedHabits = 0;
+                let activeDaysCount = 0;
+                const moodCounts = { senang: 0, biasa: 0, sedih: 0, kesal: 0 };
+
+                for (let day = 1; day <= lastDay; day++) {
+                    const dateObj = new Date(yearParam, monthParam - 1, day);
+                    const dayStr = String(day).padStart(2, '0');
+                    const formattedDate = `${yearParam}-${String(monthParam).padStart(2, '0')}-${dayStr}`;
+                    const dayName = dayNamesID[dateObj.getDay()];
+
+                    const log = logMap[formattedDate];
+                    const tr = document.createElement('tr');
+
+                    // Highlight weekend
+                    if (dateObj.getDay() === 0) {
+                        tr.style.background = '#fef2f2'; // Minggu reddish
+                    } else if (dateObj.getDay() === 6) {
+                        tr.style.background = '#fffbeb'; // Sabtu yellowish
+                    }
+
+                    let habitColsHtml = '';
+
+                    for (let h = 1; h <= 7; h++) {
+                        const val = log ? (log[`habit_${h}`] || '') : '';
+                        if (val.trim() !== '') {
+                            totalCompletedHabits++;
+                            habitColsHtml += `<td><span class="check-done" title="${escapeHtml(val)}">✓</span></td>`;
+                        } else {
+                            habitColsHtml += `<td><span class="check-empty">-</span></td>`;
+                        }
+                    }
+
+                    if (log) {
+                        activeDaysCount++;
+                        const m = (log.mood || 'biasa').toLowerCase();
+                        if (moodCounts[m] !== undefined) moodCounts[m]++;
+                    }
+
+                    // Mood Display
+                    let moodHtml = '-';
+                    if (log && log.mood) {
+                        const m = log.mood.toLowerCase();
+                        if (m === 'senang') moodHtml = '😊 Senang';
+                        else if (m === 'biasa') moodHtml = '😐 Biasa';
+                        else if (m === 'sedih') moodHtml = '😢 Sedih';
+                        else if (m === 'kesal') moodHtml = '😡 Kesal';
+                        else moodHtml = log.mood;
+                    }
+
+                    // Signature Display
+                    let sigHtml = '<span class="check-empty">-</span>';
+                    if (log && log.signature_parent) {
+                        sigHtml = `<img src="${log.signature_parent}" class="sig-thumb" alt="TTD">`;
+                    }
+
+                    tr.innerHTML = `
+                        <td style="font-weight:700;">${day}</td>
+                        <td style="font-size:7pt; color:#64748b;">${dayName}</td>
+                        ${habitColsHtml}
+                        <td style="font-size:7pt;">${moodHtml}</td>
+                        <td>${sigHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                // Compute Badges
+                const totalPossible = lastDay * 7;
+                const percent = Math.round((totalCompletedHabits / totalPossible) * 100);
+
+                document.getElementById('stat-percent').innerText = `${percent}%`;
+                document.getElementById('stat-filled').innerText = `${totalCompletedHabits} / ${totalPossible}`;
+                document.getElementById('stat-active-days').innerText = `${activeDaysCount} / ${lastDay} Hari`;
+
+                // Dominant Mood
+                let dominantMood = '😊 Senang';
+                let maxM = -1;
+                Object.keys(moodCounts).forEach(mKey => {
+                    if (moodCounts[mKey] > maxM && moodCounts[mKey] > 0) {
+                        maxM = moodCounts[mKey];
+                        if (mKey === 'senang') dominantMood = '😊 Senang';
+                        else if (mKey === 'biasa') dominantMood = '😐 Biasa';
+                        else if (mKey === 'sedih') dominantMood = '😢 Sedih';
+                        else if (mKey === 'kesal') dominantMood = '😡 Kesal';
+                    }
+                });
+                document.getElementById('stat-dominant-mood').innerText = activeDaysCount > 0 ? dominantMood : '-';
+
+                // Auto trigger print after short delay
+                setTimeout(() => {
+                    if (urlParams.get('autoprint') === 'true') {
+                        window.print();
+                    }
+                }, 600);
+
+            } catch (err) {
+                console.error("Error loading report:", err);
+                alert("Gagal memuat laporan rekap bulanan: " + err.message);
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        window.onload = loadReport;
+    </script>
+</body>
+</html>
