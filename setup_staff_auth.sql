@@ -72,6 +72,9 @@ GRANT EXECUTE ON FUNCTION public.verify_staff_password(TEXT, TEXT) TO anon, auth
 -- ------------------------------------------------------------------------------
 -- RPC: Backward compatibility untuk verify_admin_login
 -- ------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.verify_admin_login(TEXT, TEXT);
+DROP FUNCTION IF EXISTS public.verify_admin_login(TEXT);
+
 CREATE OR REPLACE FUNCTION public.verify_admin_login(
     input_password TEXT,
     input_username TEXT DEFAULT 'admin'
