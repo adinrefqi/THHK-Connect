@@ -468,7 +468,7 @@
                 if (studentId) {
                     const { data, error } = await supabaseClient
                         .from('students')
-                        .select('*')
+                        .select('id, nis, nama, kelas')
                         .eq('id', studentId)
                         .maybeSingle();
                     if (!error && data) studentData = data;
@@ -477,7 +477,7 @@
                 if (!studentData && studentNis) {
                     const { data, error } = await supabaseClient
                         .from('students')
-                        .select('*')
+                        .select('id, nis, nama, kelas')
                         .eq('nis', studentNis)
                         .maybeSingle();
                     if (!error && data) studentData = data;
@@ -485,7 +485,7 @@
 
                 // If not found in students, try buku_induk
                 if (!studentData && (studentId || studentNis)) {
-                    let query = supabaseClient.from('buku_induk').select('*');
+                    let query = supabaseClient.from('buku_induk').select('id, nama_lengkap, nis, kelas_sekarang');
                     if (studentId) query = query.eq('id', studentId);
                     else query = query.eq('nis', studentNis);
                     const { data } = await query.maybeSingle();
