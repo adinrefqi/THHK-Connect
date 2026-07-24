@@ -216,7 +216,7 @@
             padding: 6px 10px;
             font-size: 7.5pt;
             color: #334155;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .legend-grid {
@@ -224,6 +224,70 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 2px 10px;
             margin-top: 3px;
+        }
+
+        /* Activity Summary Box */
+        .activity-summary-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+
+        .summary-title {
+            font-weight: 800;
+            font-size: 8pt;
+            color: #0f172a;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px 10px;
+        }
+
+        .summary-item {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 4px 8px;
+        }
+
+        .summary-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 7.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .summary-item-badge {
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 6.5pt;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .summary-item-notes {
+            font-size: 7pt;
+            color: #475569;
+            line-height: 1.25;
+            word-break: break-word;
         }
 
         /* Signatures Section */
@@ -403,6 +467,17 @@
                 <div><b>6. Bermasyarakat:</b> Membantu ortu & ramah.</div>
                 <div><b>7. Tidur Cepat:</b> Istirahat cukup / tidak begadang.</div>
                 <div><b>Simbol:</b> <span class="check-done">✓</span> (Terlaksana) | <span class="check-empty">-</span> (Belum Diisi)</div>
+            </div>
+        </div>
+
+        <!-- Activity Details Summary -->
+        <div class="activity-summary-box">
+            <div class="summary-title">
+                <span>📌 RINGKASAN & CATATAN KEGIATAN SISWA (BULAN INI)</span>
+                <span style="font-size: 7pt; color: #64748b; font-weight: 600;">Sampel Catatan Jurnal</span>
+            </div>
+            <div class="summary-grid" id="activity-summary-grid">
+                <div style="grid-column: span 2; text-align: center; color: #64748b; font-size: 7.5pt; padding: 10px;">Memuat ringkasan kegiatan...</div>
             </div>
         </div>
 
@@ -622,6 +697,60 @@
                     }
                 });
                 document.getElementById('stat-dominant-mood').innerText = activeDaysCount > 0 ? dominantMood : '-';
+
+                // 4. Render Activity Summary Grid per Habit
+                const habitMeta = [
+                    { id: 1, name: 'Bangun Pagi', icon: '🌅' },
+                    { id: 2, name: 'Beribadah', icon: '🕌' },
+                    { id: 3, name: 'Olahraga', icon: '🏃' },
+                    { id: 4, name: 'Makan Sehat', icon: '🍎' },
+                    { id: 5, name: 'Gemar Belajar', icon: '📚' },
+                    { id: 6, name: 'Bermasyarakat', icon: '👥' },
+                    { id: 7, name: 'Tidur Cepat/Cukup', icon: '🌙' }
+                ];
+
+                const summaryGridEl = document.getElementById('activity-summary-grid');
+                if (summaryGridEl) {
+                    summaryGridEl.innerHTML = habitMeta.map(h => {
+                        const uniqueNotes = [];
+                        let habitCount = 0;
+
+                        for (let day = 1; day <= lastDay; day++) {
+                            const dayStr = String(day).padStart(2, '0');
+                            const formattedDate = `${yearParam}-${String(monthParam).padStart(2, '0')}-${dayStr}`;
+                            const log = logMap[formattedDate];
+                            if (log) {
+                                const val = (log[`habit_${h.id}`] || '').trim();
+                                if (val !== '') {
+                                    habitCount++;
+                                    if (!uniqueNotes.includes(val)) {
+                                        uniqueNotes.push(val);
+                                    }
+                                }
+                            }
+                        }
+
+                        const pct = Math.round((habitCount / lastDay) * 100);
+                        let notesHtml = '';
+                        if (uniqueNotes.length > 0) {
+                            const topNotes = uniqueNotes.slice(0, 3).map(n => escapeHtml(n)).join(' • ');
+                            const extraCount = uniqueNotes.length > 3 ? ` <i style="color:#64748b;">(+${uniqueNotes.length - 3} lainnya)</i>` : '';
+                            notesHtml = `${topNotes}${extraCount}`;
+                        } else {
+                            notesHtml = '<span style="color:#94a3b8; font-style:italic;">Belum ada catatan kegiatan</span>';
+                        }
+
+                        return `
+                            <div class="summary-item">
+                                <div class="summary-item-header">
+                                    <span>${h.icon} <b>${h.id}. ${h.name}</b></span>
+                                    <span class="summary-item-badge">${habitCount}/${lastDay} Hari (${pct}%)</span>
+                                </div>
+                                <div class="summary-item-notes">${notesHtml}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
 
                 // Auto trigger print after short delay
                 setTimeout(() => {
