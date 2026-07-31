@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Guru Piket - THHK Connect</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -19,10 +21,10 @@
             }
         }
     </script>
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -95,6 +97,7 @@
             color: var(--text-primary);
             transition: all 0.3s;
         }
+
         .input-glass:focus {
             background: var(--input-focus-bg);
             border-color: var(--input-focus-border);
@@ -104,14 +107,22 @@
 
         /* Micro-Animations & Transitions */
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .student-item {
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .student-item:hover {
             border-color: rgba(99, 102, 241, 0.4);
             background: rgba(30, 41, 59, 0.65);
@@ -123,8 +134,11 @@
             border-top-color: #6366f1;
             animation: spinner 0.8s linear infinite;
         }
+
         @keyframes spinner {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Scrollbar styles */
@@ -132,13 +146,16 @@
             width: 6px;
             height: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--scrollbar-thumb);
             border-radius: 10px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--scrollbar-thumb-hover);
         }
@@ -159,9 +176,11 @@
                 margin: 0 -0.5rem;
                 padding-bottom: 0.25rem;
             }
+
             .tabs-scrollable::-webkit-scrollbar {
                 display: none;
             }
+
             .tabs-scrollable button {
                 flex-shrink: 0;
                 position: relative;
@@ -187,6 +206,7 @@
                 margin-top: 2rem !important;
             }
         }
+
         /* Modern Confirm Modal */
         .confirm-overlay {
             position: fixed;
@@ -202,7 +222,10 @@
             opacity: 0;
             transition: opacity 0.2s ease;
         }
-        .confirm-overlay.active { opacity: 1; }
+
+        .confirm-overlay.active {
+            opacity: 1;
+        }
 
         .confirm-box {
             background: rgba(30, 41, 59, 0.95);
@@ -217,6 +240,7 @@
             transform: scale(0.9) translateY(10px);
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .confirm-overlay.active .confirm-box {
             transform: scale(1) translateY(0);
         }
@@ -242,6 +266,7 @@
             -webkit-backdrop-filter: blur(16px);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .alert-toast.show {
             transform: translateX(-50%) translateY(0);
         }
@@ -258,6 +283,7 @@
                 opacity: 0;
                 transform: translateY(8px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -316,8 +342,13 @@
 
         /* Skeleton loader */
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
 
         .skeleton {
@@ -340,6 +371,7 @@
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
         }
+
         .student-item:hover {
             border-color: rgba(99, 102, 241, 0.4);
             background: rgba(30, 41, 59, 0.65);
@@ -351,22 +383,27 @@
         .btn-micro {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .btn-micro:hover {
             transform: translateY(-1px);
         }
+
         .btn-micro:active {
             transform: scale(0.97);
         }
+
         .alert-toast.toast-success {
             background: rgba(16, 185, 129, 0.9);
             border: 1px solid rgba(52, 211, 153, 0.4);
             color: white;
         }
+
         .alert-toast.toast-error {
             background: rgba(239, 68, 68, 0.9);
             border: 1px solid rgba(252, 129, 129, 0.4);
             color: white;
         }
+
         .alert-toast.toast-info {
             background: rgba(99, 102, 241, 0.9);
             border: 1px solid rgba(129, 140, 248, 0.4);
@@ -387,28 +424,56 @@
            ============================================================ */
 
         /* ---- base body + utility text classes -> readable dark ---- */
-        [data-theme="light"] body { color: var(--text-primary); }
-        [data-theme="light"] .text-white { color: var(--text-primary); }
+        [data-theme="light"] body {
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .text-white {
+            color: var(--text-primary);
+        }
+
         [data-theme="light"] .text-slate-100,
         [data-theme="light"] .text-slate-200,
-        [data-theme="light"] .text-slate-300 { color: var(--text-primary); }
-        [data-theme="light"] .text-slate-400 { color: var(--text-secondary); }
-        [data-theme="light"] .text-slate-500 { color: rgba(30, 41, 59, 0.6); }
+        [data-theme="light"] .text-slate-300 {
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .text-slate-400 {
+            color: var(--text-secondary);
+        }
+
+        [data-theme="light"] .text-slate-500 {
+            color: rgba(30, 41, 59, 0.6);
+        }
 
         /* ---- pale accent text -> readable accent equivalents ---- */
         [data-theme="light"] .text-indigo-200\/60,
         [data-theme="light"] .text-indigo-200,
         [data-theme="light"] .text-indigo-300,
         [data-theme="light"] .text-indigo-400,
-        [data-theme="light"] .text-blue-300 { color: #4f46e5; }
-        [data-theme="light"] .text-sky-400 { color: #0284c7; }
-        [data-theme="light"] .text-emerald-400 { color: #059669; }
+        [data-theme="light"] .text-blue-300 {
+            color: #4f46e5;
+        }
+
+        [data-theme="light"] .text-sky-400 {
+            color: #0284c7;
+        }
+
+        [data-theme="light"] .text-emerald-400 {
+            color: #059669;
+        }
+
         [data-theme="light"] .text-amber-400,
         [data-theme="light"] .text-yellow-300,
-        [data-theme="light"] .text-yellow-400 { color: #b45309; }
+        [data-theme="light"] .text-yellow-400 {
+            color: #b45309;
+        }
+
         [data-theme="light"] .text-rose-300,
         [data-theme="light"] .text-rose-400,
-        [data-theme="light"] .text-red-400 { color: #dc2626; }
+        [data-theme="light"] .text-red-400 {
+            color: #dc2626;
+        }
 
         /* inline hard-coded white text (e.g. confirm-box title) handled in EXCEPTIONS */
 
@@ -420,20 +485,45 @@
            un-classed nodes like emojis), then the specific tints. */
         [data-theme="light"] #modal-detail-siswa,
         [data-theme="light"] #piket-toast-container,
-        [data-theme="light"] .confirm-box { color: #e2e8f0; }
-        [data-theme="light"] #modal-detail-siswa .text-white { color: #ffffff; }
+        [data-theme="light"] .confirm-box {
+            color: #e2e8f0;
+        }
+
+        [data-theme="light"] #modal-detail-siswa .text-white {
+            color: #ffffff;
+        }
+
         [data-theme="light"] #modal-detail-siswa .text-slate-100,
         [data-theme="light"] #modal-detail-siswa .text-slate-200,
-        [data-theme="light"] #modal-detail-siswa .text-slate-300 { color: #cbd5e1; }
-        [data-theme="light"] #modal-detail-siswa .text-slate-400 { color: #94a3b8; }
-        [data-theme="light"] #modal-detail-siswa .text-slate-500 { color: #64748b; }
-        [data-theme="light"] #piket-toast-container .text-white { color: #ffffff; }
+        [data-theme="light"] #modal-detail-siswa .text-slate-300 {
+            color: #cbd5e1;
+        }
+
+        [data-theme="light"] #modal-detail-siswa .text-slate-400 {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] #modal-detail-siswa .text-slate-500 {
+            color: #64748b;
+        }
+
+        [data-theme="light"] #piket-toast-container .text-white {
+            color: #ffffff;
+        }
+
         [data-theme="light"] #piket-toast-container .text-slate-300,
-        [data-theme="light"] #piket-toast-container .text-slate-400 { color: #cbd5e1; }
-        [data-theme="light"] .confirm-box [style*="color:#fff"] { color: #ffffff !important; }
+        [data-theme="light"] #piket-toast-container .text-slate-400 {
+            color: #cbd5e1;
+        }
+
+        [data-theme="light"] .confirm-box [style*="color:#fff"] {
+            color: #ffffff !important;
+        }
 
         /* Colored alert toasts keep white text (solid colored background) */
-        [data-theme="light"] .alert-toast { color: #ffffff; }
+        [data-theme="light"] .alert-toast {
+            color: #ffffff;
+        }
 
         /* Solid colored buttons & badges keep white text. The hover:text-white
            utility is a separate class and is untouched, so colored hover states
@@ -443,32 +533,46 @@
         [data-theme="light"] .bg-rose-500.text-white,
         [data-theme="light"] .bg-purple-500.text-white,
         [data-theme="light"] .bg-emerald-600.text-white,
-        [data-theme="light"] .bg-indigo-600 .text-white { color: #ffffff; }
+        [data-theme="light"] .bg-indigo-600 .text-white {
+            color: #ffffff;
+        }
 
         /* Native <option> lists render on their own dark bg-slate-900 */
-        [data-theme="light"] option.text-white { color: #ffffff; }
+        [data-theme="light"] option.text-white {
+            color: #ffffff;
+        }
     </style>
 </head>
+
 <body class="text-slate-100 antialiased min-h-screen p-4 md:p-8 pb-12">
 
     <!-- PORTAL LOGIN -->
     <div id="login-view" class="max-w-md mx-auto mt-8 sm:mt-20">
         <div class="glass-card rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
             <!-- Background Radial Accents -->
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+            <div
+                class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20">
+            </div>
+            <div
+                class="absolute -bottom-24 -left-24 w-48 h-48 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15">
+            </div>
 
             <div class="relative z-10">
-                <div class="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-500/20 border border-indigo-400/30">
+                <div
+                    class="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-500/20 border border-indigo-400/30">
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
                     </svg>
                 </div>
                 <h1 class="text-2xl font-bold mb-2">Portal Guru Piket</h1>
                 <p class="text-indigo-200/60 text-sm mb-8">Masuk untuk mencatat presensi harian siswa</p>
-                
-                <select id="piket-name" class="w-full px-4 py-3 mb-4 rounded-xl input-glass text-sm outline-none cursor-pointer">
-                    <option value="" disabled selected class="bg-slate-900 text-slate-400">Pilih Nama Guru Piket</option>
+
+                <select id="piket-name"
+                    class="w-full px-4 py-3 mb-4 rounded-xl input-glass text-sm outline-none cursor-pointer">
+                    <option value="" disabled selected class="bg-slate-900 text-slate-400">Pilih Nama Guru Piket
+                    </option>
                     <option value="Wida" class="bg-slate-900 text-white">Wida</option>
                     <option value="Thevea" class="bg-slate-900 text-white">Thevea</option>
                     <option value="Sunedi" class="bg-slate-900 text-white">Sunedi</option>
@@ -478,10 +582,11 @@
                     <option value="Adin" class="bg-slate-900 text-white">Adin</option>
                     <option value="Erwin" class="bg-slate-900 text-white">Erwin</option>
                 </select>
-                <input type="password" id="piket-pass" placeholder="Password Guru Piket" 
-                       class="w-full px-4 py-3 mb-4 rounded-xl input-glass placeholder-slate-500 text-sm outline-none">
-                
-                <button onclick="loginPiket()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300">
+                <input type="password" id="piket-pass" placeholder="Password Guru Piket"
+                    class="w-full px-4 py-3 mb-4 rounded-xl input-glass placeholder-slate-500 text-sm outline-none">
+
+                <button onclick="loginPiket()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300">
                     Buka Panel Piket
                 </button>
             </div>
@@ -490,51 +595,100 @@
 
     <!-- PORTAL DASHBOARD -->
     <div id="dashboard-view" class="hidden max-w-4xl mx-auto overflow-visible pb-8">
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-slate-800/80 pb-6 overflow-x-auto">
+        <header
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-slate-800/80 pb-6 overflow-x-auto">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_currentColor]"></span>
+                    <span
+                        class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_currentColor]"></span>
                     <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Dashboard Piket</h1>
                 </div>
                 <p id="today-date" class="text-indigo-300 opacity-80 mt-1.5 font-medium">Memuat tanggal...</p>
             </div>
-            
+
             <div class="flex gap-2">
-                <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 glass-card rounded-xl border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95" title="Ganti Tema">
-                    <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="p-2.5 glass-card rounded-xl border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95"
+                    title="Ganti Tema">
+                    <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
                 </button>
-                <select id="filter-kelas" onchange="loadStudents()" 
-                        class="bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
+                <select id="filter-kelas" onchange="loadStudents()"
+                    class="bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
                     <option value="7" class="bg-slate-900 text-white">Kelas 7</option>
                     <option value="8" class="bg-slate-900 text-white">Kelas 8</option>
                     <option value="9" class="bg-slate-900 text-white">Kelas 9</option>
                 </select>
-                <button onclick="loadStudents()" class="p-2.5 glass-card rounded-xl hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95" title="Refresh Data">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <button onclick="loadStudents()"
+                    class="p-2.5 glass-card rounded-xl hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-white transition-all active:scale-95"
+                    title="Refresh Data">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
                 </button>
-                <button onclick="logoutPiket()" class="p-2.5 glass-card rounded-xl border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-95" title="Keluar">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
+                <button onclick="logoutPiket()"
+                    class="p-2.5 glass-card rounded-xl border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all active:scale-95"
+                    title="Keluar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7"></path>
+                    </svg>
                 </button>
             </div>
         </header>
 
         <!-- TABS -->
         <div class="flex border-b border-slate-800/80 mb-6 gap-2 tabs-scrollable">
-            <button onclick="switchTab('manual')" id="tab-manual" class="tab-nav-btn active px-4 py-3 text-indigo-400 font-bold" title="Absensi Manual">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <button onclick="switchTab('manual')" id="tab-manual"
+                class="tab-nav-btn active px-4 py-3 text-indigo-400 font-bold" title="Absensi Manual">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                    </path>
+                </svg>
             </button>
-            <button onclick="switchTab('izin')" id="tab-izin" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Persetujuan Izin">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span id="badge-izin" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-red-500/50 hidden">0</span>
+            <button onclick="switchTab('izin')" id="tab-izin"
+                class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative"
+                title="Persetujuan Izin">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span id="badge-izin"
+                    class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-red-500/50 hidden">0</span>
             </button>
-            <button onclick="switchTab('bullying')" id="tab-bullying" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Laporan Perundungan">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                <span id="badge-bullying" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-rose-500/50 hidden">0</span>
+            <button onclick="switchTab('bullying')" id="tab-bullying"
+                class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative"
+                title="Laporan Perundungan">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                <span id="badge-bullying"
+                    class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-rose-500/50 hidden">0</span>
             </button>
-            <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative" title="Tugas Titipan">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                <span id="badge-tugas" class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-purple-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-purple-500/50 hidden">0</span>
+            <button onclick="switchTab('tugas')" id="tab-tugas"
+                class="tab-nav-btn px-4 py-3 text-slate-500 hover:text-slate-300 font-bold relative"
+                title="Tugas Titipan">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                    </path>
+                </svg>
+                <span id="badge-tugas"
+                    class="absolute -top-1 right-1 min-w-[18px] h-[18px] bg-purple-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm shadow-purple-500/50 hidden">0</span>
             </button>
         </div>
 
@@ -544,7 +698,7 @@
             <!-- SEARCH BOX -->
             <div class="mb-6">
                 <input type="text" id="search-student" oninput="filterList()" placeholder="Cari nama siswa atau NIS..."
-                       class="w-full px-6 py-4 rounded-2xl input-glass placeholder-slate-500 shadow-inner text-sm">
+                    class="w-full px-6 py-4 rounded-2xl input-glass placeholder-slate-500 shadow-inner text-sm">
             </div>
 
             <!-- LISTING CONTAINER -->
@@ -605,7 +759,8 @@
         <!-- BULLYING TAB CONTENT -->
         <div id="content-bullying" class="hidden">
             <div id="bullying-reports-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat aduan perundungan...</div>
+                <div class="col-span-full text-center py-20 text-slate-500 font-medium">Memuat aduan perundungan...
+                </div>
             </div>
         </div>
 
@@ -623,13 +778,18 @@
         <div class="glass-card w-full max-w-md p-5 relative overflow-hidden rounded-3xl modal-scroll-inner"
             style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin: auto;">
             <!-- Ambient Light Decor -->
-            <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+            <div
+                class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20">
+            </div>
+            <div
+                class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15">
+            </div>
 
             <div class="relative z-10">
                 <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-indigo-600/20 border border-indigo-500/35 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-10 h-10 bg-indigo-600/20 border border-indigo-500/35 rounded-xl flex items-center justify-center">
                             <span class="text-xl">⭐</span>
                         </div>
                         <div>
@@ -637,17 +797,21 @@
                             <p id="detail-student-nis" class="text-xs text-slate-400">NIS: 09-001</p>
                         </div>
                     </div>
-                    <button onclick="closeStudentDetail()" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                    <button onclick="closeStudentDetail()"
+                        class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
                 <!-- Mood evaluation -->
                 <div class="mb-5">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Perasaan Hari Ini</span>
-                    <div id="detail-mood-card" class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 flex items-center gap-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Perasaan Hari
+                        Ini</span>
+                    <div id="detail-mood-card"
+                        class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 flex items-center gap-4">
                         <span id="detail-mood-emoji" class="text-4xl">😐</span>
                         <div>
                             <p id="detail-mood-status" class="text-base font-bold text-white">Biasa</p>
@@ -658,25 +822,35 @@
 
                 <!-- Habits evaluation checklist -->
                 <div class="mb-5">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Jurnal 7 Kebiasaan</span>
-                    <div class="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar" id="detail-habits-grid">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Jurnal 7
+                        Kebiasaan</span>
+                    <div class="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar"
+                        id="detail-habits-grid">
                         <!-- Habit list item dynamic -->
                     </div>
                 </div>
 
                 <!-- Parents Signature preview -->
                 <div>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Tanda Tangan Orang Tua / Wali</span>
-                    <div class="h-24 bg-slate-950/50 border border-slate-850 rounded-xl flex items-center justify-center overflow-hidden relative p-1">
-                        <img id="detail-sig-parent" class="max-h-full max-w-full object-contain hidden" src="" alt="Tanda Tangan Orang Tua">
-                        <span id="detail-sig-parent-placeholder" class="text-[10px] text-slate-500 italic">Belum Tanda Tangan</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Tanda Tangan
+                        Orang Tua / Wali</span>
+                    <div
+                        class="h-24 bg-slate-950/50 border border-slate-850 rounded-xl flex items-center justify-center overflow-hidden relative p-1">
+                        <img id="detail-sig-parent" class="max-h-full max-w-full object-contain hidden" src=""
+                            alt="Tanda Tangan Orang Tua">
+                        <span id="detail-sig-parent-placeholder" class="text-[10px] text-slate-500 italic">Belum Tanda
+                            Tangan</span>
                     </div>
                 </div>
 
                 <!-- Print Habit Report Action -->
                 <div class="mt-5 pt-4 border-t border-slate-800/80">
-                    <button onclick="printStudentHabitReport()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/25 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    <button onclick="printStudentHabitReport()"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/25 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+                            <rect x="6" y="14" width="12" height="8" />
+                        </svg>
                         Cetak Rekap Bulanan 7 Kebiasaan
                     </button>
                 </div>
@@ -693,11 +867,11 @@
             return new Promise((resolve) => {
                 const colorMap = {
                     emerald: { bg: 'rgba(16,185,129,0.9)', border: 'rgba(52,211,153,0.5)', hover: 'rgba(16,185,129,1)' },
-                    rose:    { bg: 'rgba(244,63,94,0.9)',   border: 'rgba(251,113,133,0.5)', hover: 'rgba(244,63,94,1)' },
-                    indigo:  { bg: 'rgba(99,102,241,0.9)',  border: 'rgba(129,140,248,0.5)', hover: 'rgba(99,102,241,1)' },
-                    amber:   { bg: 'rgba(245,158,11,0.9)',  border: 'rgba(252,211,77,0.5)',  hover: 'rgba(245,158,11,1)' },
-                    sky:     { bg: 'rgba(14,165,233,0.9)',  border: 'rgba(56,189,248,0.5)',  hover: 'rgba(14,165,233,1)' },
-                    purple:  { bg: 'rgba(168,85,247,0.9)',  border: 'rgba(192,132,252,0.5)', hover: 'rgba(168,85,247,1)' },
+                    rose: { bg: 'rgba(244,63,94,0.9)', border: 'rgba(251,113,133,0.5)', hover: 'rgba(244,63,94,1)' },
+                    indigo: { bg: 'rgba(99,102,241,0.9)', border: 'rgba(129,140,248,0.5)', hover: 'rgba(99,102,241,1)' },
+                    amber: { bg: 'rgba(245,158,11,0.9)', border: 'rgba(252,211,77,0.5)', hover: 'rgba(245,158,11,1)' },
+                    sky: { bg: 'rgba(14,165,233,0.9)', border: 'rgba(56,189,248,0.5)', hover: 'rgba(14,165,233,1)' },
+                    purple: { bg: 'rgba(168,85,247,0.9)', border: 'rgba(192,132,252,0.5)', hover: 'rgba(168,85,247,1)' },
                 };
                 const c = colorMap[accentColor] || colorMap.indigo;
 
@@ -790,26 +964,26 @@
                 logoutPiket();
             }
         }
-        
+
         function logoutPiket() {
             localStorage.removeItem('piket_session');
             localStorage.removeItem('staff_token');
             window.location.href = 'index.html';
         }
-        
+
         document.addEventListener('DOMContentLoaded', checkPiketSession);
-        
+
         // Sembunyikan form login jika diakses langsung, biarkan blank sampai checkPiketSession selesai
         document.addEventListener('DOMContentLoaded', () => {
-            if(!localStorage.getItem('piket_session')) {
+            if (!localStorage.getItem('piket_session')) {
                 document.body.style.display = 'none';
             }
         });
-</script>
-<script>
+    </script>
+    <script>
         const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
-        
+
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allStudents = [];
@@ -922,7 +1096,7 @@
                 const month = String(now.getMonth() + 1).padStart(2, '0');
                 const day = String(now.getDate()).padStart(2, '0');
                 const todayLocal = `${year}-${month}-${day}`;
-                
+
                 const startOfDay = new Date(`${todayLocal}T00:00:00+07:00`).toISOString();
                 const endOfDay = new Date(`${todayLocal}T23:59:59+07:00`).toISOString();
 
@@ -950,64 +1124,64 @@
                 // DENGARKAN REAL-TIME PRESENSI
                 if (!isRealtimeSubscribed) {
                     supabaseClient
-                    .channel('public:attendance_logs')
-                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attendance_logs' }, payload => {
-                        console.log('Absen baru terdeteksi:', payload.new);
-                        
-                        // Cek apakah log ini untuk hari ini
-                        const logDate = new Date(payload.new.created_at).toDateString();
-                        const todayDate = new Date().toDateString();
-                        
-                        if (logDate === todayDate) {
-                            // Cek apakah ada record lama untuk user ini di array hari ini
-                            const existingIndex = attendanceToday.findIndex(l => l.user_id === payload.new.user_id);
-                            if (existingIndex !== -1) {
-                                attendanceToday[existingIndex] = payload.new;
-                            } else {
-                                attendanceToday.push(payload.new);
+                        .channel('public:attendance_logs')
+                        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attendance_logs' }, payload => {
+                            console.log('Absen baru terdeteksi:', payload.new);
+
+                            // Cek apakah log ini untuk hari ini
+                            const logDate = new Date(payload.new.created_at).toDateString();
+                            const todayDate = new Date().toDateString();
+
+                            if (logDate === todayDate) {
+                                // Cek apakah ada record lama untuk user ini di array hari ini
+                                const existingIndex = attendanceToday.findIndex(l => l.user_id === payload.new.user_id);
+                                if (existingIndex !== -1) {
+                                    attendanceToday[existingIndex] = payload.new;
+                                } else {
+                                    attendanceToday.push(payload.new);
+                                }
+                                renderList();
                             }
-                            renderList();
-                        }
-                    })
-                    .subscribe();
+                        })
+                        .subscribe();
                     isRealtimeSubscribed = true;
                 }
 
                 // DENGARKAN REAL-TIME KEBIASAAN
                 if (!window.isHabitRealtimeSubscribed) {
                     supabaseClient
-                    .channel('public:habit_logs')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'habit_logs' }, payload => {
-                        console.log('Perubahan jurnal kebiasaan terdeteksi:', payload);
-                        
-                        // Cek apakah data ini untuk hari ini
-                        const logDate = payload.new ? payload.new.log_date : (payload.old ? payload.old.log_date : null);
-                        const getLocalDateString = (d) => {
-                            const year = d.getFullYear();
-                            const month = String(d.getMonth() + 1).padStart(2, '0');
-                            const day = String(d.getDate()).padStart(2, '0');
-                            return `${year}-${month}-${day}`;
-                        };
-                        const todayLocalStr = getLocalDateString(new Date());
-                        
-                        if (logDate === todayLocalStr) {
-                            if (payload.eventType === 'INSERT') {
-                                habitsToday.push(payload.new);
-                            } else if (payload.eventType === 'UPDATE') {
-                                const idx = habitsToday.findIndex(h => h.user_id === payload.new.user_id);
-                                if (idx !== -1) {
-                                    habitsToday[idx] = payload.new;
-                                } else {
+                        .channel('public:habit_logs')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'habit_logs' }, payload => {
+                            console.log('Perubahan jurnal kebiasaan terdeteksi:', payload);
+
+                            // Cek apakah data ini untuk hari ini
+                            const logDate = payload.new ? payload.new.log_date : (payload.old ? payload.old.log_date : null);
+                            const getLocalDateString = (d) => {
+                                const year = d.getFullYear();
+                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                const day = String(d.getDate()).padStart(2, '0');
+                                return `${year}-${month}-${day}`;
+                            };
+                            const todayLocalStr = getLocalDateString(new Date());
+
+                            if (logDate === todayLocalStr) {
+                                if (payload.eventType === 'INSERT') {
                                     habitsToday.push(payload.new);
+                                } else if (payload.eventType === 'UPDATE') {
+                                    const idx = habitsToday.findIndex(h => h.user_id === payload.new.user_id);
+                                    if (idx !== -1) {
+                                        habitsToday[idx] = payload.new;
+                                    } else {
+                                        habitsToday.push(payload.new);
+                                    }
+                                } else if (payload.eventType === 'DELETE') {
+                                    const idx = habitsToday.findIndex(h => h.user_id === payload.old.user_id);
+                                    if (idx !== -1) habitsToday.splice(idx, 1);
                                 }
-                            } else if (payload.eventType === 'DELETE') {
-                                const idx = habitsToday.findIndex(h => h.user_id === payload.old.user_id);
-                                if (idx !== -1) habitsToday.splice(idx, 1);
+                                renderList();
                             }
-                            renderList();
-                        }
-                    })
-                    .subscribe();
+                        })
+                        .subscribe();
                     window.isHabitRealtimeSubscribed = true;
                 }
 
@@ -1034,7 +1208,7 @@
                 const status = log ? log.status : '';
                 const hasDevice = s.device_id && s.device_id !== '';
                 const isIzin = log && log.device_id && log.device_id.startsWith('[IZIN]');
-                
+
                 // Hitung jumlah kebiasaan yang diselesaikan hari ini
                 const habit = habitsToday.find(h => h.user_id === s.id);
                 let completedHabits = 0;
@@ -1043,7 +1217,7 @@
                         if (habit[`habit_${i}`] && habit[`habit_${i}`].trim() !== '') completedHabits++;
                     }
                 }
-                
+
                 const statusStyles = {
                     'H': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-sm shadow-emerald-500/5',
                     'T': 'bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-sm shadow-amber-500/5',
@@ -1068,10 +1242,10 @@
                         <div class="flex-1 min-w-0 cursor-pointer" onclick="showStudentDetail('${s.id}', '${s.nama.replace(/'/g, "\\'")}', '${s.nis}')">
                             <div class="flex items-center gap-2 mb-1">
                                 <h3 class="font-bold text-base text-white truncate">${s.nama}</h3>
-                                ${completedHabits > 0 
-                                    ? `<span title="7 Kebiasaan: ${completedHabits}/7 Selesai" class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold flex items-center gap-0.5 drop-shadow-[0_0_6px_rgba(245,158,11,0.25)] select-none">⭐ ${completedHabits}/7</span>`
-                                    : `<span title="Belum mengisi jurnal kebiasaan" class="px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-500 border border-slate-700/60 text-[10px] font-semibold flex items-center gap-0.5 select-none">⭐ 0/7</span>`
-                                }
+                                ${completedHabits > 0
+                        ? `<span title="7 Kebiasaan: ${completedHabits}/7 Selesai" class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold flex items-center gap-0.5 drop-shadow-[0_0_6px_rgba(245,158,11,0.25)] select-none">⭐ ${completedHabits}/7</span>`
+                        : `<span title="Belum mengisi jurnal kebiasaan" class="px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-500 border border-slate-700/60 text-[10px] font-semibold flex items-center gap-0.5 select-none">⭐ 0/7</span>`
+                    }
                                 ${hasDevice ? `<span title="HP Terkunci" class="text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.4)]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg></span>` : ''}
                                 ${(log && log.latitude && log.longitude) ? `<a href="https://maps.google.com/?q=${log.latitude},${log.longitude}" target="_blank" title="Audit Lokasi GPS" class="text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.4)] hover:text-yellow-300 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg></a>` : ''}
                             </div>
@@ -1089,18 +1263,18 @@
 
                             <div class="h-6 w-px bg-slate-800 mx-1 hidden sm:block"></div>
 
-                            ${isPresent 
-                                ? `<span class="${statusStyles[status] || statusStyles['H']} border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                            ${isPresent
+                        ? `<span class="${statusStyles[status] || statusStyles['H']} border px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
                                     <span class="w-2.5 h-2.5 rounded-full bg-current"></span>
                                     ${statusName}
                                    </span>`
-                                : `
+                        : `
                                     <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'H')" class="bg-emerald-500/10 hover:bg-emerald-600 border border-emerald-500/25 text-emerald-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-emerald-500/15">H</button>
                                     <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'S')" class="bg-sky-500/10 hover:bg-sky-600 border border-sky-500/25 text-sky-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-sky-500/15">S</button>
                                     <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'I')" class="bg-indigo-500/10 hover:bg-indigo-600 border border-indigo-500/25 text-indigo-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-indigo-500/15">I</button>
                                     <button onclick="absenManual('${s.id}', '${s.nama.replace(/'/g, "\\'")}', 'A')" class="bg-rose-500/10 hover:bg-rose-600 border border-rose-500/25 text-rose-400 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 hover:shadow-lg hover:shadow-rose-500/15">A</button>
                                   `
-                            }
+                    }
                         </div>
                     </div>
                 `;
@@ -1250,7 +1424,7 @@
                     .from('leave_requests')
                     .select('*', { count: 'exact', head: true })
                     .eq('status', 'PENDING');
-                
+
                 if (error) throw error;
                 const badge = document.getElementById('badge-izin');
                 if (count > 0) {
@@ -1306,7 +1480,7 @@
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                
+
                 if (data) {
                     const badge = document.getElementById('badge-izin');
                     if (data.length > 0) {
@@ -1328,23 +1502,23 @@
                     .from('students')
                     .select('id, nama, kelas')
                     .in('id', userIds);
-                
+
                 const studentMap = {};
                 if (students) students.forEach(s => studentMap[s.id] = s);
 
                 container.innerHTML = data.map(req => {
-                    const date = new Date(req.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    const date = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                     const student = studentMap[req.user_id] || { nama: req.user_id, kelas: '?' };
                     console.log('[PIKET] Leave request:', req.id, 'attachment_url:', req.attachment_url);
-                    const fileLink = req.attachment_url 
+                    const fileLink = req.attachment_url
                         ? `<div class="mt-3 space-y-2">
                             <a href="${req.attachment_url}" target="_blank" class="block">
                                 <img src="${req.attachment_url}" alt="Lampiran" class="w-full max-h-40 object-cover rounded-lg border border-slate-600/50 hover:border-indigo-500/50 transition-all cursor-pointer" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div style="display:none" class="items-center gap-1 text-indigo-400 text-xs mt-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran</div>
                             </a>
-                           </div>` 
+                           </div>`
                         : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada lampiran</span>`;
-                        
+
                     return `
                     <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-indigo-500/30 transition-all" id="req-${req.id}">
                         <div>
@@ -1388,7 +1562,7 @@
                     .from('leave_requests')
                     .update({ status: 'APPROVED' })
                     .eq('id', reqId);
-                
+
                 if (errUpdate) throw errUpdate;
 
                 const statusChar = (type === 'Sakit') ? 'S' : 'I';
@@ -1404,12 +1578,12 @@
                 });
 
                 if (errRpc) throw errRpc;
-                
+
                 showAlert('Berhasil menyetujui izin!', 'success');
-                
+
                 loadLeaveRequests();
                 checkPendingLeaveBadge();
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 showAlert('Terjadi kesalahan: ' + e.message, 'error');
                 if (e.message && (e.message.includes('Tidak diizinkan') || e.message.includes('sesi staf'))) {
@@ -1430,14 +1604,14 @@
                     .from('leave_requests')
                     .update({ status: 'REJECTED' })
                     .eq('id', reqId);
-                
+
                 if (errUpdate) throw errUpdate;
-                
+
                 showAlert('Izin berhasil ditolak.', 'info');
-                
+
                 loadLeaveRequests();
                 checkPendingLeaveBadge();
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 showAlert('Terjadi kesalahan: ' + e.message, 'error');
             }
@@ -1447,7 +1621,7 @@
 
         function subscribeBullyingRealtime() {
             if (isBullyingRealtimeSubscribed || !supabaseClient) return;
-            
+
             try {
                 supabaseClient
                     .channel('public:bullying_reports')
@@ -1469,7 +1643,7 @@
                         }
                     })
                     .subscribe();
-                    
+
                 isBullyingRealtimeSubscribed = true;
             } catch (err) {
                 console.error("Gagal inisialisasi realtime bullying:", err);
@@ -1480,7 +1654,7 @@
 
         function subscribeLeaveRealtime() {
             if (isLeaveRealtimeSubscribed || !supabaseClient) return;
-            
+
             try {
                 supabaseClient
                     .channel('public:leave_requests_piket')
@@ -1489,7 +1663,7 @@
                         if (document.getElementById('content-izin') && !document.getElementById('content-izin').classList.contains('hidden')) {
                             loadLeaveRequests();
                         }
-                        
+
                         // Kirim notifikasi jika ada izin baru masuk
                         if (payload.eventType === 'INSERT' && payload.new.status === 'PENDING') {
                             const req = payload.new;
@@ -1608,14 +1782,14 @@
 
                 container.innerHTML = data.map(req => {
                     const date = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-                    const fileLink = req.attachment_url 
-                        ? `<a href="${req.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Aduan</a>` 
+                    const fileLink = req.attachment_url
+                        ? `<a href="${req.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Aduan</a>`
                         : '';
-                    
+
                     let statusLabel = 'Pending';
                     let statusCss = 'bg-red-500/20 text-red-400 border-red-500/30';
                     let actionButtons = '';
-                    
+
                     if (req.status === 'PENDING') {
                         statusLabel = 'Pending';
                         statusCss = 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -1634,12 +1808,12 @@
                         statusCss = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
                         actionButtons = `<span class="w-full text-center py-2 text-slate-400 text-xs font-semibold">Telah ditangani oleh Guru Piket</span>`;
                     }
-                    
+
                     const isAnon = req.reporter_name_display === 'Anonim';
-                    const reporterInfoHtml = isAnon 
-                        ? `<span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 uppercase tracking-wider">Laporan Anonim</span>` 
+                    const reporterInfoHtml = isAnon
+                        ? `<span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 uppercase tracking-wider">Laporan Anonim</span>`
                         : `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 uppercase tracking-wider">Pelapor: ${req.reporter_name_display}</span>`;
-                        
+
                     return `
                     <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-purple-500/30 transition-all">
                          <div>
@@ -1686,7 +1860,7 @@
                 'Ya, Ubah', 'Batal', color
             );
             if (!ok) return;
-            
+
             try {
                 const token = localStorage.getItem('staff_token');
                 if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
@@ -1699,7 +1873,7 @@
                 if (error) throw error;
 
                 showAlert('Status aduan berhasil diperbarui!', 'success');
-                
+
                 loadBullyingReports();
                 checkPendingBullyingBadge();
             } catch (e) {
@@ -1803,8 +1977,8 @@
 
                 container.innerHTML = data.map(t => {
                     const isMyTask = (t.assigned_piket || '').toLowerCase() === (window.currentPiketName || '').toLowerCase();
-                    const dateFormatted = new Date(t.task_date).toLocaleDateString('id-ID', {day:'numeric', month:'short'});
-                    
+                    const dateFormatted = new Date(t.task_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
                     const fileLink = t.attachment_url
                         ? `<a href="${t.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Unduh Berkas Tugas</a>`
                         : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada berkas</span>`;
@@ -1825,8 +1999,8 @@
                         actions = `<span class="text-xs text-emerald-400 font-bold block text-center w-full py-2 bg-emerald-500/5 rounded-xl border border-emerald-500/10">Tugas Selesai Disalurkan</span>`;
                     }
 
-                    const cardBorder = isMyTask 
-                        ? 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-purple-950/10' 
+                    const cardBorder = isMyTask
+                        ? 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-purple-950/10'
                         : 'border-slate-700/50';
 
                     return `
@@ -1908,7 +2082,7 @@
         function playNotificationSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
+
                 // Sound chime note 1
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
@@ -2052,7 +2226,7 @@
                         const task = payload.new;
                         const currentPiket = (window.currentPiketName || '').toLowerCase();
                         const assignedPiket = (task.assigned_piket || '').toLowerCase();
-                        
+
                         if (currentPiket === assignedPiket) {
                             showPiketNotification(
                                 'Tugas Titipan Baru! 📋',
@@ -2084,7 +2258,7 @@
             const moodEmojiEl = document.getElementById('detail-mood-emoji');
             const moodStatusEl = document.getElementById('detail-mood-status');
             const moodDescEl = document.querySelector('#detail-mood-card p.text-\\[10px\\]');
-            
+
             const moods = {
                 'senang': { emoji: '😊', label: 'Senang', desc: 'Alhamdulillah, siswa merasa gembira dan berenergi hari ini!' },
                 'biasa': { emoji: '😐', label: 'Biasa', desc: 'Perasaan siswa stabil dan biasa saja hari ini.' },
@@ -2198,4 +2372,5 @@
         document.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
+
 </html>

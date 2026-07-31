@@ -1,0 +1,297 @@
+# PANDUAN LENGKAP MEMBUAT APLIKASI ANDROID THHK CONNECT GUNAKAN FLUTTER
+
+Tentu saja! Menggunakan **Flutter** jauh lebih mudah dibandingkan Kotlin native karena Flutter memiliki paket `flutter_inappwebview` yang **secara otomatis menangani GPS / Geolocation HTML5, Kamera, Galeri, dan Bottom Navigation** tanpa perlu konfigurasi rumit.
+
+---
+
+## 🚀 LANGKAH-LANGKAH MEMBUAT PROJECT FLUTTER
+
+### Step 1: Buat Project Flutter Baru
+Buka terminal / Command Prompt / VS Code / Android Studio, lalu jalankan:
+```bash
+flutter create thhk_connect
+cd thhk_connect
+```
+
+---
+
+### Step 2: Tambahkan Dependencies (`pubspec.yaml`)
+Buka file `pubspec.yaml` di project Flutter Anda, tambahkan package berikut di bawah `dependencies:`:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_inappwebview: ^6.0.0
+  permission_handler: ^11.3.1
+  cupertino_icons: ^1.0.6
+```
+
+Jalankan perintah ini di terminal:
+```bash
+flutter pub get
+```
+
+---
+
+### Step 3: Konfigurasi Izin Android (`android/app/src/main/AndroidManifest.xml`)
+Buka file `android/app/src/main/AndroidManifest.xml`, tambahkan izin berikut tepat di atas tag `<application>`:
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Izin Internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <!-- Izin Akses GPS / Lokasi -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    
+    <!-- Izin Kamera & Galeri -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+    <application
+        android:label="THHK Connect"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true">
+        ...
+```
+
+Di file `android/app/build.gradle` (atau `build.gradle.kts`), pastikan `minSdkVersion` minimal **21**:
+```groovy
+defaultConfig {
+    minSdkVersion 21
+    targetSdkVersion 34
+}
+```
+
+---
+
+### Step 4: Kode Utama (`lib/main.dart`)
+Ganti seluruh isi file `lib/main.dart` dengan kode lengkap di bawah ini:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Minta izin lokasi dan kamera saat awal aplikasi dibuka
+  await [
+    Permission.location,
+    Permission.camera,
+    Permission.storage,
+  ].request();
+
+  runApp(const THHKConnectApp());
+}
+
+class THHKConnectApp extends StatelessWidget {
+  const THHKConnectApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'THHK Connect',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF0F172A),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  InAppWebViewController? webViewController;
+  double _progress = 0;
+  int _selectedIndex = 0;
+
+  final String baseUrl = "https://thhkconnect.vercel.app/";
+
+  // Opsi Webview Lengkap dengan Dukungan GPS & Kamera
+  final InAppWebViewSettings settings = InAppWebViewSettings(
+    isInspectable: true,
+    javaScriptEnabled: true,
+    domStorageEnabled: true,
+    databaseEnabled: true,
+    geolocationEnabled: true, // AKTIFKAN GPS HTML5
+    allowFileAccessFromFileURLs: true,
+    allowUniversalAccessFromFileURLs: true,
+    useOnDownloadStart: true,
+    useHybridComposition: true,
+    supportZoom: false,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        if (webViewController != null && await webViewController!.canGoBack()) {
+          webViewController!.goBack();
+        } else {
+          // Tutup aplikasi jika sudah di halaman paling awal
+          final shouldPop = await _showExitDialog(context);
+          if (shouldPop && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Progress Bar Loading
+              if (_progress < 1.0)
+                LinearProgressIndicator(
+                  value: _progress,
+                  color: Colors.amber,
+                  backgroundColor: Colors.transparent,
+                  minHeight: 3,
+                ),
+              
+              // Halaman WebView
+              Expanded(
+                child: InAppWebView(
+                  initialUrlRequest: URLRequest(url: WebUri(baseUrl)),
+                  initialSettings: settings,
+                  onWebViewCreated: (controller) {
+                    webViewController = controller;
+                  },
+                  onProgressChanged: (controller, progress) {
+                    setState(() {
+                      _progress = progress / 100;
+                    });
+                  },
+                  // Mengizinkan Akses GPS HTML5 secara otomatis
+                  onGeolocationPermissionsShowPrompt: (controller, origin) async {
+                    var status = await Permission.location.status;
+                    if (!status.isGranted) {
+                      await Permission.location.request();
+                    }
+                    return GeolocationPermissionShowPromptResponse(
+                      origin: origin,
+                      allow: true,
+                      retain: true,
+                    );
+                  },
+                  // Mengizinkan Akses Kamera/Galeri untuk upload foto
+                  onPermissionRequest: (controller, request) async {
+                    return PermissionResponse(
+                      resources: request.resources,
+                      action: PermissionResponseAction.GRANT,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Bottom Navigation Bar Modern
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.white10, width: 0.5),
+            ),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            backgroundColor: const Color(0xFF0F172A),
+            selectedItemColor: Colors.amber,
+            unselectedItemColor: Colors.grey,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+
+              if (webViewController != null) {
+                switch (index) {
+                  case 0:
+                    webViewController!.loadUrl(
+                      urlRequest: URLRequest(url: WebUri(baseUrl)),
+                    );
+                    break;
+                  case 1:
+                    webViewController!.loadUrl(
+                      urlRequest: URLRequest(url: WebUri("$baseUrl#attendance")),
+                    );
+                    break;
+                  case 2:
+                    webViewController!.loadUrl(
+                      urlRequest: URLRequest(url: WebUri("$baseUrl#profile")),
+                    );
+                    break;
+                }
+              }
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                label: 'Beranda',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.how_to_reg_rounded),
+                label: 'Absensi',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_rounded),
+                label: 'Profil',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _showExitDialog(BuildContext context) async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Keluar Aplikasi?'),
+            content: const Text('Apakah Anda yakin ingin keluar dari THHK Connect?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Keluar'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+}
+```
+
+---
+
+## 🔥 KEUNGGULAN VERSI FLUTTER INI:
+
+1. **GPS Otomatis**: `onGeolocationPermissionsShowPrompt` sudah dikonfigurasi langsung di `InAppWebView`, sehingga HTML5 `navigator.geolocation` langsung dapat membaca lokasi GPS tanpa kendala "Mencari GPS...".
+2. **Support Upload Kamera & Galeri**: Pengunggahan foto surat izin/sakit langsung terhubung ke kamera/galeri HP secara otomatis.
+3. **Cross Platform**: Selain Android APK, project Flutter ini dapat langsung di-build ke iOS (iPhone) jika dibutuhkan nanti.
+4. **Bottom Navigation & Interaksi Smooth**: Navigasi bawah terasa native dengan tema dark mode yang cocok dengan tampilan THHK Connect.

@@ -72,7 +72,7 @@ INSERT INTO public.students (nis, nama, kelas) VALUES
 ('08-001', 'Cathleen Hava Eliora.S', '8'),
 ('08-002', 'Chrisna Monica Onggowarsito', '8'),
 ('08-003', 'Eleanore Kimberly Wong', '8'),
-('08-004', 'Engracia Sarah Chrisyabelle.S', '8'),
+('08-004', 'Engracia Sarah Christabelle.S', '8'),
 ('08-005', 'Jasson Alvaro Gunarto', '8'),
 ('08-006', 'Jennifer Aurelia Febriana', '8'),
 ('08-007', 'Keane William Gunawan', '8'),

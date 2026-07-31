@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Waka Kurikulum - Kelola Tugas Titipan</title>
-    
+
     <!-- Session Check for Admin Adin -->
     <script>
         const session = localStorage.getItem('piket_session');
@@ -12,10 +14,11 @@
             window.location.href = 'index.html';
         }
     </script>
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
@@ -69,10 +72,19 @@
         }
 
         /* === RESET & BASE === */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        html, body {
-            height: 100%; width: 100%; overflow-x: hidden;
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         body {
@@ -89,7 +101,10 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background:
                 radial-gradient(ellipse 70% 50% at 15% 10%, var(--mesh-1) 0%, transparent 60%),
                 radial-gradient(ellipse 50% 40% at 85% 90%, var(--mesh-2) 0%, transparent 60%);
@@ -97,13 +112,35 @@
             z-index: 0;
         }
 
-        button { background: transparent; border: none; outline: none; padding: 0; margin: 0; font-family: inherit; cursor: pointer; color: inherit; }
+        button {
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            font-family: inherit;
+            cursor: pointer;
+            color: inherit;
+        }
 
         /* === SCROLLBAR === */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
 
         /* === HEADER === */
         .app-header {
@@ -115,6 +152,7 @@
             top: 0;
             z-index: 40;
         }
+
         .header-inner {
             max-width: 1200px;
             margin: 0 auto;
@@ -124,13 +162,16 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .header-brand {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
+
         .brand-icon {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             background: var(--brand-icon);
             border-radius: 10px;
             display: flex;
@@ -138,13 +179,20 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
         }
-        .brand-icon svg { width: 20px; height: 20px; color: white; }
+
+        .brand-icon svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+        }
+
         .brand-text h1 {
             font-size: 0.95rem;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
         }
+
         .brand-text p {
             font-size: 0.6rem;
             color: var(--accent);
@@ -152,11 +200,13 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
+
         .header-actions {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -171,11 +221,24 @@
             transition: all 0.2s;
             text-decoration: none;
         }
-        .btn-back:hover { background: var(--accent-light); color: var(--text-primary); }
-        .btn-back:active { transform: scale(0.96); }
-        .btn-back svg { width: 14px; height: 14px; }
+
+        .btn-back:hover {
+            background: var(--accent-light);
+            color: var(--text-primary);
+        }
+
+        .btn-back:active {
+            transform: scale(0.96);
+        }
+
+        .btn-back svg {
+            width: 14px;
+            height: 14px;
+        }
+
         .avatar-circle {
-            width: 34px; height: 34px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -183,7 +246,12 @@
             align-items: center;
             justify-content: center;
         }
-        .avatar-circle svg { width: 16px; height: 16px; color: var(--accent); }
+
+        .avatar-circle svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent);
+        }
 
         /* === MAIN LAYOUT === */
         .main-content {
@@ -203,24 +271,39 @@
             gap: 0.75rem;
             margin-bottom: 1.25rem;
         }
+
         .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 0.875rem;
             padding: 0.875rem 1rem;
             text-align: center;
             transition: all 0.25s;
         }
-        .stat-card:hover { background: rgba(255,255,255,0.05); }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         .stat-number {
             font-size: 1.5rem;
             font-weight: 800;
             line-height: 1;
             margin-bottom: 0.25rem;
         }
-        .stat-number.pending { color: #fbbf24; }
-        .stat-number.active { color: #60a5fa; }
-        .stat-number.done { color: #34d399; }
+
+        .stat-number.pending {
+            color: #fbbf24;
+        }
+
+        .stat-number.active {
+            color: #60a5fa;
+        }
+
+        .stat-number.done {
+            color: #34d399;
+        }
+
         .stat-label {
             font-size: 0.65rem;
             font-weight: 600;
@@ -236,6 +319,7 @@
             justify-content: space-between;
             margin-bottom: 1rem;
         }
+
         .section-title {
             font-size: 0.9rem;
             font-weight: 700;
@@ -244,8 +328,10 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .section-title .icon {
-            width: 28px; height: 28px;
+            width: 28px;
+            height: 28px;
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid rgba(99, 102, 241, 0.15);
             border-radius: 0.5rem;
@@ -253,22 +339,32 @@
             align-items: center;
             justify-content: center;
         }
-        .section-title .icon svg { width: 15px; height: 15px; color: #818cf8; }
+
+        .section-title .icon svg {
+            width: 15px;
+            height: 15px;
+            color: #818cf8;
+        }
 
         /* === FORM PANEL === */
         .form-panel {
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 1rem;
             padding: 1.25rem;
             margin-bottom: 1.5rem;
         }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.875rem;
         }
-        .form-full { grid-column: 1 / -1; }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
         .form-group label {
             display: block;
             font-size: 0.7rem;
@@ -278,6 +374,7 @@
             letter-spacing: 0.05em;
             margin-bottom: 0.4rem;
         }
+
         .form-input {
             width: 100%;
             padding: 0.625rem 0.875rem;
@@ -285,18 +382,23 @@
             font-weight: 500;
             color: #e2e8f0;
             background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 0.625rem;
             outline: none;
             transition: all 0.2s;
             font-family: inherit;
         }
-        .form-input::placeholder { color: #475569; }
+
+        .form-input::placeholder {
+            color: #475569;
+        }
+
         .form-input:focus {
             border-color: rgba(99, 102, 241, 0.4);
             background: rgba(15, 23, 42, 0.8);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
         }
+
         select.form-input {
             cursor: pointer;
             appearance: none;
@@ -305,8 +407,17 @@
             background-position: right 0.75rem center;
             padding-right: 2rem;
         }
-        select.form-input option { background: #1e293b; color: #e2e8f0; }
-        textarea.form-input { resize: none; line-height: 1.5; }
+
+        select.form-input option {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        textarea.form-input {
+            resize: none;
+            line-height: 1.5;
+        }
+
         .form-hint {
             font-size: 0.65rem;
             color: #475569;
@@ -322,7 +433,7 @@
             justify-content: space-between;
             padding: 0.625rem 0.875rem;
             background: rgba(15, 23, 42, 0.4);
-            border: 1px dashed rgba(255,255,255,0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
             border-radius: 0.625rem;
             cursor: pointer;
             transition: all 0.2s;
@@ -330,12 +441,18 @@
             font-weight: 500;
             color: #64748b;
         }
+
         .file-upload-area:hover {
             border-color: rgba(99, 102, 241, 0.3);
             background: rgba(99, 102, 241, 0.03);
             color: #a5b4fc;
         }
-        .file-upload-area svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        .file-upload-area svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
 
         /* Submit button */
         .btn-submit {
@@ -355,10 +472,27 @@
             gap: 0.5rem;
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
         }
-        .btn-submit:hover { box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35); transform: translateY(-1px); }
-        .btn-submit:active { transform: scale(0.98) translateY(0); }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .btn-submit svg { width: 16px; height: 16px; }
+
+        .btn-submit:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98) translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit svg {
+            width: 16px;
+            height: 16px;
+        }
+
         .upload-indicator {
             font-size: 0.65rem;
             color: #818cf8;
@@ -366,7 +500,11 @@
             font-weight: 600;
             display: none;
         }
-        .upload-indicator.active { display: block; animation: pulse 1.5s ease-in-out infinite; }
+
+        .upload-indicator.active {
+            display: block;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
 
         /* === FILTERS === */
         .filters-bar {
@@ -375,20 +513,25 @@
             gap: 0.5rem;
             flex-wrap: wrap;
         }
+
         .filter-input {
             padding: 0.45rem 0.7rem;
             font-size: 0.75rem;
             font-weight: 600;
             color: #cbd5e1;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 0.5rem;
             outline: none;
             font-family: inherit;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .filter-input:focus { border-color: rgba(99, 102, 241, 0.3); }
+
+        .filter-input:focus {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
         select.filter-input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M2.5 3.75L5 6.25L7.5 3.75' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -396,21 +539,37 @@
             background-position: right 0.5rem center;
             padding-right: 1.5rem;
         }
-        select.filter-input option { background: #1e293b; }
+
+        select.filter-input option {
+            background: #1e293b;
+        }
+
         .btn-refresh {
-            width: 32px; height: 32px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 0.5rem;
             color: #64748b;
             transition: all 0.2s;
         }
-        .btn-refresh:hover { color: white; background: rgba(255,255,255,0.08); }
-        .btn-refresh:active { transform: scale(0.92); }
-        .btn-refresh svg { width: 14px; height: 14px; }
+
+        .btn-refresh:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-refresh:active {
+            transform: scale(0.92);
+        }
+
+        .btn-refresh svg {
+            width: 14px;
+            height: 14px;
+        }
 
         /* === TASK CARDS === */
         .task-list {
@@ -418,15 +577,20 @@
             flex-direction: column;
             gap: 0.625rem;
         }
+
         .task-card {
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 0.875rem;
             padding: 1rem 1.125rem;
             transition: all 0.25s;
             animation: fadeSlideIn 0.35s ease-out both;
         }
-        .task-card:hover { background: rgba(255,255,255,0.04); }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
         .task-card-top {
             display: flex;
             align-items: flex-start;
@@ -434,16 +598,19 @@
             gap: 0.75rem;
             margin-bottom: 0.625rem;
         }
+
         .task-meta {
             flex: 1;
             min-width: 0;
         }
+
         .task-teacher {
             font-size: 0.875rem;
             font-weight: 700;
             color: white;
             line-height: 1.3;
         }
+
         .task-subject-line {
             display: flex;
             align-items: center;
@@ -451,6 +618,7 @@
             margin-top: 0.2rem;
             flex-wrap: wrap;
         }
+
         .task-badge {
             display: inline-flex;
             align-items: center;
@@ -460,16 +628,19 @@
             border-radius: 1rem;
             white-space: nowrap;
         }
+
         .badge-class {
             background: rgba(99, 102, 241, 0.1);
             color: #a5b4fc;
             border: 1px solid rgba(99, 102, 241, 0.15);
         }
+
         .badge-subject {
             background: rgba(236, 72, 153, 0.08);
             color: #f9a8d4;
             border: 1px solid rgba(236, 72, 153, 0.12);
         }
+
         .task-description {
             font-size: 0.8rem;
             color: #94a3b8;
@@ -480,18 +651,21 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
         .task-card-bottom {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 0.5rem;
         }
+
         .task-info-row {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             flex-wrap: wrap;
         }
+
         .task-info-item {
             display: flex;
             align-items: center;
@@ -500,14 +674,24 @@
             color: #64748b;
             font-weight: 500;
         }
-        .task-info-item svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+        .task-info-item svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+        }
+
         .task-info-item a {
             color: #818cf8;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
         }
-        .task-info-item a:hover { color: #a5b4fc; }
+
+        .task-info-item a:hover {
+            color: #a5b4fc;
+        }
+
         .task-actions {
             display: flex;
             align-items: center;
@@ -526,28 +710,42 @@
             border-radius: 1rem;
             white-space: nowrap;
         }
+
         .status-dot {
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
         }
+
         .status-pending {
             background: rgba(251, 191, 36, 0.08);
             color: #fbbf24;
             border: 1px solid rgba(251, 191, 36, 0.15);
         }
-        .status-pending .status-dot { background: #fbbf24; }
+
+        .status-pending .status-dot {
+            background: #fbbf24;
+        }
+
         .status-distributed {
             background: rgba(96, 165, 250, 0.08);
             color: #60a5fa;
             border: 1px solid rgba(96, 165, 250, 0.15);
         }
-        .status-distributed .status-dot { background: #60a5fa; }
+
+        .status-distributed .status-dot {
+            background: #60a5fa;
+        }
+
         .status-done {
             background: rgba(52, 211, 153, 0.08);
             color: #34d399;
             border: 1px solid rgba(52, 211, 153, 0.15);
         }
-        .status-done .status-dot { background: #34d399; }
+
+        .status-done .status-dot {
+            background: #34d399;
+        }
 
         /* Action buttons */
         .btn-action {
@@ -560,22 +758,39 @@
             border-radius: 0.4rem;
             transition: all 0.2s;
         }
-        .btn-action:active { transform: scale(0.94); }
-        .btn-action svg { width: 12px; height: 12px; }
+
+        .btn-action:active {
+            transform: scale(0.94);
+        }
+
+        .btn-action svg {
+            width: 12px;
+            height: 12px;
+        }
+
         .btn-distribute {
             background: rgba(251, 191, 36, 0.1);
             color: #fbbf24;
             border: 1px solid rgba(251, 191, 36, 0.2);
         }
-        .btn-distribute:hover { background: rgba(251, 191, 36, 0.2); }
+
+        .btn-distribute:hover {
+            background: rgba(251, 191, 36, 0.2);
+        }
+
         .btn-complete {
             background: rgba(52, 211, 153, 0.1);
             color: #34d399;
             border: 1px solid rgba(52, 211, 153, 0.2);
         }
-        .btn-complete:hover { background: rgba(52, 211, 153, 0.2); }
+
+        .btn-complete:hover {
+            background: rgba(52, 211, 153, 0.2);
+        }
+
         .btn-delete {
-            width: 28px; height: 28px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -584,29 +799,42 @@
             border: 1px solid transparent;
             transition: all 0.2s;
         }
+
         .btn-delete:hover {
             color: #f87171;
             background: rgba(248, 113, 113, 0.08);
             border-color: rgba(248, 113, 113, 0.15);
         }
-        .btn-delete svg { width: 14px; height: 14px; }
+
+        .btn-delete svg {
+            width: 14px;
+            height: 14px;
+        }
 
         /* === EMPTY STATE === */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
         }
+
         .empty-icon {
-            width: 48px; height: 48px;
+            width: 48px;
+            height: 48px;
             margin: 0 auto 0.75rem;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .empty-icon svg { width: 22px; height: 22px; color: #334155; }
+
+        .empty-icon svg {
+            width: 22px;
+            height: 22px;
+            color: #334155;
+        }
+
         .empty-text {
             font-size: 0.825rem;
             font-weight: 500;
@@ -618,9 +846,11 @@
             text-align: center;
             padding: 3rem 1rem;
         }
+
         .spinner {
-            width: 24px; height: 24px;
-            border: 2.5px solid rgba(255,255,255,0.06);
+            width: 24px;
+            height: 24px;
+            border: 2.5px solid rgba(255, 255, 255, 0.06);
             border-left-color: #6366f1;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -635,6 +865,7 @@
             z-index: 100;
             pointer-events: none;
         }
+
         .toast {
             pointer-events: all;
             display: flex;
@@ -648,12 +879,29 @@
             opacity: 0;
             transform: translateY(-12px) scale(0.96);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
         }
-        .toast.visible { opacity: 1; transform: translateY(0) scale(1); }
-        .toast.success { background: #059669; border: 1px solid rgba(255,255,255,0.1); }
-        .toast.error { background: #dc2626; border: 1px solid rgba(255,255,255,0.1); }
-        .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toast.success {
+            background: #059669;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast.error {
+            background: #dc2626;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
 
         /* === FAB (Mobile Form Toggle) === */
         .fab {
@@ -662,7 +910,8 @@
             bottom: 1.5rem;
             right: 1.5rem;
             z-index: 50;
-            width: 52px; height: 52px;
+            width: 52px;
+            height: 52px;
             background: linear-gradient(135deg, #6366f1, #7c3aed);
             border-radius: 50%;
             align-items: center;
@@ -670,9 +919,21 @@
             box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
             transition: all 0.25s;
         }
-        .fab:hover { transform: scale(1.05); box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5); }
-        .fab:active { transform: scale(0.95); }
-        .fab svg { width: 22px; height: 22px; color: white; }
+
+        .fab:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
 
         /* === MOBILE FORM OVERLAY === */
         .form-overlay {
@@ -680,11 +941,17 @@
             position: fixed;
             inset: 0;
             z-index: 60;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
-        .form-overlay.active { display: flex; align-items: flex-end; justify-content: center; }
+
+        .form-overlay.active {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
         .form-sheet {
             width: 100%;
             max-width: 480px;
@@ -693,14 +960,16 @@
             background: #111827;
             border-top-left-radius: 1.25rem;
             border-top-right-radius: 1.25rem;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-bottom: none;
             padding: 1.25rem;
             animation: sheetUp 0.35s ease-out;
         }
+
         .form-sheet-handle {
-            width: 36px; height: 4px;
-            background: rgba(255,255,255,0.15);
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
             margin: 0 auto 1rem;
         }
@@ -711,34 +980,81 @@
             grid-template-columns: 1fr;
             gap: 1.5rem;
         }
+
         @media (min-width: 1024px) {
             .layout-grid {
                 grid-template-columns: 380px 1fr;
             }
-            .form-panel-desktop { display: block; }
-            .fab { display: none !important; }
+
+            .form-panel-desktop {
+                display: block;
+            }
+
+            .fab {
+                display: none !important;
+            }
         }
+
         @media (max-width: 1023px) {
-            .form-panel-desktop { display: none; }
-            .fab { display: flex; }
+            .form-panel-desktop {
+                display: none;
+            }
+
+            .fab {
+                display: flex;
+            }
         }
 
         /* === ANIMATIONS === */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @keyframes sheetUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
         }
 
         /* Responsive stat cards */
         @media (max-width: 380px) {
-            .stat-number { font-size: 1.25rem; }
-            .stat-label { font-size: 0.6rem; }
+            .stat-number {
+                font-size: 1.25rem;
+            }
+
+            .stat-label {
+                font-size: 0.6rem;
+            }
         }
 
         /* Completion text for done */
@@ -756,15 +1072,37 @@
            White text on solid/gradient surfaces (.btn-submit, .fab svg,
            .brand-icon svg, .toast) is intentionally NOT touched.
            ============================================================ */
-        [data-theme="light"] .section-title { color: var(--text-primary); }
-        [data-theme="light"] .task-teacher { color: var(--text-primary); }
-        [data-theme="light"] .btn-refresh:hover { color: var(--text-primary); }
-        [data-theme="light"] .upload-indicator { color: #4f46e5; }
-        [data-theme="light"] .task-info-item a { color: #4f46e5; }
-        [data-theme="light"] .task-info-item a:hover { color: #4338ca; }
-        [data-theme="light"] select.filter-input option { background: var(--bg-secondary); color: var(--text-primary); }
+        [data-theme="light"] .section-title {
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .task-teacher {
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .btn-refresh:hover {
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .upload-indicator {
+            color: #4f46e5;
+        }
+
+        [data-theme="light"] .task-info-item a {
+            color: #4f46e5;
+        }
+
+        [data-theme="light"] .task-info-item a:hover {
+            color: #4338ca;
+        }
+
+        [data-theme="light"] select.filter-input option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
     </style>
 </head>
+
 <body>
 
     <!-- TOAST -->
@@ -781,7 +1119,9 @@
             <div class="header-brand">
                 <div class="brand-icon">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
                     </svg>
                 </div>
                 <div class="brand-text">
@@ -790,19 +1130,32 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all" style="background: var(--accent-light); border: 1px solid var(--glass-border);" title="Ganti Tema">
-                    <svg id="theme-icon-sun" class="w-4 h-4 hidden" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <svg id="theme-icon-moon" class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg transition-all"
+                    style="background: var(--accent-light); border: 1px solid var(--glass-border);" title="Ganti Tema">
+                    <svg id="theme-icon-sun" class="w-4 h-4 hidden" style="color: var(--accent);" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg id="theme-icon-moon" class="w-4 h-4" style="color: var(--accent);" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
                 </button>
                 <a href="index.html" class="btn-back">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                     Kembali
                 </a>
                 <div class="avatar-circle">
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clip-rule="evenodd"></path>
                     </svg>
                 </div>
             </div>
@@ -837,7 +1190,8 @@
                     <div class="section-title">
                         <div class="icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
                         Buat Tugas Baru
@@ -854,7 +1208,9 @@
                     <div class="section-title">
                         <div class="icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
                             </svg>
                         </div>
                         Daftar Tugas
@@ -869,7 +1225,9 @@
                         </select>
                         <button onclick="fetchTasks()" class="btn-refresh" title="Refresh">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
                             </svg>
                         </button>
                     </div>
@@ -901,7 +1259,8 @@
             <div class="section-title" style="margin-bottom: 1rem;">
                 <div class="icon">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
                 Buat Tugas Baru
@@ -922,7 +1281,7 @@
         // Token upload ke Cloudflare Worker. HARUS sama persis dengan Secret
         // UPLOAD_TOKEN yang di-set di Cloudflare (Worker thhk-storage > Settings > Variables).
         const UPLOAD_TOKEN = 'e11a81b52fa2cf7b979189d525f7f53217022e289aeac77f';
-        
+
         let supabaseClient;
         if (window.supabase) {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1009,11 +1368,11 @@
             // Set default dates
             const today = new Date();
             const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            
+
             document.getElementById('dk-task-date').value = dateStr;
             document.getElementById('mb-task-date').value = dateStr;
             document.getElementById('filter-date').value = dateStr;
-            
+
             fetchTasks();
             setupRealtimeSubscription();
         });
@@ -1038,10 +1397,10 @@
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-message');
             const toastIcon = document.getElementById('toast-icon');
-            
+
             toastMsg.textContent = message;
             toast.className = `toast ${type}`;
-            
+
             if (type === 'success') {
                 toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
             } else {
@@ -1051,7 +1410,7 @@
             requestAnimationFrame(() => {
                 toast.classList.add('visible');
             });
-            
+
             setTimeout(() => {
                 toast.classList.remove('visible');
             }, 3000);
@@ -1069,14 +1428,14 @@
 
         async function uploadFile(prefix) {
             if (!selectedFile) return null;
-            
+
             const statusEl = document.getElementById(`${prefix}-upload-status`);
             statusEl.classList.add('active');
-            
+
             try {
                 const fileExt = selectedFile.name.split('.').pop() || 'jpg';
                 const fileName = `tugas_titipan_${Date.now()}.${fileExt}`;
-                
+
                 const workerUrl = 'https://thhk-storage.adin-refqi.workers.dev/upload?filename=' + fileName;
                 const response = await fetch(workerUrl, {
                     method: 'POST',
@@ -1086,12 +1445,12 @@
                         'X-Upload-Token': UPLOAD_TOKEN
                     }
                 });
-                
+
                 if (!response.ok) throw new Error('Gagal mengunggah berkas.');
-                
+
                 const data = await response.json();
                 if (!data.success) throw new Error(data.error || 'Gagal upload.');
-                
+
                 statusEl.classList.remove('active');
                 return data.url;
             } catch (err) {
@@ -1115,10 +1474,10 @@
                 let query = supabaseClient.from('delegated_tasks').select('*');
                 if (dateVal) query = query.eq('task_date', dateVal);
                 if (classVal) query = query.eq('class_name', classVal);
-                
+
                 const { data, error } = await query.order('created_at', { ascending: false });
                 if (error) throw error;
-                
+
                 allTasks = data || [];
                 updateStats(allTasks);
                 renderTaskCards(allTasks, container);
@@ -1140,7 +1499,7 @@
             const pending = tasks.filter(t => t.status === 'Belum Disalurkan').length;
             const distributed = tasks.filter(t => t.status === 'Disalurkan').length;
             const done = tasks.filter(t => t.status === 'Selesai').length;
-            
+
             document.getElementById('count-pending').textContent = pending;
             document.getElementById('count-distributed').textContent = distributed;
             document.getElementById('count-done').textContent = done;
@@ -1161,7 +1520,7 @@
 
             container.innerHTML = data.map((t, idx) => {
                 const formatedDate = new Date(t.task_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-                
+
                 // Status badge
                 const statusMap = {
                     'Belum Disalurkan': { cls: 'status-pending', label: 'Menunggu' },
@@ -1235,7 +1594,7 @@
 
         async function saveTask(event, prefix) {
             event.preventDefault();
-            
+
             const btnSubmit = document.getElementById(`${prefix}-btn-submit`);
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = `<div class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></div> Menyimpan...`;
@@ -1264,16 +1623,16 @@
                 document.getElementById(`form-${prefix}`).reset();
                 selectedFile = null;
                 document.getElementById(`${prefix}-file-label`).innerText = 'Pilih file (PDF/Foto)...';
-                
+
                 const today = new Date();
                 const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 document.getElementById(`${prefix}-task-date`).value = dateStr;
 
                 showToast('Tugas titipan berhasil disimpan!', 'success');
-                
+
                 // Close mobile form if open
                 if (prefix === 'mb') {
-                    closeMobileForm({target: document.getElementById('mobile-overlay'), currentTarget: document.getElementById('mobile-overlay')});
+                    closeMobileForm({ target: document.getElementById('mobile-overlay'), currentTarget: document.getElementById('mobile-overlay') });
                 }
 
                 fetchTasks();
@@ -1369,4 +1728,5 @@
         document.addEventListener('DOMContentLoaded', initTheme);
     </script>
 </body>
+
 </html>
