@@ -10,7 +10,7 @@
     <!-- Session Check for Admin Adin -->
     <script>
         const session = localStorage.getItem('piket_session');
-        if (!session || !['adin', 'morys'].includes(session.toLowerCase())) {
+        if (!session || !['adin', 'morys', 'wahyu'].includes(session.toLowerCase())) {
             window.location.href = 'index.html';
         }
     </script>
@@ -1345,6 +1345,7 @@
                             <option value="Yanuar">Pak Yanuar</option>
                             <option value="Adin">Pak Adin</option>
                             <option value="Erwin">Pak Erwin</option>
+                            <option value="Wahyu">Bu Sri Wahyuningsih (Kepala Sekolah)</option>
                         </select>
                     </div>
                     <div class="form-group form-full">

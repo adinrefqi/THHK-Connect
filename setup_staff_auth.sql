@@ -30,7 +30,9 @@ ALTER TABLE public.staff_credentials ENABLE ROW LEVEL SECURITY;
 -- ------------------------------------------------------------------------------
 INSERT INTO public.staff_credentials (role, password_hash) VALUES
     ('admin', crypt('admin11',   gen_salt('bf'))),
-    ('piket', crypt('admin54321', gen_salt('bf')))
+    ('piket', crypt('admin54321', gen_salt('bf'))),
+    ('wahyu', crypt('admin54321', gen_salt('bf'))),
+    ('kepsek', crypt('admin54321', gen_salt('bf')))
 ON CONFLICT (role) DO UPDATE
     SET password_hash = EXCLUDED.password_hash,
         updated_at    = NOW();

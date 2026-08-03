@@ -4231,11 +4231,13 @@
                     // Muat tugas titipan siswa jika ada
                     fetchStudentDelegatedTasks();
                     subscribeStudentTasksRealtime();
-                } else if (piketSession && ['adin', 'morys'].includes(piketSession.toLowerCase())) {
+                } else if (piketSession && ['adin', 'morys', 'wahyu'].includes(piketSession.toLowerCase())) {
                     setView('admin-hub');
                     const adminGreeting = document.getElementById('admin-greeting');
                     if (adminGreeting) {
-                        adminGreeting.innerText = 'Halo, ' + (piketSession.toLowerCase() === 'adin' ? 'Adin' : 'Morys') + ' 👋';
+                        const s = piketSession.toLowerCase();
+                        const nameStr = s === 'adin' ? 'Adin' : (s === 'morys' ? 'Morys' : 'Bu Sri Wahyuningsih');
+                        adminGreeting.innerText = 'Halo, ' + nameStr + ' 👋';
                     }
                 } else {
                     setView('login');
@@ -4335,8 +4337,8 @@
 
                 if (!nis) { showToast('Masukkan Username / NIS Anda', 'error'); return; }
 
-                // --- LOGIKA GURU PIKET ---
-                const teacherNames = ['wida', 'thevea', 'sunedi', 'morys', 'faizal', 'yanuar', 'adin', 'erwin'];
+                // --- LOGIKA GURU PIKET & KEPALA SEKOLAH ---
+                const teacherNames = ['wida', 'thevea', 'sunedi', 'morys', 'faizal', 'yanuar', 'adin', 'erwin', 'wahyu'];
                 if (teacherNames.includes(nis.toLowerCase())) {
                     if (!supabaseClient) {
                         showToast("Sistem belum siap. Mohon refresh halaman.", "error");
@@ -4354,20 +4356,24 @@
                     if (piketToken) {
                         localStorage.setItem('piket_session', nis);
                         localStorage.setItem('staff_token', piketToken);
-                        if (['adin', 'morys'].includes(nis.toLowerCase())) {
-                            const isAdin = nis.toLowerCase() === 'adin';
-                            showToast('Selamat datang, Admin ' + (isAdin ? 'Adin' : 'Morys') + '!', 'success');
+                        if (['adin', 'morys', 'wahyu'].includes(nis.toLowerCase())) {
+                            const userLower = nis.toLowerCase();
+                            const isAdin = userLower === 'adin';
+                            const isMorys = userLower === 'morys';
+                            const nameStr = isAdin ? 'Adin' : (isMorys ? 'Morys' : 'Bu Sri Wahyuningsih');
+                            const roleTitle = (isAdin || isMorys) ? ('Admin ' + nameStr) : 'Kepala Sekolah (Bu Sri Wahyuningsih)';
+                            showToast('Selamat datang, ' + roleTitle + '!', 'success');
                             setView('admin-hub');
                             const adminGreeting = document.getElementById('admin-greeting');
                             if (adminGreeting) {
-                                adminGreeting.innerText = 'Halo, ' + (isAdin ? 'Adin' : 'Morys') + ' 👋';
+                                adminGreeting.innerText = 'Halo, ' + nameStr + ' 👋';
                             }
                         } else {
                             window.location.href = 'guru_piket.html';
                         }
                         return;
                     } else {
-                        showToast('Password Guru Piket salah', 'error');
+                        showToast('Password Guru Piket / Staf salah', 'error');
                         return;
                     }
                 }

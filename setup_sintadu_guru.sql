@@ -70,8 +70,9 @@ CREATE INDEX IF NOT EXISTS idx_grades_subject ON sintadu_grades(subject);
 -- hilangkan tanda komentar (--) di bawah ini:
 -- =================================================================================
 
--- INSERT INTO sintadu_teachers (username, name, password, subjects) VALUES
--- ('yanuar', 'Yanuar Evanto, S.Pd', 'guru123', '{"IPA", "TIK"}'),
--- ('thevea', 'Thevea Yurike R., S.Pd.', 'guru123', '{"Matematika"}'),
--- ('elsa', 'Elsa Anggraeni, S.T.', 'guru123', '{"Bahasa Mandarin"}')
--- ON CONFLICT (username) DO NOTHING;
+INSERT INTO sintadu_teachers (username, name, password, subjects) VALUES
+('wahyu', 'Sri Wahyuningsih, S.s., S.Pd.', 'admin54321', '{}'),
+('yanuar', 'Yanuar Evanto, S.Pd', 'guru123', '{"IPA", "TIK"}'),
+('thevea', 'Thevea Yurike R., S.Pd.', 'guru123', '{"Matematika"}'),
+('elsa', 'Elsa Anggraeni, S.T.', 'guru123', '{"Bahasa Mandarin"}')
+ON CONFLICT (username) DO NOTHING;
