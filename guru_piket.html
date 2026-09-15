@@ -1581,9 +1581,12 @@
             const req = pendingLeaveMap[reqId];
             if (!req) return;
             const { user_id: userId, type, reason } = req;
+            // Tanggal pengajuan menurut WIB -> absen S/I dicatat di hari itu meski disetujui belakangan
+            const tanggalIzin = new Date(req.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+            const tanggalLabel = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
             const ok = await showConfirm(
                 'Setujui Izin',
-                `Setujui pengajuan izin <strong>${esc(type)}</strong> ini?`,
+                `Setujui pengajuan izin <strong>${esc(type)}</strong> untuk tanggal <strong>${tanggalLabel}</strong>?<br><span class="text-xs text-slate-400">Absen dicatat di tanggal pengajuan, bukan hari ini.</span>`,
                 'Setujui', 'Batal', 'emerald'
             );
             if (!ok) return;
@@ -1594,13 +1597,9 @@
                 const statusChar = (type === 'Sakit') ? 'S' : 'I';
                 const note = `[IZIN] ${type} - ${reason}`;
 
-                // Catat absen dulu; status APPROVED baru di-set setelah absen pasti tersimpan
-                const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', {
-                    p_student_id: userId,
-                    p_teacher_note: note,
-                    p_status: statusChar,
-                    p_token: token
-                });
+                // Catat absen dulu (di tanggal pengajuan); status APPROVED baru di-set setelah absen pasti tersimpan
+                const args = { p_student_id: userId, p_teacher_note: note, p_status: statusChar, p_token: token };
+                const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', { ...args, p_tanggal: tanggalIzin });
 
                 if (errRpc) throw errRpc;
 
