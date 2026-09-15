@@ -3,6 +3,11 @@ node_modules/
 
 # Skrip dev sekali pakai (menunggu dihapus permanen)
 _archive/
+_audit_*.png
+_*.cjs
+
+# Tool lokal
+.commandcode/
 
 # Claude Code local settings
 .claude/settings.local.json
