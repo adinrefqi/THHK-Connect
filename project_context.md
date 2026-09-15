@@ -1,7 +1,7 @@
 # Project Context — THHK Connect
 
 > Catatan kerja agar pekerjaan bisa dilanjutkan kapan saja (boleh istirahat di tengah jalan).
-> Terakhir diperbarui: 2026-06-23
+> Terakhir diperbarui: 2026-09-15
 
 ---
 
@@ -39,8 +39,9 @@ User meminta agar aplikasi bisa berganti tema (dark/light) sesuai keinginan peng
 | `admin_dashboard.html` | ✅ Done | Dark |
 | `rekap.html` | ✅ Done | Dark |
 | `tugas_titipan.html` | ✅ Done | Dark |
-| `guru.html` | ✅ Done | Light |
 | `admin.html` | ✅ Already had it | Dark |
+
+> `guru.html` (default Light) sudah diarsipkan ke `_archive/` — lihat bagian "Pembersihan 2026-09-15".
 
 ### Icon Toggle
 - Dark mode aktif → ☀️ (sun icon, click untuk switch ke light)
@@ -76,6 +77,34 @@ if (['adin', 'morys', 'sunedi', 'thevea', 'wahyu'].includes(nis.toLowerCase())) 
 - ✅ Admin Dashboard (`admin_dashboard.html`)
 - ✅ Rekap Absensi (`rekap.html`)
 - ✅ Tugas Titipan Guru (`tugas_titipan.html`)
+
+---
+
+## 🧹 Pembersihan 2026-09-15
+
+### Halaman buku induk diarsipkan
+`guru.html` & `print_induk.html` dipindah ke `_archive/` (tidak di-track git):
+- Tabel `buku_induk` **tidak ada** di project Supabase mana pun (dicek via REST → `PGRST205`).
+- `guru.html` butuh `localStorage.bi_session` yang tidak pernah di-set lagi oleh aplikasi.
+- Tidak ada halaman yang menautkan ke kedua file ini.
+- `print_habit.html` masih punya fallback query ke `buku_induk` — aman, error diabaikan.
+
+Jika fitur buku induk mau dihidupkan lagi: buat tabel `buku_induk` di project aktif, isi data ulang, lalu pulihkan file dari `_archive/`.
+
+### File sisa audit diarsipkan
+14 screenshot `_audit_*.png` + `_probe.cjs`, `_darkcheck.cjs`, `_lightcheck.cjs` dipindah ke `_archive/`.
+`.gitignore` kini mengabaikan `_audit_*.png`, `_*.cjs`, dan `.commandcode/`.
+
+### Project Supabase
+Semua halaman aktif memakai project **`tknvnlyxipxjkospcpbt`**. Tabel `students` sudah menolak akses anon (RLS hardening aktif).
+
+### ⚠️ Risiko yang sengaja diterima (keputusan user)
+Karena semua guru dipercaya, hal berikut **dibiarkan**:
+- Fallback password hardcoded (`admin54321` / `admin11`) di `index.html` & `guru_piket.html`.
+- Satu password bersama untuk semua staf; role (superadmin / kepsek / piket) ditentukan dari **username di client** + `localStorage.piket_session`, bukan dari database.
+- Daftar username admin tertulis ulang di 5 tempat (`index.html` ×2, `admin_dashboard.html`, `rekap.html`, `tugas_titipan.html`) — saat menambah admin, update semuanya.
+
+Perlindungan data bergantung pada `is_valid_staff_token` + RLS di Supabase. Jika kelak butuh data khusus admin: buat akun staf per-user dengan role di DB dan cek role di RPC.
 
 ---
 
@@ -116,12 +145,16 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 2. ✅ Dark/Light mode toggle — DONE (all pages)
 3. ✅ Morys superuser access — DONE
 4. ✅ Verify & cleanup — DONE
+5. ✅ Superadmin Sunedi & Thevea — DONE
+6. ✅ Arsipkan halaman buku induk (`guru.html`, `print_induk.html`) — DONE
+7. ✅ Rapikan file sisa audit + `.gitignore` — DONE
+8. ⏸️ Auth staf per-user dengan role di DB — DITUNDA (risiko diterima)
 
 ---
 
 ## 🧭 Catatan Teknis
 
-- Tema default: **Dark Mode** (kecuali guru.html yang default Light)
+- Tema default: **Dark Mode** di semua halaman aktif
 - Tema disimpan di: `localStorage.getItem('theme')`
 - Toggle button ada di header setiap halaman
 - Semantic colors (emerald, amber, rose, indigo) dibiarkan hardcoded karena masuk akal di kedua tema
