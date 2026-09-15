@@ -189,18 +189,30 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 
 ---
 
-## 📌 Status Task Tracker
+## 📌 Progres (per 2026-09-15)
 
-1. ✅ Fix index.html light-mode invisible text — DONE
-2. ✅ Dark/Light mode toggle — DONE (all pages)
-3. ✅ Morys superuser access — DONE
-4. ✅ Verify & cleanup — DONE
-5. ✅ Superadmin Sunedi & Thevea — DONE
-6. ✅ Arsipkan halaman buku induk (`guru.html`, `print_induk.html`) — DONE
-7. ✅ Rapikan file sisa audit + `.gitignore` — DONE
-8. ⏸️ Auth staf per-user dengan role di DB — DITUNDA (risiko diterima)
-9. ✅ Audit & perbaikan bug #1–14, #16–20 — DONE (lihat "Perbaikan Bug 2026-09-15")
-10. ⏸️ Push notif via Firebase (#15) — BELUM
+### ✅ Sudah
+1. Fix teks tak terlihat di light mode (`index.html`)
+2. Toggle Dark/Light mode di semua halaman
+3. Superadmin Adin, Morys, Sunedi, Thevea + akun Kepala Sekolah (wahyu)
+4. Arsipkan halaman buku induk (`guru.html`, `print_induk.html`) & file sisa audit, rapikan `.gitignore`
+5. Audit bug seluruh aplikasi → bug #1–14 dan #16–20 diperbaiki & di-push (lihat "Perbaikan Bug 2026-09-15")
+6. Reset `device_id` siswa yang terkunci ID konstan (`FLUTTER_ANDROID_NATIVE` / `UNKNOWN`) via SQL
+7. `fix_absen_duplikat.sql` dijalankan di Supabase
+8. SQL berbahaya (`fix_presensi_error.sql`, `database_setup.sql`) diarsipkan ke `_archive/`
+9. `project_context.md` diperbarui dengan catatan perbaikan
+
+### ⏳ Belum
+1. **Build ulang APK Android** — perlu agar perbaikan upload (#19) berlaku. Tidak mendesak: APK memuat `thhkconnect.vercel.app`, jadi perbaikan web lainnya sudah aktif. Sebaiknya sekalian dengan push notif.
+2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
+3. **Izin disetujui terlambat** tercatat di hari persetujuan, bukan hari izin diajukan.
+4. **Rentang bulan rekap** (`rekap.html`, `admin.html`) masih pakai zona waktu perangkat — benar hanya di perangkat WIB.
+5. **Upload worker** (`worker.js`): nama file dari client bisa menimpa file lain; token upload hardcoded di client.
+6. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
+7. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): setujui/tolak izin, absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan.
+
+### ⏸️ Ditunda (keputusan user)
+- Auth staf per-user dengan role di DB (risiko password bersama diterima)
 
 ---
 
