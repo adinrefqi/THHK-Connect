@@ -108,6 +108,56 @@ Perlindungan data bergantung pada `is_valid_staff_token` + RLS di Supabase. Jika
 
 ---
 
+## 🐛 Perbaikan Bug 2026-09-15
+
+Audit bug seluruh aplikasi → 20 temuan, 19 diperbaiki dalam 3 commit (`0234023`, `5923411`, `27a19b5`).
+
+### Kritis
+| # | Masalah | Perbaikan |
+|---|---------|-----------|
+| 1 | APK Flutter mengirim device ID konstan `FLUTTER_ANDROID_NATIVE` → hanya 1 siswa bisa absen | `index.html` membuat ID acak per-instalasi (`localStorage.device_uuid`) jika ID kosong/konstan; baris ID konstan dihapus dari `main.dart`. Siswa yang terkunci ID lama sudah di-reset via SQL. |
+| 2 | Setujui/tolak izin memakai `.update()` langsung (diblokir RLS) | Lewat RPC `update_leave_status` (fallback ke update langsung hanya jika RPC belum ada / `PGRST202`) |
+| 3 | Izin di-APPROVED sebelum absen tercatat | Absen S/I dicatat dulu, baru status diubah |
+| 4 | Tombol "Setujui" rusak jika alasan berisi `'` | Tombol hanya kirim ID; data diambil dari `pendingLeaveMap` |
+| 5 | `admin.html` "hari ini" pakai UTC | Rentang WIB (`+07:00`) |
+| 6 | Dasbor menghitung log A/S/I staf sebagai Hadir | Hitung dari `status`, log terbaru per siswa |
+| 7 | Dropdown tahun hanya 2025–2026 | Dibuat otomatis 2025 → tahun berjalan (`rekap.html`, `admin.html`) |
+
+### Tinggi
+| # | Masalah | Perbaikan |
+|---|---------|-----------|
+| 8 | Ganti Bulan/Tahun di rekap tidak memuat ulang | `onchange` memanggil `fetchData()` |
+| 9 | Tombol absen aktif lagi / tertimpa "Area Tidak Valid" | Status "✅ Sudah Absen Hari Ini" dipertahankan |
+| 10 | Tanda tangan orang tua putih → kosong saat dicetak | `print_habit.html` `.sig-thumb { filter: brightness(0) }` |
+| 11 | Query rekap bulanan bisa kena batas 1000 baris | Filter `.in('user_id', siswa kelas)` + urut `created_at` |
+| 12 | `proses_absen_piket` selalu INSERT → absen dobel | `fix_absen_duplikat.sql` (**sudah dijalankan**): update log hari ini jika ada, advisory lock per siswa |
+| 13 | XSS dari teks izin/bullying/tugas/tanda tangan | Helper `esc()` / `safeUrl()` di `guru_piket.html`, `tugas_titipan.html`; `escapeHtml` di `print_habit.html` |
+
+### Sedang
+| # | Masalah | Perbaikan |
+|---|---------|-----------|
+| 14 | Realtime bullying tidak pernah jalan (anon tanpa SELECT) | Polling `get_bullying_reports` tiap 30 detik + notifikasi laporan baru |
+| 15 | Push notif tidak pernah terkirim (`device_tokens` kosong) | ⏸️ **BELUM** — butuh Firebase Messaging di APK + project Firebase |
+| 16 | SQL lama membatalkan hardening bila dijalankan ulang | `fix_presensi_error.sql` & `database_setup.sql` → `_archive/`; `setup_dynamic_geofence.sql` tak lagi `GRANT ALL`/`DISABLE RLS` pada `settings` |
+| 17 | Tugas titipan tak muncul setelah login form; hanya tugas pertama | Dimuat saat login, semua tugas ditampilkan |
+| 18 | UI geofence pakai jarak dibulatkan, validasi pakai jarak mentah | UI pakai jarak mentah |
+| 19 | Upload APK mengirim file cache terakhir, bukan body request | Body diutamakan, cache hanya cadangan (**perlu build ulang APK**) |
+| 20 | Kecil-kecil | Tanggal "hari ini" WIB di semua halaman; `admin.html` satu channel realtime + pesan error; guard `section-stats` di `rekap.html` |
+
+### ⚠️ Aturan setelah perbaikan ini
+- **Jangan jalankan ulang** `setup_rls_hardening.sql` atau `insert_siswa.sql` — keduanya mengembalikan `proses_absen_piket` versi lama (bisa dobel). Definisi terbaru ada di `fix_absen_duplikat.sql`.
+- **Jangan jalankan** file SQL di `_archive/`.
+- Menandai S/I untuk siswa yang sudah absen H hari itu kini **mengganti** statusnya, bukan menambah baris.
+- Data dobel lama tidak dihapus; tampilan rekap memakai log terbaru.
+
+### Sisa kerja
+- Push notif (#15).
+- Izin yang disetujui terlambat tercatat di hari persetujuan, bukan hari izin.
+- Rentang bulan di `rekap.html`/`admin.html` masih memakai zona waktu perangkat (benar hanya di perangkat WIB).
+- Upload worker (`worker.js`): nama file dari client bisa menimpa file lain; token upload hardcoded.
+
+---
+
 ## 🔍 Light Mode Fix (Earlier Work)
 
 ### Diagnosis (Akar Masalah)
@@ -149,6 +199,8 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 6. ✅ Arsipkan halaman buku induk (`guru.html`, `print_induk.html`) — DONE
 7. ✅ Rapikan file sisa audit + `.gitignore` — DONE
 8. ⏸️ Auth staf per-user dengan role di DB — DITUNDA (risiko diterima)
+9. ✅ Audit & perbaikan bug #1–14, #16–20 — DONE (lihat "Perbaikan Bug 2026-09-15")
+10. ⏸️ Push notif via Firebase (#15) — BELUM
 
 ---
 
