@@ -573,12 +573,8 @@
         async function fetchTodayStats() {
             if (!supabaseClient) return;
 
-            // Dapatkan tanggal hari ini (WIB)
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const todayLocal = `${year}-${month}-${day}`;
+            // Dapatkan tanggal hari ini (WIB, apa pun zona waktu perangkat)
+            const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
             
             // Konversi rentang hari ini (waktu lokal) ke UTC
             const startOfDay = new Date(`${todayLocal}T00:00:00+07:00`).toISOString();

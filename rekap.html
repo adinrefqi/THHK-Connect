@@ -1371,6 +1371,7 @@
             const isMobile = window.innerWidth < 768;
             if (isMobile) {
                 const statsContent = document.getElementById('section-stats');
+                if (!statsContent) return;
                 const statsHeader = statsContent.previousElementSibling;
                 if (statsHeader && statsHeader.classList.contains('collapsible-header')) {
                     statsHeader.classList.add('collapsed');

@@ -4250,11 +4250,7 @@
                 const session = getSession();
                 if (!session || !session.kelas || !supabaseClient) return;
                 
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                const todayStr = `${year}-${month}-${day}`;
+                const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
                 try {
                     const { data, error } = await supabaseClient
@@ -4268,22 +4264,19 @@
 
                     const card = document.getElementById('substitute-task-card');
                     if (data && data.length > 0) {
-                        const task = data[0]; 
-                        document.getElementById('task-subject-student').innerText = task.subject;
-                        document.getElementById('task-teacher-student').innerText = task.teacher_name;
-                        document.getElementById('task-desc-student').innerText = task.task_description;
-                        
+                        // Bisa lebih dari satu guru menitip tugas untuk kelas yang sama -> tampilkan semua
+                        const multi = data.length > 1;
+                        document.getElementById('task-subject-student').innerText = data.map(t => t.subject).join(' • ');
+                        document.getElementById('task-teacher-student').innerText = data.map(t => t.teacher_name).join(' • ');
+                        document.getElementById('task-desc-student').innerText = data.map(t => (multi ? `[${t.subject}] ` : '') + t.task_description).join('\n\n');
+
                         const fileContainer = document.getElementById('task-file-container-student');
-                        if (task.attachment_url) {
-                            fileContainer.innerHTML = `
-                                <a href="${task.attachment_url}" target="_blank" class="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl text-xs font-bold text-purple-300 transition active:scale-95">
+                        fileContainer.innerHTML = data.map((t, i) => /^https?:\/\//i.test(t.attachment_url || '') ? `
+                                <a href="${t.attachment_url.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl text-xs font-bold text-purple-300 transition active:scale-95">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                    Unduh Materi Tugas
+                                    Unduh Materi Tugas${multi ? ' ' + (i + 1) : ''}
                                 </a>
-                            `;
-                        } else {
-                            fileContainer.innerHTML = '';
-                        }
+                            ` : '').join('');
                         card.classList.remove('hidden');
                     } else {
                         card.classList.add('hidden');
@@ -4423,6 +4416,8 @@
                     if(welcomeTitle) welcomeTitle.innerText = 'Halo, ' + data.nama + '!';
                     showToast(`Selamat datang, ${data.nama}!`, 'success');
                     setView('dashboard');
+                    fetchStudentDelegatedTasks();
+                    subscribeStudentTasksRealtime();
 
                 } catch (err) {
                     showToast(`Login gagal: ${err.message}`, 'error');
@@ -4684,11 +4679,12 @@
 
                     const distanceRound = Math.round(distance);
 
-                    if (distanceRound <= MAX_DISTANCE_METERS) {
+                    // Bandingkan jarak mentah (sama seperti validasi tombol absen & server), bukan hasil pembulatan
+                    if (distance <= MAX_DISTANCE_METERS) {
                         updateDistanceUI(`Jarak: ${distanceRound}m`, 'Lokasi sesuai! Anda dapat absen sekarang', 'bg-green-400', true);
                         updateMap(locationData.lat, locationData.lon, true);
                     } else {
-                        const selisih = distanceRound - MAX_DISTANCE_METERS;
+                        const selisih = Math.max(1, Math.ceil(distance - MAX_DISTANCE_METERS));
                         updateDistanceUI(`Jarak: ${distanceRound}m`, `Mendekatlah ${selisih}m lagi ke area sekolah`, 'bg-red-400', false);
                         updateMap(locationData.lat, locationData.lon, false);
                     }
@@ -4857,12 +4853,8 @@
 
                 const badge = document.getElementById('today-status-badge');
 
-                // Perbaikan Zona Waktu: Ambil tanggal lokal (WIB)
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const todayLocal = `${year}-${month}-${day}`;
+                // Perbaikan Zona Waktu: tanggal hari ini menurut WIB, apa pun zona waktu HP
+                const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
                 // Konversi rentang hari ini (waktu lokal) ke UTC
                 const startOfDay = new Date(`${todayLocal}T00:00:00+07:00`).toISOString();

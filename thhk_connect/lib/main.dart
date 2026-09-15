@@ -363,17 +363,16 @@ class _MainScreenState extends State<MainScreen> {
           return btoa(chunks.join(''));
         }
         
-        // === STRATEGI 1: Gunakan pre-cached data ===
-        var cached = window._fileDataCache['_latest'];
-        if (cached && cached.base64 && cached.base64.length > 0) {
-          console.log('[NativeUpload] Using pre-cached file data (' + cached.name + ')');
+        // Cache file terakhir HANYA dipakai jika body tidak bisa dibaca (content:// URI di WebView).
+        // Body asli diutamakan agar hasil kompresi & file dari form yang benar yang terkirim.
+        function useCache() {
+          var cached = window._fileDataCache['_latest'];
+          if (!cached || !cached.base64 || cached.base64.length === 0) return false;
+          console.log('[NativeUpload] Body unreadable, using pre-cached file data (' + cached.name + ')');
           sendViaDart(cached.base64, cached.type || contentType);
-          // Clear cache setelah dipakai
           window._fileDataCache = {};
-          return;
+          return true;
         }
-        
-        console.log('[NativeUpload] No cache, trying to read body directly');
         
         // === STRATEGI 2: body.arrayBuffer() (Promise API) ===
         if (typeof body.arrayBuffer === 'function') {
@@ -381,11 +380,13 @@ class _MainScreenState extends State<MainScreen> {
           body.arrayBuffer()
             .then(function(ab) {
               console.log('[NativeUpload] arrayBuffer OK, size=' + ab.byteLength);
+              window._fileDataCache = {};
               sendViaDart(ab2b64(ab), contentType || (body.type || 'application/octet-stream'));
             })
             .catch(function(e1) {
               console.error('[NativeUpload] arrayBuffer failed:', e1);
-              
+              if (useCache()) return;
+
               // === STRATEGI 3: FileReader ===
               if (body instanceof Blob) {
                 console.log('[NativeUpload] Trying FileReader fallback');
@@ -431,6 +432,7 @@ class _MainScreenState extends State<MainScreen> {
         }
         
         // Fallback total
+        if (useCache()) return;
         console.warn('[NativeUpload] All strategies failed, using original fetch');
         _origFetch.call(window, url, options).then(resolve).catch(reject);
       });

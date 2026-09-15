@@ -12,13 +12,9 @@ INSERT INTO public.settings (key, value)
 VALUES ('geofence', '{"latitude": -6.858194, "longitude": 109.137222, "radius_meters": 50.0}'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
--- Berikan izin akses select/update bagi peran anon/authenticated
-GRANT ALL ON public.settings TO anon;
-GRANT ALL ON public.settings TO authenticated;
-GRANT ALL ON public.settings TO service_role;
-
--- Enable RLS if needed, but for simplicity let's bypass RLS on settings or add open policies
-ALTER TABLE public.settings DISABLE ROW LEVEL SECURITY;
+-- Hak akses & RLS tabel settings diatur di setup_rls_hardening_v2.sql.
+-- (Dulu di sini ada GRANT ALL ke anon + DISABLE RLS, yang membatalkan hardening
+--  dan membuat siapa pun bisa memindah geofence. Sengaja dihapus.)
 
 -- ==============================================================================
 -- 2. Modifikasi Fungsi Absen Siswa Agar Membaca Geofence dari Tabel settings

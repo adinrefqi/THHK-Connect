@@ -114,7 +114,7 @@ waktu via backend) bisa jadi langkah lanjutan.
 
 ## 4. 🟠 RPC `SECURITY DEFINER` tanpa cek hak akses — ✅ DIPERBAIKI
 
-`reset_device_siswa(p_student_id)` dan `proses_absen_piket(...)` (di `database_setup.sql`)
+`reset_device_siswa(p_student_id)` dan `proses_absen_piket(...)` (dulu di `database_setup.sql`, kini diarsipkan ke `_archive/` — jangan dijalankan ulang)
 dulu berjalan dengan hak elevasi tetapi **tidak mengecek siapa pemanggilnya**.
 
 **Dampak (sebelum):** siapa pun dengan anon key bisa membuka kunci device siswa mana saja,

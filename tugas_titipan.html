@@ -1368,7 +1368,7 @@
 
             // Set default dates
             const today = new Date();
-            const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            const dateStr = `${today.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })}`;
 
             document.getElementById('dk-task-date').value = dateStr;
             document.getElementById('mb-task-date').value = dateStr;
@@ -1630,7 +1630,7 @@
                 document.getElementById(`${prefix}-file-label`).innerText = 'Pilih file (PDF/Foto)...';
 
                 const today = new Date();
-                const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                const dateStr = `${today.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })}`;
                 document.getElementById(`${prefix}-task-date`).value = dateStr;
 
                 showToast('Tugas titipan berhasil disimpan!', 'success');
