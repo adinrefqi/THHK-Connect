@@ -152,8 +152,6 @@ Audit bug seluruh aplikasi → 20 temuan, 19 diperbaiki dalam 3 commit (`0234023
 
 ### Sisa kerja
 - Push notif (#15).
-- Izin yang disetujui terlambat tercatat di hari persetujuan, bukan hari izin.
-- Rentang bulan di `rekap.html`/`admin.html` masih memakai zona waktu perangkat (benar hanya di perangkat WIB).
 - Upload worker (`worker.js`): nama file dari client bisa menimpa file lain; token upload hardcoded.
 
 ---
@@ -202,11 +200,11 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 8. SQL berbahaya (`fix_presensi_error.sql`, `database_setup.sql`) diarsipkan ke `_archive/`
 9. `project_context.md` diperbarui dengan catatan perbaikan
 10. Izin yang disetujui terlambat kini dicatat di **tanggal pengajuan** (WIB): `proses_absen_piket` punya parameter opsional `p_tanggal` (di `fix_absen_duplikat.sql`), `guru_piket.html` mengirim tanggal `created_at` izin
+11. Rekap bulanan (`rekap.html`, `admin.html` Rekap & Analisis) memakai rentang bulan dan tanggal **WIB**, benar di perangkat dengan zona waktu apa pun
 
 ### ⏳ Belum
 1. **Build ulang APK Android** — perlu agar perbaikan upload (#19) berlaku. Tidak mendesak: APK memuat `thhkconnect.vercel.app`, jadi perbaikan web lainnya sudah aktif. Sebaiknya sekalian dengan push notif.
 2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
-4. **Rentang bulan rekap** (`rekap.html`, `admin.html`) masih pakai zona waktu perangkat — benar hanya di perangkat WIB.
 5. **Upload worker** (`worker.js`): nama file dari client bisa menimpa file lain; token upload hardcoded di client.
 6. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
 7. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): setujui/tolak izin, absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan.

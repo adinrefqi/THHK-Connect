@@ -681,14 +681,16 @@
 
             const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas).order('nama');
             if (!students) { alert('Gagal memuat data siswa.'); return; }
-            const start = new Date(tahun, bulan, 1).toISOString();
-            const end = new Date(tahun, bulan + 1, 0, 23, 59, 59).toISOString();
-            const { data: logs } = await supabaseClient.from('attendance_logs').select('*').in('user_id', students.map(s => s.id)).gte('created_at', start).lte('created_at', end).order('created_at');
+            // Awal bulan menurut WIB, apa pun zona waktu perangkat; end eksklusif
+            const wibMonthStart = (y, m) => new Date(Date.UTC(y, m, 1) - 7 * 3600e3).toISOString();
+            const start = wibMonthStart(tahun, bulan);
+            const end = wibMonthStart(tahun, bulan + 1);
+            const { data: logs } = await supabaseClient.from('attendance_logs').select('*').in('user_id', students.map(s => s.id)).gte('created_at', start).lt('created_at', end).order('created_at');
             if (!logs) { alert('Gagal memuat data absensi.'); return; }
 
             const map = {};
             logs.forEach(l => { 
-                const d = new Date(l.created_at).getDate();
+                const d = Number(new Date(l.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(8)); // tanggal WIB
                 if(!map[l.user_id]) map[l.user_id] = {};
                 
                 let st = l.status;
@@ -729,12 +731,12 @@
 
             try {
                 const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas);
-                const { data: logs } = await supabaseClient.from('attendance_logs').select('*').in('user_id', students.map(s => s.id)).gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()).order('created_at');
+                const { data: logs } = await supabaseClient.from('attendance_logs').select('*').in('user_id', students.map(s => s.id)).gte('created_at', new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(0, 7) + '-01T00:00:00+07:00').order('created_at');
 
                 const map = {};
                 logs.forEach(l => {
                     const d = new Date(l.created_at);
-                    const dayName = d.toLocaleDateString('id-ID', { weekday: 'long' });
+                    const dayName = d.toLocaleDateString('id-ID', { weekday: 'long', timeZone: 'Asia/Jakarta' });
                     if(!map[l.user_id]) map[l.user_id] = { dates: [], statuses: [], days: [] };
                     
                     let st = l.status;
@@ -744,7 +746,7 @@
                         st = (jenis === 'Sakit') ? 'S' : 'I';
                     }
 
-                    map[l.user_id].dates.push(d.getDate());
+                    map[l.user_id].dates.push(Number(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(8)));
                     map[l.user_id].statuses.push(st);
                     map[l.user_id].days.push(dayName);
                 });
