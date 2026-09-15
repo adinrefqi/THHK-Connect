@@ -597,7 +597,8 @@
                     .from('attendance_logs')
                     .select('user_id, status, device_id')
                     .gte('created_at', startOfDay)
-                    .lte('created_at', endOfDay);
+                    .lte('created_at', endOfDay)
+                    .order('created_at', { ascending: false });
 
                 if (errLogs) throw errLogs;
 
@@ -605,29 +606,28 @@
                 let terlambat = 0;
                 let sakit = 0;
                 let izin = 0;
+                let alfaLog = 0;
 
                 // Set untuk melacak siswa yang sudah absen hari ini
                 const loggedUsers = new Set();
 
                 logs.forEach(log => {
-                    if (loggedUsers.has(log.user_id)) return; // Log pertama saja
+                    if (loggedUsers.has(log.user_id)) return; // Log terbaru saja (koreksi piket menang)
                     loggedUsers.add(log.user_id);
 
-                    const isIzin = log.device_id && log.device_id.startsWith('[IZIN]');
-                    if (isIzin) {
-                        if (log.device_id.toLowerCase().includes('sakit')) {
-                            sakit++;
-                        } else {
-                            izin++;
-                        }
-                    } else if (log.status === 'T') {
-                        terlambat++;
-                    } else {
-                        hadir++;
+                    let st = log.status || 'H';
+                    // Log izin lama mungkin tanpa status S/I -> tebak dari catatan
+                    if (log.device_id && log.device_id.startsWith('[IZIN]') && st !== 'S' && st !== 'I') {
+                        st = log.device_id.toLowerCase().includes('sakit') ? 'S' : 'I';
                     }
+                    if (st === 'S') sakit++;
+                    else if (st === 'I') izin++;
+                    else if (st === 'T') terlambat++;
+                    else if (st === 'A') alfaLog++;
+                    else hadir++;
                 });
 
-                const alfa = Math.max(0, totalSiswa - loggedUsers.size);
+                const alfa = Math.max(0, totalSiswa - loggedUsers.size) + alfaLog;
 
                 // Update UI Counter Cards
                 document.getElementById('stat-hadir').innerText = hadir;

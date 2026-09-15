@@ -1520,6 +1520,7 @@
 
                 const studentMap = {};
                 if (students) students.forEach(s => studentMap[s.id] = s);
+                pendingLeaveMap = Object.fromEntries(data.map(r => [r.id, r]));
 
                 container.innerHTML = data.map(req => {
                     const date = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -1552,7 +1553,7 @@
                             </div>
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="approveLeave('${req.id}', '${req.user_id}', '${req.type}', '${req.reason}')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Setujui</button>
+                            <button onclick="approveLeave('${req.id}')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-emerald-500/30 active:scale-95">Setujui</button>
                             <button onclick="rejectLeave('${req.id}')" class="flex-1 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-red-500/30 active:scale-95">Tolak</button>
                         </div>
                     </div>
@@ -1565,7 +1566,22 @@
             }
         }
 
-        async function approveLeave(reqId, userId, type, reason) {
+        var pendingLeaveMap = {};
+
+        // Ubah status izin lewat RPC bergerbang token (UPDATE langsung ditolak RLS)
+        async function setLeaveStatus(reqId, status, token) {
+            const { error } = await supabaseClient.rpc('update_leave_status', { p_token: token, p_id: reqId, p_status: status });
+            if (!error) return;
+            if (error.code !== 'PGRST202') throw error;
+            // ponytail: fallback jika create_leave_requests.sql belum dijalankan (RPC belum ada); hapus setelah RPC pasti ada
+            const { error: errUpdate } = await supabaseClient.from('leave_requests').update({ status }).eq('id', reqId);
+            if (errUpdate) throw errUpdate;
+        }
+
+        async function approveLeave(reqId) {
+            const req = pendingLeaveMap[reqId];
+            if (!req) return;
+            const { user_id: userId, type, reason } = req;
             const ok = await showConfirm(
                 'Setujui Izin',
                 `Setujui pengajuan izin <strong>${type}</strong> ini?`,
@@ -1573,18 +1589,13 @@
             );
             if (!ok) return;
             try {
-                const { error: errUpdate } = await supabaseClient
-                    .from('leave_requests')
-                    .update({ status: 'APPROVED' })
-                    .eq('id', reqId);
-
-                if (errUpdate) throw errUpdate;
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
 
                 const statusChar = (type === 'Sakit') ? 'S' : 'I';
                 const note = `[IZIN] ${type} - ${reason}`;
 
-                const token = localStorage.getItem('staff_token');
-                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
+                // Catat absen dulu; status APPROVED baru di-set setelah absen pasti tersimpan
                 const { error: errRpc } = await supabaseClient.rpc('proses_absen_piket', {
                     p_student_id: userId,
                     p_teacher_note: note,
@@ -1593,6 +1604,8 @@
                 });
 
                 if (errRpc) throw errRpc;
+
+                await setLeaveStatus(reqId, 'APPROVED', token);
 
                 showAlert('Berhasil menyetujui izin!', 'success');
 
@@ -1615,12 +1628,10 @@
             );
             if (!ok) return;
             try {
-                const { error: errUpdate } = await supabaseClient
-                    .from('leave_requests')
-                    .update({ status: 'REJECTED' })
-                    .eq('id', reqId);
+                const token = localStorage.getItem('staff_token');
+                if (!token) { showAlert('Sesi staf habis. Silakan login ulang.', 'error'); logoutPiket(); return; }
 
-                if (errUpdate) throw errUpdate;
+                await setLeaveStatus(reqId, 'REJECTED', token);
 
                 showAlert('Izin berhasil ditolak.', 'info');
 
@@ -1629,6 +1640,9 @@
             } catch (e) {
                 console.error(e);
                 showAlert('Terjadi kesalahan: ' + e.message, 'error');
+                if (e.message && (e.message.includes('Tidak diizinkan') || e.message.includes('sesi staf'))) {
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 

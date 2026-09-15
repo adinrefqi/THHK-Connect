@@ -4766,9 +4766,14 @@
                     }
 
                     // 5. Ambil Device ID
-                    let deviceId = 'UNKNOWN';
-                    if (typeof window.Android.getDeviceId === 'function') {
-                        deviceId = window.Android.getDeviceId();
+                    let deviceId = typeof window.Android.getDeviceId === 'function' ? window.Android.getDeviceId() : '';
+                    // APK Flutter lama selalu mengirim ID konstan (semua HP sama) -> pakai ID acak per-instalasi
+                    if (!deviceId || deviceId === 'FLUTTER_ANDROID_NATIVE' || deviceId === 'UNKNOWN') {
+                        deviceId = localStorage.getItem('device_uuid');
+                        if (!deviceId) {
+                            deviceId = 'APP-' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+                            localStorage.setItem('device_uuid', deviceId);
+                        }
                     }
 
                     // 6. Panggil RPC Supabase (Versi 3 - Paling Stabil)

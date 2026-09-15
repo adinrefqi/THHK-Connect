@@ -1381,6 +1381,9 @@
 
         // Initialize Dates
         const now = new Date();
+        const selTahun = document.getElementById('sel-tahun');
+        selTahun.innerHTML = '';
+        for (let y = now.getFullYear(); y >= 2025; y--) selTahun.add(new Option(y, y));
         document.getElementById('sel-bulan').value = now.getMonth();
         document.getElementById('sel-tahun').value = now.getFullYear();
 

@@ -139,7 +139,6 @@ class _MainScreenState extends State<MainScreen> {
         window.Android = window.Android || {};
         window.Android.getNativeLocation = function() { return locData; };
         window.Android.getLocation = function() { return locData; };
-        window.Android.getDeviceId = function() { return 'FLUTTER_ANDROID_NATIVE'; };
         
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition = function(success, error, options) {

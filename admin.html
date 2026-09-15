@@ -418,8 +418,10 @@
                     <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
                 </select>
                 <select id="recap-tahun" class="rounded-lg px-4 py-2" style="background: var(--select-bg); border: 1px solid var(--select-border); color: var(--text-primary);">
-                    <option value="2026">2026</option><option value="2025">2025</option>
                 </select>
+                <script>
+                    for (let y = new Date().getFullYear(); y >= 2025; y--) document.getElementById('recap-tahun').add(new Option(y, y));
+                </script>
                 <button onclick="loadRecap()" class="bg-blue-600 px-6 py-2 rounded-lg font-bold text-white hover:bg-blue-500 transition">Tampilkan</button>
                 <button onclick="window.print()" class="bg-slate-700 px-6 py-2 rounded-lg font-bold text-white hover:bg-slate-600 transition">Cetak PDF</button>
             </div>
@@ -562,10 +564,10 @@
         // --- HARIAN LOGIC ---
         async function loadDaily() {
             const kelas = document.getElementById('daily-kelas').value;
-            const today = new Date().toISOString().split('T')[0];
-            
+            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }); // YYYY-MM-DD WIB
+
             const { data: students } = await supabaseClient.from('students').select('id, nis, nama, kelas, device_id, created_at').eq('kelas', kelas).order('nama');
-            const { data: logs } = await supabaseClient.from('attendance_logs').select('*').gte('created_at', today+'T00:00:00Z').lte('created_at', today+'T23:59:59Z');
+            const { data: logs } = await supabaseClient.from('attendance_logs').select('*').gte('created_at', today+'T00:00:00+07:00').lte('created_at', today+'T23:59:59+07:00');
             
             studentsData = students;
             dailyLogs = logs;
