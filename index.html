@@ -4231,12 +4231,13 @@
                     // Muat tugas titipan siswa jika ada
                     fetchStudentDelegatedTasks();
                     subscribeStudentTasksRealtime();
-                } else if (piketSession && ['adin', 'morys', 'wahyu'].includes(piketSession.toLowerCase())) {
+                } else if (piketSession && ['adin', 'morys', 'sunedi', 'thevea', 'wahyu'].includes(piketSession.toLowerCase())) {
                     setView('admin-hub');
                     const adminGreeting = document.getElementById('admin-greeting');
                     if (adminGreeting) {
                         const s = piketSession.toLowerCase();
-                        const nameStr = s === 'adin' ? 'Adin' : (s === 'morys' ? 'Morys' : 'Bu Sri Wahyuningsih');
+                        const nameMap = { adin: 'Adin', morys: 'Morys', sunedi: 'Sunedi', thevea: 'Thevea', wahyu: 'Bu Sri Wahyuningsih' };
+                        const nameStr = nameMap[s] || (s.charAt(0).toUpperCase() + s.slice(1));
                         adminGreeting.innerText = 'Halo, ' + nameStr + ' 👋';
                     }
                 } else {
@@ -4372,12 +4373,12 @@
                     if (piketToken) {
                         localStorage.setItem('piket_session', nis);
                         localStorage.setItem('staff_token', piketToken);
-                        if (['adin', 'morys', 'wahyu'].includes(nis.toLowerCase())) {
+                        if (['adin', 'morys', 'sunedi', 'thevea', 'wahyu'].includes(nis.toLowerCase())) {
                             const userLower = nis.toLowerCase();
-                            const isAdin = userLower === 'adin';
-                            const isMorys = userLower === 'morys';
-                            const nameStr = isAdin ? 'Adin' : (isMorys ? 'Morys' : 'Bu Sri Wahyuningsih');
-                            const roleTitle = (isAdin || isMorys) ? ('Admin ' + nameStr) : 'Kepala Sekolah (Bu Sri Wahyuningsih)';
+                            const isSuperAdmin = ['adin', 'morys', 'sunedi', 'thevea'].includes(userLower);
+                            const nameMap = { adin: 'Adin', morys: 'Morys', sunedi: 'Sunedi', thevea: 'Thevea', wahyu: 'Bu Sri Wahyuningsih' };
+                            const nameStr = nameMap[userLower] || (userLower.charAt(0).toUpperCase() + userLower.slice(1));
+                            const roleTitle = isSuperAdmin ? ('Admin ' + nameStr) : 'Kepala Sekolah (Bu Sri Wahyuningsih)';
                             showToast('Selamat datang, ' + roleTitle + '!', 'success');
                             setView('admin-hub');
                             const adminGreeting = document.getElementById('admin-greeting');

@@ -48,43 +48,34 @@ User meminta agar aplikasi bisa berganti tema (dark/light) sesuai keinginan peng
 
 ---
 
-## 🎯 Fitur Baru: User Morys Superuser
+## 🎯 Fitur Baru: User Superadmin (Adin, Morys, Sunedi, Thevea)
 
-User "morys" dijadikan superuser seperti "adin".
+User "morys", "sunedi", dan "thevea" dijadikan superadmin / superuser seperti "adin".
 
-### Perubahan di `index.html`
+### Perubahan di `index.html`, `admin_dashboard.html`, `rekap.html`, `tugas_titipan.html`
 
-1. Login check diubah dari:
+1. Cek sesi & login diubah menjadi:
 ```javascript
-if (nis.toLowerCase() === 'adin') {
-    showToast('Selamat datang, Admin Adin!', 'success');
-    setView('admin-hub');
-} else {
-    window.location.href = 'guru_piket.html';
-}
-```
-
-2. Menjadi:
-```javascript
-if (['adin', 'morys'].includes(nis.toLowerCase())) {
-    const isAdin = nis.toLowerCase() === 'adin';
-    showToast('Selamat datang, Admin ' + (isAdin ? 'Adin' : 'Morys') + '!', 'success');
+if (['adin', 'morys', 'sunedi', 'thevea', 'wahyu'].includes(nis.toLowerCase())) {
+    const isSuperAdmin = ['adin', 'morys', 'sunedi', 'thevea'].includes(userLower);
+    const nameMap = { adin: 'Adin', morys: 'Morys', sunedi: 'Sunedi', thevea: 'Thevea', wahyu: 'Bu Sri Wahyuningsih' };
+    const nameStr = nameMap[userLower] || (userLower.charAt(0).toUpperCase() + userLower.slice(1));
+    const roleTitle = isSuperAdmin ? ('Admin ' + nameStr) : 'Kepala Sekolah (Bu Sri Wahyuningsih)';
+    showToast('Selamat datang, ' + roleTitle + '!', 'success');
     setView('admin-hub');
     const adminGreeting = document.getElementById('admin-greeting');
     if (adminGreeting) {
-        adminGreeting.innerText = 'Halo, ' + (isAdin ? 'Adin' : 'Morys') + ' 👋';
+        adminGreeting.innerText = 'Halo, ' + nameStr + ' 👋';
     }
-} else {
-    window.location.href = 'guru_piket.html';
 }
 ```
 
-### Akses yang Dimiliki Morys
-- ✅ Admin Hub
-- ✅ Dasbor Guru Piket
-- ✅ Admin Dashboard
-- ✅ Rekap Absensi
-- ✅ Tugas Titipan Guru
+### Akses Superadmin (Adin, Morys, Sunedi, Thevea)
+- ✅ Admin Hub (`index.html`)
+- ✅ Dasbor Guru Piket (`guru_piket.html`)
+- ✅ Admin Dashboard (`admin_dashboard.html`)
+- ✅ Rekap Absensi (`rekap.html`)
+- ✅ Tugas Titipan Guru (`tugas_titipan.html`)
 
 ---
 
