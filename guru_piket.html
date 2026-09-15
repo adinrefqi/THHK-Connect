@@ -914,6 +914,14 @@
             });
         }
 
+        // Escape teks dari DB sebelum masuk innerHTML (izin/bullying/tugas bisa ditulis siapa pun)
+        function esc(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function safeUrl(u) {
+            return /^https?:\/\//i.test(u || '') ? esc(u) : '#';
+        }
+
         function showAlert(message, type = 'info') {
             const icons = {
                 success: '<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>',
@@ -1528,8 +1536,8 @@
                     console.log('[PIKET] Leave request:', req.id, 'attachment_url:', req.attachment_url);
                     const fileLink = req.attachment_url
                         ? `<div class="mt-3 space-y-2">
-                            <a href="${req.attachment_url}" target="_blank" class="block">
-                                <img src="${req.attachment_url}" alt="Lampiran" class="w-full max-h-40 object-cover rounded-lg border border-slate-600/50 hover:border-indigo-500/50 transition-all cursor-pointer" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <a href="${safeUrl(req.attachment_url)}" target="_blank" rel="noopener" class="block">
+                                <img src="${safeUrl(req.attachment_url)}" alt="Lampiran" class="w-full max-h-40 object-cover rounded-lg border border-slate-600/50 hover:border-indigo-500/50 transition-all cursor-pointer" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div style="display:none" class="items-center gap-1 text-indigo-400 text-xs mt-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran</div>
                             </a>
                            </div>`
@@ -1540,15 +1548,15 @@
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="font-bold text-lg text-white">${student.nama}</h3>
-                                    <p class="text-xs text-slate-400">Kelas ${student.kelas} • ${date}</p>
+                                    <h3 class="font-bold text-lg text-white">${esc(student.nama)}</h3>
+                                    <p class="text-xs text-slate-400">Kelas ${esc(student.kelas)} • ${date}</p>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${req.type === 'Sakit' ? 'bg-sky-500/20 text-sky-400' : 'bg-indigo-500/20 text-indigo-400'} border border-current">
-                                    ${req.type}
+                                    ${esc(req.type)}
                                 </span>
                             </div>
                             <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
-                                <p class="text-sm text-slate-300">"${req.reason}"</p>
+                                <p class="text-sm text-slate-300">"${esc(req.reason)}"</p>
                                 ${fileLink}
                             </div>
                         </div>
@@ -1584,7 +1592,7 @@
             const { user_id: userId, type, reason } = req;
             const ok = await showConfirm(
                 'Setujui Izin',
-                `Setujui pengajuan izin <strong>${type}</strong> ini?`,
+                `Setujui pengajuan izin <strong>${esc(type)}</strong> ini?`,
                 'Setujui', 'Batal', 'emerald'
             );
             if (!ok) return;
@@ -1812,7 +1820,7 @@
                 container.innerHTML = data.map(req => {
                     const date = new Date(req.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                     const fileLink = req.attachment_url
-                        ? `<a href="${req.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Aduan</a>`
+                        ? `<a href="${safeUrl(req.attachment_url)}" target="_blank" rel="noopener" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Lihat Lampiran Aduan</a>`
                         : '';
 
                     let statusLabel = 'Pending';
@@ -1841,15 +1849,15 @@
                     const isAnon = req.reporter_name_display === 'Anonim';
                     const reporterInfoHtml = isAnon
                         ? `<span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 uppercase tracking-wider">Laporan Anonim</span>`
-                        : `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 uppercase tracking-wider">Pelapor: ${req.reporter_name_display}</span>`;
+                        : `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 uppercase tracking-wider">Pelapor: ${esc(req.reporter_name_display)}</span>`;
 
                     return `
                     <div class="glass-card rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-between hover:border-purple-500/30 transition-all">
                          <div>
                              <div class="flex justify-between items-start mb-2">
                                  <div>
-                                     <h3 class="font-bold text-lg text-white">Korban: ${req.victim_name}</h3>
-                                     <p class="text-xs text-slate-400">${date} • Lokasi: ${req.incident_location}</p>
+                                     <h3 class="font-bold text-lg text-white">Korban: ${esc(req.victim_name)}</h3>
+                                     <p class="text-xs text-slate-400">${date} • Lokasi: ${esc(req.incident_location)}</p>
                                  </div>
                                  <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusCss} border">
                                      ${statusLabel}
@@ -1857,10 +1865,10 @@
                              </div>
                              <div class="flex items-center gap-2 mt-2">
                                  ${reporterInfoHtml}
-                                 <span class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 text-[10px] font-bold border border-rose-500/25 uppercase tracking-wider">Jenis: ${req.bullying_type}</span>
+                                 <span class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 text-[10px] font-bold border border-rose-500/25 uppercase tracking-wider">Jenis: ${esc(req.bullying_type)}</span>
                              </div>
                              <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
-                                 <p class="text-sm text-slate-300">"${req.description}"</p>
+                                 <p class="text-sm text-slate-300">"${esc(req.description)}"</p>
                                  ${fileLink}
                              </div>
                          </div>
@@ -2009,7 +2017,7 @@
                     const dateFormatted = new Date(t.task_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
                     const fileLink = t.attachment_url
-                        ? `<a href="${t.attachment_url}" target="_blank" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Unduh Berkas Tugas</a>`
+                        ? `<a href="${safeUrl(t.attachment_url)}" target="_blank" rel="noopener" class="text-purple-400 text-xs hover:underline flex items-center gap-1 mt-2 w-max"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Unduh Berkas Tugas</a>`
                         : `<span class="text-slate-500 text-xs mt-2 block flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Tidak ada berkas</span>`;
 
                     const statusStyles = {
@@ -2038,22 +2046,22 @@
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <h3 class="font-bold text-lg text-white flex items-center gap-1.5">
-                                        Kelas ${t.class_name} 
+                                        Kelas ${esc(t.class_name)}
                                         ${isMyTask ? `<span class="px-2 py-0.5 rounded bg-purple-500 text-white text-[9px] font-bold uppercase tracking-wider">Tugas Anda</span>` : ''}
                                     </h3>
-                                    <p class="text-xs text-slate-400">Ketidakhadiran: ${t.teacher_name} • ${dateFormatted}</p>
+                                    <p class="text-xs text-slate-400">Ketidakhadiran: ${esc(t.teacher_name)} • ${dateFormatted}</p>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass} border">
-                                    ${t.status}
+                                    ${esc(t.status)}
                                 </span>
                             </div>
                             <div class="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50 mt-3">
-                                <p class="text-xs font-bold text-purple-300 mb-1">Mata Pelajaran: ${t.subject}</p>
-                                <p class="text-sm text-slate-300 whitespace-pre-line">"${t.task_description}"</p>
+                                <p class="text-xs font-bold text-purple-300 mb-1">Mata Pelajaran: ${esc(t.subject)}</p>
+                                <p class="text-sm text-slate-300 whitespace-pre-line">"${esc(t.task_description)}"</p>
                                 ${fileLink}
                             </div>
                             <div class="mt-3 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                                Penanggung Jawab Piket: <span class="text-purple-300 font-bold">${t.assigned_piket}</span>
+                                Penanggung Jawab Piket: <span class="text-purple-300 font-bold">${esc(t.assigned_piket)}</span>
                             </div>
                         </div>
                         <div class="flex gap-2 mt-4">
@@ -2195,8 +2203,8 @@
             toast.innerHTML = `
                 <div class="text-2xl flex items-center justify-center">${config.icon}</div>
                 <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-sm text-white">${title}</h4>
-                    <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${message}</p>
+                    <h4 class="font-bold text-sm text-white">${esc(title)}</h4>
+                    <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${esc(message)}</p>
                 </div>
                 <button class="text-slate-400 hover:text-white flex-shrink-0 self-start text-xs font-bold w-5 h-5 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full transition-colors">&times;</button>
             `;

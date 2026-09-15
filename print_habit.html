@@ -201,6 +201,7 @@
         }
 
         .sig-thumb {
+            filter: brightness(0); /* coretan disimpan putih (untuk kanvas gelap) -> hitamkan di kertas */
             max-height: 20px;
             max-width: 40px;
             object-fit: contain;
@@ -657,13 +658,13 @@
                         else if (m === 'biasa') moodHtml = '😐 Biasa';
                         else if (m === 'sedih') moodHtml = '😢 Sedih';
                         else if (m === 'kesal') moodHtml = '😡 Kesal';
-                        else moodHtml = log.mood;
+                        else moodHtml = escapeHtml(log.mood);
                     }
 
                     // Signature Display
                     let sigHtml = '<span class="check-empty">-</span>';
-                    if (log && log.signature_parent) {
-                        sigHtml = `<img src="${log.signature_parent}" class="sig-thumb" alt="TTD">`;
+                    if (log && /^(data:image\/|https:\/\/)/i.test(log.signature_parent || '')) {
+                        sigHtml = `<img src="${escapeHtml(log.signature_parent)}" class="sig-thumb" alt="TTD">`;
                     }
 
                     tr.innerHTML = `

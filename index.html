@@ -4608,6 +4608,12 @@
                     btn.className = "btn-ripple bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-bold py-3.5 rounded-xl shadow-[0_8px_16px_rgba(59,130,246,0.3)] transform transition active:scale-95 flex items-center justify-center gap-2.5 w-full text-sm relative overflow-hidden";
                     textAbsen.innerText = "Klik untuk Absen";
                     iconAbsen.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                } else if (alreadyAttendedToday) {
+                    // Sudah absen: pertahankan tampilan hijau, jangan ditimpa "Area Tidak Valid"
+                    btn.disabled = true;
+                    btn.className = "btn-ripple bg-green-500/20 text-green-300 cursor-not-allowed border border-green-500/30 font-bold py-3.5 rounded-xl shadow-lg transform transition flex items-center justify-center gap-2.5 w-full text-sm relative overflow-hidden";
+                    textAbsen.innerText = "✅ Sudah Absen Hari Ini";
+                    iconAbsen.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
                 } else {
                     // Tombol Non-Aktif
                     btn.disabled = true;
@@ -4836,7 +4842,8 @@
                         showToast(`\u274C Gagal: ${cleanMsg}`, 'error');
                     }
                 } finally {
-                    toggleBtnLoading('btn-absen', false, 'Klik untuk Absen');
+                    toggleBtnLoading('btn-absen', false, alreadyAttendedToday ? '✅ Sudah Absen Hari Ini' : 'Klik untuk Absen');
+                    if (alreadyAttendedToday) document.getElementById('btn-absen').disabled = true;
                 }
             }
 

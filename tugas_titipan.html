@@ -1519,6 +1519,10 @@
                 return;
             }
 
+            // Escape teks dari DB sebelum masuk innerHTML (tabel bisa ditulis siapa pun)
+            const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            const safeUrl = u => /^https?:\/\//i.test(u || '') ? esc(u) : '#';
+
             container.innerHTML = data.map((t, idx) => {
                 const formatedDate = new Date(t.task_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -1532,7 +1536,7 @@
 
                 // Attachment
                 const attachHtml = t.attachment_url
-                    ? `<a href="${t.attachment_url}" target="_blank">📎 Berkas</a>`
+                    ? `<a href="${safeUrl(t.attachment_url)}" target="_blank" rel="noopener">📎 Berkas</a>`
                     : '';
 
                 // Actions
@@ -1557,10 +1561,10 @@
                     <div class="task-card" style="animation-delay: ${delay}ms">
                         <div class="task-card-top">
                             <div class="task-meta">
-                                <div class="task-teacher">${t.teacher_name}</div>
+                                <div class="task-teacher">${esc(t.teacher_name)}</div>
                                 <div class="task-subject-line">
-                                    <span class="task-badge badge-class">Kelas ${t.class_name}</span>
-                                    <span class="task-badge badge-subject">${t.subject}</span>
+                                    <span class="task-badge badge-class">Kelas ${esc(t.class_name)}</span>
+                                    <span class="task-badge badge-subject">${esc(t.subject)}</span>
                                 </div>
                             </div>
                             <span class="status-badge ${st.cls}">
@@ -1568,7 +1572,7 @@
                                 ${st.label}
                             </span>
                         </div>
-                        <div class="task-description">${t.task_description}</div>
+                        <div class="task-description">${esc(t.task_description)}</div>
                         <div class="task-card-bottom">
                             <div class="task-info-row">
                                 <div class="task-info-item">
@@ -1577,13 +1581,13 @@
                                 </div>
                                 <div class="task-info-item">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    Piket: ${t.assigned_piket}
+                                    Piket: ${esc(t.assigned_piket)}
                                 </div>
                                 ${attachHtml ? `<div class="task-info-item">${attachHtml}</div>` : ''}
                             </div>
                             <div class="task-actions">
                                 ${actionHtml}
-                                <button class="btn-delete" onclick="deleteTask('${t.id}', '${t.teacher_name.replace(/'/g, "\\'")}')" title="Hapus">
+                                <button class="btn-delete" onclick="deleteTask('${esc(t.id)}', ${esc(JSON.stringify(t.teacher_name || ''))})" title="Hapus">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>

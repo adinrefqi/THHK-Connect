@@ -994,7 +994,7 @@
 
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Bulan</label>
-                        <select id="sel-bulan" class="pill-select" onchange="updateQuickButtons()">
+                        <select id="sel-bulan" class="pill-select" onchange="updateQuickButtons(); fetchData()">
                             <option value="0">Januari</option>
                             <option value="1">Februari</option>
                             <option value="2">Maret</option>
@@ -1012,7 +1012,7 @@
 
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Tahun</label>
-                        <select id="sel-tahun" class="pill-select" onchange="updateQuickButtons()">
+                        <select id="sel-tahun" class="pill-select" onchange="updateQuickButtons(); fetchData()">
                             <option value="2026">2026</option>
                             <option value="2025">2025</option>
                         </select>
@@ -1504,8 +1504,10 @@
                 const { data: logs, error: lErr } = await supabaseClient
                     .from('attendance_logs')
                     .select('user_id, created_at, status')
+                    .in('user_id', students.map(s => s.id)) // per kelas -> tidak kena batas 1000 baris
                     .gte('created_at', start)
-                    .lte('created_at', end);
+                    .lte('created_at', end)
+                    .order('created_at'); // log terbaru menimpa yang lama
 
                 if (lErr) throw lErr;
 
