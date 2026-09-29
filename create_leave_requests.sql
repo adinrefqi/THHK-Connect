@@ -9,7 +9,7 @@
 -- ==============================================================================
 
 CREATE TABLE IF NOT EXISTS public.leave_requests (
-    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id             BIGSERIAL PRIMARY KEY,  -- tabel live memakai bigint, bukan uuid
     user_id        UUID REFERENCES public.students(id) ON DELETE CASCADE,
     type           TEXT NOT NULL,                 -- 'Sakit' | 'Izin'
     reason         TEXT,
@@ -48,9 +48,11 @@ GRANT  SELECT, INSERT  ON public.leave_requests TO   anon, authenticated;
 -- RPC: ubah status izin (approve/reject) — bergerbang token staf.
 -- Mengganti pemanggilan .update() langsung di guru_piket.html.
 -- ------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.update_leave_status(TEXT, UUID, TEXT);  -- buang versi lama bertipe UUID
+
 CREATE OR REPLACE FUNCTION public.update_leave_status(
     p_token  TEXT,
-    p_id     UUID,
+    p_id     BIGINT,
     p_status TEXT
 )
 RETURNS JSON
@@ -63,12 +65,20 @@ BEGIN
         RAISE EXCEPTION 'Tidak diizinkan: sesi staf tidak valid atau kedaluwarsa.';
     END IF;
 
+    IF p_status NOT IN ('APPROVED', 'REJECTED') THEN
+        RAISE EXCEPTION 'Status izin tidak valid: %', p_status;
+    END IF;
+
     UPDATE public.leave_requests
     SET status = p_status
     WHERE id = p_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Pengajuan izin % tidak ditemukan.', p_id;
+    END IF;
 
     RETURN json_build_object('status', 'success');
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.update_leave_status(TEXT, UUID, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.update_leave_status(TEXT, BIGINT, TEXT) TO anon, authenticated;

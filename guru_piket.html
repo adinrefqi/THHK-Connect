@@ -1570,11 +1570,7 @@
         // Ubah status izin lewat RPC bergerbang token (UPDATE langsung ditolak RLS)
         async function setLeaveStatus(reqId, status, token) {
             const { error } = await supabaseClient.rpc('update_leave_status', { p_token: token, p_id: reqId, p_status: status });
-            if (!error) return;
-            if (error.code !== 'PGRST202') throw error;
-            // ponytail: fallback jika create_leave_requests.sql belum dijalankan (RPC belum ada); hapus setelah RPC pasti ada
-            const { error: errUpdate } = await supabaseClient.from('leave_requests').update({ status }).eq('id', reqId);
-            if (errUpdate) throw errUpdate;
+            if (error) throw error;
         }
 
         async function approveLeave(reqId) {
