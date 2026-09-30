@@ -2997,9 +2997,14 @@
             // ==========================================
             const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
-            // Token upload ke Cloudflare Worker. HARUS sama persis dengan Secret
-            // UPLOAD_TOKEN yang di-set di Cloudflare (Worker thhk-storage > Settings > Variables).
-            const UPLOAD_TOKEN = 'e11a81b52fa2cf7b979189d525f7f53217022e289aeac77f';
+            // Token sesi untuk upload ke Cloudflare Worker (dicek Worker lewat
+            // RPC verify_upload_token). Siswa: dari create_student_session saat login.
+            function getUploadToken(session) {
+                if (!session || !session.upload_token) {
+                    throw new Error('Sesi login lama. Silakan keluar lalu login ulang untuk mengunggah foto.');
+                }
+                return session.upload_token;
+            }
 
             // Leaflet Map Variables (harus dideklarasikan global)
             var leafletMap = null;
@@ -4033,10 +4038,13 @@
                             body: file,
                             headers: {
                                 'Content-Type': file.type || 'application/octet-stream',
-                                'X-Upload-Token': UPLOAD_TOKEN
+                                'X-Upload-Token': getUploadToken(session)
                             }
                         });
 
+                        if (response.status === 401) {
+                            throw new Error('Sesi login kedaluwarsa. Silakan keluar lalu login ulang.');
+                        }
                         if (!response.ok) {
                             const respText = await response.text().catch(() => '');
                             console.error('[IZIN] Upload gagal, status:', response.status, 'body:', respText);
@@ -4150,10 +4158,13 @@
                             body: file,
                             headers: {
                                 'Content-Type': file.type || 'application/octet-stream',
-                                'X-Upload-Token': UPLOAD_TOKEN
+                                'X-Upload-Token': getUploadToken(session)
                             }
                         });
 
+                        if (response.status === 401) {
+                            throw new Error('Sesi login kedaluwarsa. Silakan keluar lalu login ulang.');
+                        }
                         if (!response.ok) {
                             throw new Error('Gagal mengunggah bukti ke server.');
                         }
@@ -4405,6 +4416,18 @@
                     if (error) {
                         let msg = error.message.replace(/^.*?Exception: /, '').replace(/P0001:/g, '').trim();
                         throw new Error(msg || 'NIS atau password salah');
+                    }
+
+                    // Token sesi upload. Gagal tidak menggagalkan login; upload
+                    // nanti meminta login ulang (mis. SQL belum dijalankan).
+                    try {
+                        const { data: uploadToken } = await supabaseClient.rpc('create_student_session', {
+                            p_nis: nis,
+                            p_password: password
+                        });
+                        if (uploadToken) data.upload_token = uploadToken;
+                    } catch (e) {
+                        console.warn('create_student_session gagal:', e);
                     }
 
                     // Simpan sesi ke localStorage

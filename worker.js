@@ -7,6 +7,45 @@
 //   R2 bucket: thhk-connect
 // =============================================================================
 
+// Supabase untuk verifikasi sesi upload (URL & anon key memang publik, sama
+// dengan yang ada di index.html).
+const SUPABASE_URL = 'https://tknvnlyxipxjkospcpbt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrbnZubHl4aXB4amtvc3BjcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwOTYzOTksImV4cCI6MjA5NTY3MjM5OX0.lsZR2gsTFRqOwUqMMjBfMNP0zZFHTMPvTFC6BcXasG8';
+
+// Token = token sesi staf (create_staff_session) atau siswa (create_student_session).
+// Dicek ke server lewat RPC verify_upload_token (create_upload_sessions.sql).
+async function isValidSessionToken(token) {
+    if (!token) return false;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verify_upload_token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ p_token: token }),
+    });
+    return res.ok && (await res.json()) === true;
+}
+
+// Batas ukuran upload (foto HP ~3-5 MB, berkas tugas bisa lebih besar).
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+// Hanya tipe ini yang ditampilkan langsung di browser. Tipe lain (HTML, SVG,
+// JS, dll.) dipaksa diunduh agar bucket tidak bisa dipakai untuk hosting
+// halaman phishing / XSS di domain workers.dev.
+const INLINE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+
+// Nama file ditentukan server: awalan dari client disaring, lalu ditambah UUID,
+// sehingga upload tidak pernah bisa menimpa file yang sudah ada.
+function makeObjectKey(clientName) {
+    const name = String(clientName || '');
+    const dot = name.lastIndexOf('.');
+    const ext = dot > 0 ? name.slice(dot + 1).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10) : '';
+    const base = (dot > 0 ? name.slice(0, dot) : name).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 80);
+    return (base ? base + '_' : '') + crypto.randomUUID() + (ext ? '.' + ext : '');
+}
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
@@ -26,23 +65,28 @@ export default {
             // POST /upload?filename=xxx — Upload file ke R2
             // =================================================================
             if (request.method === 'POST' && url.pathname === '/upload') {
-                // Cek token upload — hanya aplikasi yang membawa token benar yang boleh upload.
-                // Set UPLOAD_TOKEN sebagai Secret di Cloudflare (Settings > Variables).
-                const expectedToken = env.UPLOAD_TOKEN;
-                if (!expectedToken || request.headers.get('X-Upload-Token') !== expectedToken) {
+                // Cek sesi: header X-Upload-Token berisi token sesi staf/siswa.
+                // Masa transisi: token bersama lama (Secret UPLOAD_TOKEN) masih diterima
+                // selama Secret itu ada. Hapus Secret-nya untuk mematikan token bersama.
+                const token = request.headers.get('X-Upload-Token') || '';
+                const allowed = (env.UPLOAD_TOKEN && token === env.UPLOAD_TOKEN)
+                    || await isValidSessionToken(token);
+                if (!allowed) {
                     return Response.json(
-                        { success: false, error: 'Tidak diizinkan: token upload tidak valid.' },
+                        { success: false, error: 'Sesi tidak valid atau kedaluwarsa. Silakan keluar lalu login ulang.' },
                         { status: 401, headers: corsHeaders }
                     );
                 }
 
-                const filename = url.searchParams.get('filename');
-                if (!filename) {
+                const declaredSize = Number(request.headers.get('Content-Length') || 0);
+                if (declaredSize > MAX_UPLOAD_BYTES) {
                     return Response.json(
-                        { success: false, error: 'Parameter filename diperlukan' },
-                        { status: 400, headers: corsHeaders }
+                        { success: false, error: 'File terlalu besar (maks 20 MB).' },
+                        { status: 413, headers: corsHeaders }
                     );
                 }
+
+                const filename = makeObjectKey(url.searchParams.get('filename'));
 
                 // Cek R2 binding
                 const bucket = env.LEAVE_ATTACHMENTS || env.BUCKET || env.R2_BUCKET || env.MY_BUCKET || env.THHK_BUCKET || env.r2;
@@ -58,6 +102,12 @@ export default {
                     return Response.json(
                         { success: false, error: 'Body kosong' },
                         { status: 400, headers: corsHeaders }
+                    );
+                }
+                if (body.byteLength > MAX_UPLOAD_BYTES) {
+                    return Response.json(
+                        { success: false, error: 'File terlalu besar (maks 20 MB).' },
+                        { status: 413, headers: corsHeaders }
                     );
                 }
 
@@ -104,7 +154,14 @@ export default {
                 }
 
                 const headers = new Headers(corsHeaders);
-                headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
+                const storedType = (object.httpMetadata?.contentType || '').split(';')[0].trim().toLowerCase();
+                if (INLINE_TYPES.includes(storedType)) {
+                    headers.set('Content-Type', storedType);
+                } else {
+                    headers.set('Content-Type', 'application/octet-stream');
+                    headers.set('Content-Disposition', 'attachment');
+                }
+                headers.set('X-Content-Type-Options', 'nosniff');
                 headers.set('Cache-Control', 'public, max-age=31536000, immutable');
 
                 return new Response(object.body, { headers });
@@ -115,12 +172,10 @@ export default {
             // =================================================================
             if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '')) {
                 const bucket = env.LEAVE_ATTACHMENTS || env.BUCKET || env.R2_BUCKET || env.MY_BUCKET || env.THHK_BUCKET || env.r2;
-                const bindings = Object.keys(env || {});
                 return Response.json({
                     status: 'ok',
                     service: 'thhk-storage',
                     r2_connected: !!bucket,
-                    env_bindings: bindings,
                     endpoints: ['POST /upload?filename=xxx', 'GET /file/{filename}']
                 }, { headers: corsHeaders });
             }
@@ -132,7 +187,7 @@ export default {
 
         } catch (err) {
             return Response.json(
-                { success: false, error: err.message, stack: err.stack },
+                { success: false, error: err.message },
                 { status: 500, headers: corsHeaders }
             );
         }
