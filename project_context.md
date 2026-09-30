@@ -152,7 +152,6 @@ Audit bug seluruh aplikasi → 20 temuan, 19 diperbaiki dalam 3 commit (`0234023
 
 ### Sisa kerja
 - Push notif (#15).
-- Upload worker: deploy & matikan token bersama (lihat "Belum" #5).
 
 ---
 
@@ -202,15 +201,12 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 10. Izin yang disetujui terlambat kini dicatat di **tanggal pengajuan** (WIB): `proses_absen_piket` punya parameter opsional `p_tanggal` (di `fix_absen_duplikat.sql`), `guru_piket.html` mengirim tanggal `created_at` izin
 11. Rekap bulanan (`rekap.html`, `admin.html` Rekap & Analisis) memakai rentang bulan dan tanggal **WIB**, benar di perangkat dengan zona waktu apa pun
 12. Setujui/tolak izin diperbaiki: `update_leave_status` memakai `p_id BIGINT` (`create_leave_requests.sql` **sudah dijalankan**, versi UUID lama terhapus), di-deploy (`4b70b8c`) & **diuji manual berhasil** (2026-09-29)
+13. **Upload worker diamankan** (2026-09-30, `0820463`): cek sesi per-user via RPC `verify_upload_token` (`create_upload_sessions.sql` **sudah dijalankan**), nama file dibuat server (UUID, tak bisa menimpa), batas 20 MB, hanya gambar/PDF tampil inline. Worker di-deploy, upload siswa & admin **diuji berhasil**, Secret `UPLOAD_TOKEN` dihapus → token bersama lama ditolak (401). Siswa yang login sebelum 2026-09-30 diminta login ulang saat upload pertama.
 
 ### ⏳ Belum
 1. **Build ulang APK Android** — perlu agar perbaikan upload (#19) berlaku. Tidak mendesak: APK memuat `thhkconnect.vercel.app`, jadi perbaikan web lainnya sudah aktif. Sebaiknya sekalian dengan push notif.
 2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
-5. **Upload worker** (`worker.j5. **Upload worker** (`worker.js`) — kode selesai 2026-09-30, **belum di-deploy**:
-   - Nama file dibuat server (awalan disaring + UUID → tak bisa menimpa), batas 20 MB, hanya gambar/PDF tampil inline (lainnya dipaksa unduh + `nosniff`), health check tak membocorkan binding.
-   - Cek sesi per-user: header `X-Upload-Token` berisi `staff_token` (staf) atau `upload_token` di `thhk_session` (siswa, dari RPC `create_student_session`, 180 hari). Worker memanggil RPC `verify_upload_token`. Token bersama dihapus dari HTML.
-   - Urutan deploy: (1) jalankan `create_upload_sessions.sql`, (2) deploy `worker.js` ke Cloudflare, (3) push HTML ke Vercel, (4) hapus Secret `UPLOAD_TOKEN` di Worker → token bersama lama mati.
-   - Siswa yang login sebelum deploy belum punya `upload_token` → saat upload diminta keluar & login ulang (sekali saja).idak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
+6. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
 7. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan.
 
 ### ⏸️ Ditunda (keputusan user)
