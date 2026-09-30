@@ -1818,6 +1818,11 @@
                 if (newReports.length && tab && !tab.classList.contains('hidden')) loadBullyingReports();
             } catch (err) {
                 console.error("Gagal load badge bullying", err);
+                // Dipanggil saat halaman dibuka & tiap 30 dtk: token kedaluwarsa (12 jam) -> langsung ke login
+                if (err.message && (err.message.includes('Tidak diizinkan') || err.message.includes('sesi staf'))) {
+                    showAlert('Sesi staf habis. Silakan login ulang.', 'error');
+                    setTimeout(() => logoutPiket(), 1500);
+                }
             }
         }
 
