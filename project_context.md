@@ -102,7 +102,7 @@ Semua halaman aktif memakai project **`tknvnlyxipxjkospcpbt`**. Tabel `students`
 Karena semua guru dipercaya, hal berikut **dibiarkan**:
 - Fallback password hardcoded (`admin54321` / `admin11`) di `index.html` & `guru_piket.html`.
 - Satu password bersama untuk semua staf; role (superadmin / kepsek / piket) ditentukan dari **username di client** + `localStorage.piket_session`, bukan dari database.
-- Daftar username admin tertulis ulang di 5 tempat (`index.html` ×2, `admin_dashboard.html`, `rekap.html`, `tugas_titipan.html`) — saat menambah admin, update semuanya.
+- Daftar username admin tertulis ulang di 6 tempat (`index.html` ×2, `admin_dashboard.html`, `rekap.html`, `tugas_titipan.html`, `guru_piket.html` → `updateBackToPortal`) — saat menambah admin, update semuanya.
 
 Perlindungan data bergantung pada `is_valid_staff_token` + RLS di Supabase. Jika kelak butuh data khusus admin: buat akun staf per-user dengan role di DB dan cek role di RPC.
 
