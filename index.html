@@ -2200,6 +2200,9 @@
             /* Kebiasaan: kartu 2 kolom */
             .habit-list { display: grid !important; grid-template-columns: 1fr 1fr; gap: 0.75rem !important; }
         }
+        /* Peta OSM bernuansa gelap di tema gelap */
+        html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+        .leaflet-control-attribution { font-size: 9px !important; }
     </style>
 
 </head>
@@ -4576,12 +4579,13 @@
                         // Inisialisasi peta pertama kali
                         leafletMap = L.map('map', {
                             zoomControl: false,
-                            attributionControl: false
+                            attributionControl: true
                         }).setView([SCHOOL_LAT, SCHOOL_LON], 17);
 
                         // Tambahkan Tile Layer (CartoDB Dark Matter agar sesuai dengan tema gelap premium)
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                            maxZoom: 20
+                        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap',
+                            maxZoom: 19
                         }).addTo(leafletMap);
 
                         // Buat Marker Sekolah

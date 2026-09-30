@@ -218,6 +218,9 @@
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
         }
+        /* Peta OSM bernuansa gelap di tema gelap */
+        html:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+        .leaflet-control-attribution { font-size: 9px !important; }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col pb-12" style="color: var(--text-primary);">
@@ -1002,12 +1005,13 @@
             try {
                 geofenceMap = L.map('geofence-map', {
                     zoomControl: true,
-                    attributionControl: false
+                    attributionControl: true
                 }).setView([lat, lon], 17);
                 
                 // Tambahkan Tile Layer Dark Matter
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 20
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap',
+                    maxZoom: 19
                 }).addTo(geofenceMap);
                 
                 // Marker Sekolah (Draggable)
