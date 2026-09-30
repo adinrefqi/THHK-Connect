@@ -47,10 +47,15 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   InAppWebViewController? webViewController;
   double _progress = 0;
   StreamSubscription<Position>? _positionStream;
+
+  // Halaman web tetap di memori selama app di latar belakang, sehingga update
+  // web tak terlihat. Muat ulang jika app dibuka lagi setelah lama ditinggal.
+  static const Duration _reloadAfter = Duration(minutes: 30);
+  DateTime? _pausedAt;
 
   final String baseUrl = "https://thhkconnect.vercel.app/";
 
@@ -76,13 +81,28 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _startLocationUpdates();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _positionStream?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _pausedAt = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      final pausedAt = _pausedAt;
+      _pausedAt = null;
+      if (pausedAt != null && DateTime.now().difference(pausedAt) > _reloadAfter) {
+        webViewController?.reload();
+      }
+    }
   }
 
   // =====================================================================
@@ -99,10 +119,15 @@ class _MainScreenState extends State<MainScreen> {
     }
     if (permission == LocationPermission.deniedForever) return;
 
-    const LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 2,
-    );
+    // Kirim fix baru tiap 2 detik walau HP diam: halaman web menganggap koordinat
+    // yang persis sama selama 30 detik sebagai "Sinyal Statis" (anti fake GPS).
+    final LocationSettings locationSettings = Platform.isAndroid
+        ? AndroidSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 0,
+            intervalDuration: const Duration(seconds: 2),
+          )
+        : const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 0);
 
     _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
       (Position position) => _injectLocationToWeb(position),
