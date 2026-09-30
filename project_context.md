@@ -1,7 +1,7 @@
 # Project Context — THHK Connect
 
 > Catatan kerja agar pekerjaan bisa dilanjutkan kapan saja (boleh istirahat di tengah jalan).
-> Terakhir diperbarui: 2026-09-29
+> Terakhir diperbarui: 2026-09-30
 
 ---
 
@@ -147,6 +147,7 @@ Audit bug seluruh aplikasi → 20 temuan, 19 diperbaiki dalam 3 commit (`0234023
 ### ⚠️ Aturan setelah perbaikan ini
 - **Jangan jalankan ulang** `setup_rls_hardening.sql` atau `insert_siswa.sql` — keduanya mengembalikan `proses_absen_piket` versi lama (bisa dobel). Definisi terbaru ada di `fix_absen_duplikat.sql`.
 - **Jangan jalankan** file SQL di `_archive/`.
+- Overload RPC tanpa token pernah muncul lagi di DB (2026-09-30) — setelah menjalankan SQL lama apa pun, jalankan ulang `hapus_rpc_tanpa_token.sql` dan cek Security Advisor.
 - Menandai S/I untuk siswa yang sudah absen H hari itu kini **mengganti** statusnya, bukan menambah baris.
 - Data dobel lama tidak dihapus; tampilan rekap memakai log terbaru.
 
@@ -186,7 +187,7 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 
 ---
 
-## 📌 Progres (per 2026-09-29)
+## 📌 Progres (per 2026-09-30)
 
 ### ✅ Sudah
 1. Fix teks tak terlihat di light mode (`index.html`)
@@ -204,9 +205,11 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 13. **Upload worker diamankan** (2026-09-30, `0820463`): cek sesi per-user via RPC `verify_upload_token` (`create_upload_sessions.sql` **sudah dijalankan**), nama file dibuat server (UUID, tak bisa menimpa), batas 20 MB, hanya gambar/PDF tampil inline. Worker di-deploy, upload siswa & admin **diuji berhasil**, Secret `UPLOAD_TOKEN` dihapus → token bersama lama ditolak (401). Siswa yang login sebelum 2026-09-30 diminta login ulang saat upload pertama.
 14. **Tampilan laptop/PC** (2026-09-30, `8d159b9`): `index.html` punya blok `@media (min-width: 1024px)` — login 2 kolom, Admin Hub kartu 2×2, dasbor siswa dengan sidebar kiri (nav bawah), beranda & kebiasaan 2 kolom; lebar per view diatur `:has()` pada `.app-container`. `guru_piket.html` melebar (`xl:max-w-7xl`), kartu 3 kolom baru di ≥1536px (di 1366px nama terpotong). Tampilan HP tidak berubah. **Dicek user di laptop: bagus.**
 15. **Belum absen & Alpha massal di Guru Piket** (2026-09-30): ringkasan "N dari M siswa belum absen", filter "belum absen saja", tombol "Tandai Alpha semua" (memanggil `proses_absen_piket` status A untuk tiap siswa tanpa log hari ini). Kartu siswa berstatus A punya tombol koreksi H/T/S/I — perlu karena `proses_absen_siswa` menolak absen jika sudah ada log hari itu.
-16. **Alpha otomatis 15:00 WIB** (2026-09-30, `setup_auto_alpha.sql` **sudah dijalankan**, job pg_cron `auto-alpha-harian` id 1, `0 8 * * 1-5` UTC): Senin–Jumat, siswa kelas 7/8/9 tanpa log hari itu dicatat A (`device_id = OTOMATIS 15:00`). Dilewati jika tak ada satu pun absen hari itu (dianggap libur). Fungsi `auto_alpha_harian` tidak bisa dipanggil anon. Sekolah libur Sabtu & Minggu (dikonfirmasi user). Belum terlihat berjalan — cek `cron.job_run_details` setelah 15:00 hari sekolah berikutnya.
+16. **Alpha otomatis 15:00 WIB** (2026-09-30, `setup_auto_alpha.sql` **sudah dijalankan**, job pg_cron `auto-alpha-harian` id 1, `0 8 * * 1-5` UTC): Senin–Jumat, siswa kelas 7/8/9 tanpa log hari itu dicatat A (`device_id = OTOMATIS 15:00`). Dilewati jika tak ada satu pun absen hari itu (dianggap libur). Fungsi `auto_alpha_harian` tidak bisa dipanggil anon. Sekolah libur Sabtu & Minggu (dikonfirmasi user). **Jalan pertama 2026-09-30 15:00: sukses, 36 dari 51 siswa ditandai A** (hanya ~7–16 siswa/hari absen lewat aplikasi). User memutuskan fitur **tetap aktif** apa adanya.
 17. **APK 1.0.2 (versionCode 3)** dibangun 2026-09-30 (`build/app/outputs/flutter-apk/app-release.apk`, 44,9 MB, ditandatangani debug keystore laptop ini — sama dengan APK sebelumnya): perbaikan upload (#19), reload WebView otomatis jika app dibuka lagi setelah >30 menit di latar belakang, ikon aplikasi logo sekolah (`flutter_launcher_icons`, adaptive latar putih). GPS kini dikirim tiap 2 dtk tanpa distanceFilter (sebelumnya `distanceFilter: 2` → HP diam = koordinat identik → web menampilkan "Sinyal Statis"). **Diuji di HP (Samsung A52) via adb: status "Jarak 15m – dapat absen" setelah >30 dtk diam.** Peringatan build: AGP 8.7.3 & Kotlin 2.1.0 akan segera tak didukung Flutter (naikkan ke AGP ≥8.11.1, Kotlin ≥2.2.20 kelak).
 18. **Peta: CartoDB → OpenStreetMap** (2026-09-30): tile CartoDB kini berisi "API KEY REQUIRED". `index.html` & `admin_dashboard.html` memakai `tile.openstreetmap.org` (maxZoom 19, atribusi "© OpenStreetMap" wajib), tema gelap memakai filter invert pada `.leaflet-tile-pane`.
+19. **Guru Piket logout saat sesi staf habis** (2026-09-30, `dad9de3`): token staf berlaku 12 jam; sebelumnya dasbor tetap tampil dengan token kedaluwarsa dan polling bullying gagal diam-diam (error 400 di log). `checkPendingBullyingBadge` (saat buka & tiap 30 dtk) kini mengarahkan ke login jika token ditolak.
+20. **RPC tanpa token dicabut** (2026-09-30, `hapus_rpc_tanpa_token.sql` **sudah dijalankan & dicek**): `reset_device_siswa(uuid)` dan `proses_absen_piket(uuid,text,text)` versi lama (siapa pun bisa buka kunci HP / catat absen) dihapus; `update_admin_password`, `upsert_teacher_with_hash`, `verify_teacher_login` (tabel `admins`/`teachers`, tidak dipakai aplikasi ini — dikonfirmasi user) dicabut dari anon/authenticated. Versi bertoken tetap ada.
 
 ### ⏳ Belum
 1. **Pastikan aplikasi yang dipakai siswa sebelum menyebar APK 1.0.2.** Di HP user ada dua app: `com.finansial.thhkconnect` v1.1 (lama, dipasang 31 Mei, kode TIDAK ada di repo ini) dan `com.example.thhk_connect` (Flutter, repo ini). Jika siswa memakai yang lama, APK Flutter terpasang sebagai app KEDUA (bukan update) → ID perangkat berbeda → kemungkinan harus reset kunci HP siswa.
