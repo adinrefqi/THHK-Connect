@@ -202,6 +202,7 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 11. Rekap bulanan (`rekap.html`, `admin.html` Rekap & Analisis) memakai rentang bulan dan tanggal **WIB**, benar di perangkat dengan zona waktu apa pun
 12. Setujui/tolak izin diperbaiki: `update_leave_status` memakai `p_id BIGINT` (`create_leave_requests.sql` **sudah dijalankan**, versi UUID lama terhapus), di-deploy (`4b70b8c`) & **diuji manual berhasil** (2026-09-29)
 13. **Upload worker diamankan** (2026-09-30, `0820463`): cek sesi per-user via RPC `verify_upload_token` (`create_upload_sessions.sql` **sudah dijalankan**), nama file dibuat server (UUID, tak bisa menimpa), batas 20 MB, hanya gambar/PDF tampil inline. Worker di-deploy, upload siswa & admin **diuji berhasil**, Secret `UPLOAD_TOKEN` dihapus → token bersama lama ditolak (401). Siswa yang login sebelum 2026-09-30 diminta login ulang saat upload pertama.
+14. **Tampilan laptop/PC** (2026-09-30, `8d159b9`): `index.html` punya blok `@media (min-width: 1024px)` — login 2 kolom, Admin Hub kartu 2×2, dasbor siswa dengan sidebar kiri (nav bawah), beranda & kebiasaan 2 kolom; lebar per view diatur `:has()` pada `.app-container`. `guru_piket.html` melebar (`xl:max-w-7xl`), kartu 3 kolom baru di ≥1536px (di 1366px nama terpotong). Tampilan HP tidak berubah. **Dicek user di laptop: bagus.**
 
 ### ⏳ Belum
 1. **Build ulang APK Android** — perlu agar perbaikan upload (#19) berlaku. Tidak mendesak: APK memuat `thhkconnect.vercel.app`, jadi perbaikan web lainnya sudah aktif. Sebaiknya sekalian dengan push notif.
