@@ -209,6 +209,7 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 ### ⏳ Belum
 1. **Build ulang APK Android** — perlu agar perbaikan upload (#19) berlaku. Tidak mendesak: APK memuat `thhkconnect.vercel.app`, jadi perbaikan web lainnya sudah aktif. Sebaiknya sekalian dengan push notif.
    - Sekalian: muat ulang WebView otomatis saat aplikasi dibuka lagi setelah >30 menit di latar belakang (`main.dart`, mis. `WidgetsBindingObserver` → `AppLifecycleState.resumed` → `controller.reload()`). Alasan 2026-09-30: halaman lama tertahan di memori APK sehingga update web tak terlihat sampai app ditutup/cache dihapus; header Vercel sudah benar (`max-age=0, must-revalidate`).
+   - Sekalian: ganti ikon aplikasi (launcher) dengan logo sekolah. Sumber: `E:\Logo sekolah\Logo THHK-NOBG.png` (1000×1013, latar transparan); di web sudah dipakai sebagai `logo.png`/`favicon.png` (2026-09-30). Mis. pakai paket `flutter_launcher_icons`, beri latar putih untuk adaptive icon Android.
 2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
 6. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
 7. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan.
