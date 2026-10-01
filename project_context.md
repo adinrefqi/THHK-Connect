@@ -204,7 +204,12 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 1. **Pastikan aplikasi yang dipakai siswa sebelum menyebar APK 1.0.3.** Di HP user ada dua app: `com.finansial.thhkconnect` v1.1 (lama, dipasang 31 Mei, kode TIDAK ada di repo ini) dan `com.example.thhk_connect` (Flutter, repo ini). Jika siswa memakai yang lama, APK Flutter terpasang sebagai app KEDUA (bukan update) → ID perangkat berbeda → kemungkinan harus reset kunci HP siswa.
 2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
 3. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
-4. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan, badge Alfa/Sakit/Izin di dasbor siswa.
+4. **Uji manual** — 2026-10-01 sebagian selesai:
+   - ✅ Rekap ganti bulan (`rekap.html`): Sep kelas 7 per siswa & kelas 9 total (H 169, T 17, A 23) **cocok persis** dengan DB (log terbaru per hari); kembali ke Okt juga benar.
+   - ✅ Cetak laporan kebiasaan (`print_habit.html`, siswa kelas 9, Sep): 22/30 hari sesuai DB, 22 tanda tangan termuat & hitam (`brightness(0)`), tanpa error console.
+   - ✅ Tidak ada absen dobel per siswa per hari sejak 2026-09-15.
+   - ⏳ Absen H lalu S oleh piket: belum ada kejadian nyata; MCP Supabase read-only jadi tak bisa diuji via transaksi rollback. Uji saat ada siswa sakit sungguhan.
+   - ⏳ Badge Alfa/Sakit/Izin di dasbor siswa: cek setelah Alpha otomatis 15:00 pada siswa yang belum absen.
 
 ### ⏸️ Ditunda (keputusan user)
 - Auth staf per-user dengan role di DB (risiko password bersama diterima)
