@@ -227,7 +227,7 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 - Toggle button ada di header setiap halaman
 - Semantic colors (emerald, amber, rose, indigo) dibiarkan hardcoded karena masuk akal di kedua tema
 - `#modal-detail-siswa` (Guru Piket) sengaja tetap gelap di kedua tema — elemen baru di dalamnya pakai gaya gelap
-- **Debug HP via adb:** `adb` ada di `%LOCALAPPDATA%\Android\Sdk\platform-toolsdb.exe` (tidak di PATH). `adb shell dumpsys location` menunjukkan permintaan GPS app (`com.example.thhk_connect`), interval, dan kapan lokasi HP dinyalakan/dimatikan. `adb exec-out screencap -p > x.png` untuk screenshot. `adb shell cmd location set-location-enabled true|false` untuk uji lokasi mati/nyala.
+- **Debug HP via adb:** `adb` ada di `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` (tidak di PATH). `adb shell dumpsys location` menunjukkan permintaan GPS app (`com.example.thhk_connect`), interval, dan kapan lokasi HP dinyalakan/dimatikan. `adb exec-out screencap -p > x.png` untuk screenshot. `adb shell cmd location set-location-enabled true|false` untuk uji lokasi mati/nyala.
 - **MCP Supabase `supabase-thhk` hanya bisa baca** (read-only transaction) — INSERT/UPDATE/rollback-test tidak bisa; perubahan DB lewat file SQL yang dijalankan user.
 - **Tidak ada akun siswa uji** — semua 51 siswa (kelas 7: 10, 8: 14, 9: 27) nyata. Jangan tulis absen uji tanpa izin user.
 - **Uji `guru_piket.html` lokal:** tanpa sesi staf, `logoutPiket()` mengalihkan ke `index.html`. Buat salinan sementara dengan redirect dihapus, sajikan `python -m http.server`, lalu hapus salinannya. Chrome user biasanya sudah punya sesi staf di situs live (bisa untuk uji baca `rekap.html`).
