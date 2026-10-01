@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' hide ServiceStatus;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +51,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   InAppWebViewController? webViewController;
   double _progress = 0;
   StreamSubscription<Position>? _positionStream;
+  StreamSubscription<ServiceStatus>? _serviceStatusStream;
 
   // Halaman web tetap di memori selama app di latar belakang, sehingga update
   // web tak terlihat. Muat ulang jika app dibuka lagi setelah lama ditinggal.
@@ -83,12 +84,26 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _startLocationUpdates();
+    // Lokasi HP bisa dimatikan/dinyalakan saat app terbuka: stream lama berhenti,
+    // jadi mulai ulang saat nyala, dan buang koordinat lama saat mati.
+    _serviceStatusStream = Geolocator.getServiceStatusStream().listen((status) {
+      if (status == ServiceStatus.enabled) {
+        _startLocationUpdates();
+      } else {
+        webViewController?.evaluateJavascript(source: '''
+          window.Android = window.Android || {};
+          window.Android.getNativeLocation = function() { return null; };
+          window.Android.getLocation = function() { return null; };
+        ''');
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _positionStream?.cancel();
+    _serviceStatusStream?.cancel();
     super.dispose();
   }
 
@@ -129,6 +144,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           )
         : const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 0);
 
+    await _positionStream?.cancel();
     _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
       (Position position) => _injectLocationToWeb(position),
       onError: (error) => debugPrint("GPS Stream error: $error"),
