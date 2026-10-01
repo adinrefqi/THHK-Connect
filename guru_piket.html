@@ -870,6 +870,10 @@
 
                 <!-- Print Habit Report Action -->
                 <div class="mt-5 pt-4 border-t border-slate-800/80">
+                    <label for="print-habit-month"
+                        class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Bulan Laporan</label>
+                    <input type="month" id="print-habit-month" style="color-scheme: dark"
+                        class="w-full mb-3 bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
                     <button onclick="printStudentHabitReport()"
                         class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-98 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/25 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2446,11 +2450,16 @@
                 alert("ID Siswa tidak ditemukan.");
                 return;
             }
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const year = now.getFullYear();
+            const thisMonth = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(0, 7);
+            const [year, month] = (document.getElementById('print-habit-month').value || thisMonth).split('-').map(Number);
             window.open(`print_habit.html?id=${currentDetailStudentId}&month=${month}&year=${year}`, '_blank');
         }
+
+        // Default bulan laporan = bulan berjalan (WIB); bulan lalu tetap bisa dipilih (mis. di awal bulan)
+        (() => {
+            const el = document.getElementById('print-habit-month');
+            el.value = el.max = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }).slice(0, 7);
+        })();
 
         // ========== THEME TOGGLE ==========
         function initTheme() {
