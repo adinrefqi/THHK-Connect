@@ -1,7 +1,7 @@
 # Project Context — THHK Connect
 
 > Catatan kerja agar pekerjaan bisa dilanjutkan kapan saja (boleh istirahat di tengah jalan).
-> Terakhir diperbarui: 2026-09-30
+> Terakhir diperbarui: 2026-10-01
 
 ---
 
@@ -173,21 +173,7 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 
 ---
 
-## ✅ Sudah Selesai
-
-### index.html — SELESAI & terverifikasi
-- Light mode readability fixes (66 → 2 elemen)
-- Dark/Light mode toggle implementation
-- Morys superuser access
-
-### Semua Halaman HTML
-- Dark/Light mode toggle buttons di header
-- Theme persistence di localStorage
-- Icon toggle (sun/moon) sesuai tema aktif
-
----
-
-## 📌 Progres (per 2026-09-30)
+## 📌 Progres (per 2026-10-01)
 
 ### ✅ Sudah
 1. Fix teks tak terlihat di light mode (`index.html`)
@@ -211,12 +197,13 @@ CSS variables (`--text-primary`, dll.) di `:root` (dark) dan `[data-theme="light
 19. **Guru Piket logout saat sesi staf habis** (2026-09-30, `dad9de3`): token staf berlaku 12 jam; sebelumnya dasbor tetap tampil dengan token kedaluwarsa dan polling bullying gagal diam-diam (error 400 di log). `checkPendingBullyingBadge` (saat buka & tiap 30 dtk) kini mengarahkan ke login jika token ditolak.
 20. **RPC tanpa token dicabut** (2026-09-30, `hapus_rpc_tanpa_token.sql` **sudah dijalankan & dicek**): `reset_device_siswa(uuid)` dan `proses_absen_piket(uuid,text,text)` versi lama (siapa pun bisa buka kunci HP / catat absen) dihapus; `update_admin_password`, `upsert_teacher_with_hash`, `verify_teacher_login` (tabel `admins`/`teachers`, tidak dipakai aplikasi ini — dikonfirmasi user) dicabut dari anon/authenticated. Versi bertoken tetap ada.
 21. **Tabel terbuka dikunci ulang** (2026-09-30, bagian bawah `hapus_rpc_tanpa_token.sql` **sudah dijalankan & dicek**): `settings` (geofence) ternyata RLS mati & anon bisa tulis → dikunci lagi (anon hanya SELECT, tulis lewat `update_geofence` bertoken); `teachers`/`teachers_safe` dan `sintadu_teachers` (app SINTADU sudah tidak dipakai — dikonfirmasi user) ditutup dari anon. Data tetap ada.
+22. **Status hari ini di dasbor siswa** (2026-09-30, `eeba9cb`): badge memakai kolom `status` dari DB → tampil Hadir/Terlambat/Sakit/Izin/Alfa (sebelumnya A dan S/I dari guru piket tampil "Hadir"). Jika A, tombol absen merah "❌ Tercatat Alfa — hubungi guru piket" dan tidak lagi ditimpa loop GPS.
 
 ### ⏳ Belum
 1. **Pastikan aplikasi yang dipakai siswa sebelum menyebar APK 1.0.2.** Di HP user ada dua app: `com.finansial.thhkconnect` v1.1 (lama, dipasang 31 Mei, kode TIDAK ada di repo ini) dan `com.example.thhk_connect` (Flutter, repo ini). Jika siswa memakai yang lama, APK Flutter terpasang sebagai app KEDUA (bukan update) → ID perangkat berbeda → kemungkinan harus reset kunci HP siswa.
 2. **Push notif via Firebase (#15)** — pasang Firebase Messaging di APK (`google-services.json`), panggil `register_device_token`; butuh project Firebase.
-6. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
-7. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan.
+3. **Data absen dobel lama** tidak dihapus (rekap sudah memakai log terbaru) — opsional dibersihkan.
+4. **Uji manual** perbaikan di browser & HP (belum dilakukan setelah deploy): absen H lalu S untuk siswa sama, cetak laporan kebiasaan, rekap ganti bulan, badge Alfa/Sakit/Izin di dasbor siswa.
 
 ### ⏸️ Ditunda (keputusan user)
 - Auth staf per-user dengan role di DB (risiko password bersama diterima)
